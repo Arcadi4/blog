@@ -4,7 +4,7 @@
   --background: #fafafa;
   --foreground: #0f0f0f;
   --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: "Bricolage Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-title: "Bricolage Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
@@ -16,11 +16,30 @@
   --font-mono: var(--font-mono);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.title {
+  font-family: var(--font-title);
+}
+
+@layer components {
+  .h1-hero {
+    @apply text-8xl font-bold text-black leading-none;
+  }
+}
+
 @theme inline {
   --color-acid: #c3ff00;
   --color-klein: #0048ff;
   --color-magenta: #ff00a6;
 }
+
+/* 
+Dark mode not designed yet. This is just a placeholder for when I do design it.
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -28,6 +47,7 @@
     --foreground: #fafafa;
   }
 }
+*/
 
 body {
   background: var(--background);
@@ -38,3 +58,4 @@ body {
 .font-display {
   font-family: var(--font-display);
 }
+

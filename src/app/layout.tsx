@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
-import "./globals.css";
 import Header from "@/components/Header";
+import "./global.css";
 
 export const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   title: "My Personal Blog",
   description: "A personal blog built with Next.js, TypeScript, and Tailwind CSS",
 };
+
+
 
 export default function RootLayout({
   children,
