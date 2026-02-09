@@ -37,7 +37,7 @@ export default function About() {
           </h2>
           
           <p className="text-zinc-700 dark:text-zinc-300">
-            Feel free to reach out if you'd like to connect or collaborate on projects.
+            Feel free to reach out if you&apos;d like to connect or collaborate on projects.
             You can find me on various platforms or drop me an email.
           </p>
         </div>
