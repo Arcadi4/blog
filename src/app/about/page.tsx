@@ -10,17 +10,17 @@ export default function About() {
         <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-8">
           About Me
         </h1>
-        
+
         <div className="prose prose-zinc dark:prose-invert max-w-none">
           <p className="text-lg text-zinc-700 dark:text-zinc-300 mb-6">
-            Welcome to my personal blog! This is a space where I share my thoughts, 
+            Welcome to my personal blog! This is a space where I share my thoughts,
             experiences, and knowledge about web development and technology.
           </p>
 
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-8 mb-4">
             About This Blog
           </h2>
-          
+
           <p className="text-zinc-700 dark:text-zinc-300 mb-4">
             This blog is built with modern web technologies:
           </p>
@@ -35,7 +35,7 @@ export default function About() {
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mt-8 mb-4">
             Get In Touch
           </h2>
-          
+
           <p className="text-zinc-700 dark:text-zinc-300">
             Feel free to reach out if you&apos;d like to connect or collaborate on projects.
             You can find me on various platforms or drop me an email.
