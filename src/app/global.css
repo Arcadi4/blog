@@ -28,7 +28,15 @@ h6,
 
 @layer components {
   .h1-hero {
-    @apply text-8xl font-bold text-black leading-none;
+    @apply text-9xl font-bold text-black leading-none;
+  }
+
+  .large-p {
+    @apply text-2xl;
+  }
+  
+  .large-link {
+    @apply text-5xl leading-16;
   }
 }
 
@@ -53,15 +61,26 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  --link-bg: var(--background);
 }
 
 .font-display {
   font-family: var(--font-display);
 }
 
+.bg-acid {
+  --link-bg: var(--color-acid);
+}
+
+.bg-white {
+  --link-bg: #ffffff;
+}
+
 /* ── Animated Link ─────────────────────────────────────── */
 
 .animated-link {
+  display: inline-block;
+  width: fit-content;
   position: relative;
   text-decoration: none;
   cursor: pointer;
@@ -72,10 +91,9 @@ body {
    * transitions to 100 % on hover → left-to-right reveal.
    */
   background-image: linear-gradient(currentColor, currentColor);
-  background-position: 0% 92
-  %;
+  background-position: 0 calc(92%);
   background-repeat: no-repeat;
-  background-size: 0% var(--underline-thickness, 1.5px);
+  background-size: 0% var(--underline-thickness, 2px);
   transition: background-size 0.4s cubic-bezier(0.33, 0, 0.2, 1);
 
   /*
@@ -96,7 +114,7 @@ body {
 
 .animated-link:hover,
 .animated-link:focus-visible {
-  background-size: 100% var(--underline-thickness, 1.5px);
+  background-size: 100% var(--underline-thickness, 2px);
 }
 
 /* Remove the shadow mask when text is selected so
