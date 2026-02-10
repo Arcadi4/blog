@@ -1,6 +1,6 @@
 import { getPostData, getAllPostSlugs } from '@/lib/posts';
 import { formatDate } from '@/lib/utils';
-import Link from 'next/link';
+import Link from '@/components/Link';
 
 export async function generateStaticParams() {
   const posts = getAllPostSlugs();
@@ -9,7 +9,7 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string; }>; }) {
   const { slug } = await params;
   const post = await getPostData(slug);
   return {
@@ -18,34 +18,35 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function Post({ params }: { params: Promise<{ slug: string }> }) {
+export default async function Post({ params }: { params: Promise<{ slug: string; }>; }) {
   const { slug } = await params;
   const post = await getPostData(slug);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <article className="max-w-3xl mx-auto px-6 py-12">
-        <Link 
-          href="/" 
-          className="text-blue-600 dark:text-blue-400 hover:underline mb-8 inline-block"
-        >
-          ← Back to all posts
-        </Link>
-        
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-            {post.title}
-          </h1>
-          <time className="text-zinc-500 dark:text-zinc-500">
-            {formatDate(post.date)}
-          </time>
-        </header>
+    <main className="min-h-dvh flex flex-col">
+      <section className="bg-acid border-b-2 border-b-black">
+        <div className="max-w-4xl mx-auto px-6 py-10">
+          <Link href="/" className="large-p">
+            ← Back to all posts
+          </Link>
+        </div>
+      </section>
 
-        <div 
-          className="prose prose-zinc dark:prose-invert max-w-none prose-headings:text-zinc-900 dark:prose-headings:text-zinc-100 prose-p:text-zinc-700 dark:prose-p:text-zinc-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-strong:text-zinc-900 dark:prose-strong:text-zinc-100 prose-code:text-zinc-900 dark:prose-code:text-zinc-100"
-          dangerouslySetInnerHTML={{ __html: post.content || '' }}
-        />
-      </article>
-    </div>
+      <section className="bg-white border-b-2 border-l-2 border-r-2 border-black flex-1">
+        <article className="max-w-4xl mx-auto px-6 py-12">
+          <header className="mb-10">
+            <h1 className="h1-hero text-6xl mb-4">
+              {post.title}
+            </h1>
+            <time className="large-p">{formatDate(post.date)}</time>
+          </header>
+
+          <div
+            className="prose max-w-none prose-headings:font-[var(--font-title)] prose-headings:text-black prose-p:text-black/80 prose-li:text-black/80 prose-strong:text-black prose-a:text-black prose-a:underline prose-a:decoration-black prose-code:text-black prose-code:bg-black/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-black prose-pre:text-white prose-blockquote:text-black/70"
+            dangerouslySetInnerHTML={{ __html: post.content || '' }}
+          />
+        </article>
+      </section>
+    </main>
   );
 }
