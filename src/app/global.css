@@ -70,16 +70,18 @@ body {
   cursor: none;
 }
 
-.font-display {
-  font-family: var(--font-display);
-}
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
 
-.bg-acid {
-  --link-bg: var(--color-acid);
-}
+  .bg-acid {
+    --link-bg: var(--color-acid);
+  }
 
-.bg-white {
-  --link-bg: #ffffff;
+  .bg-white {
+    --link-bg: #ffffff;
+  }
 }
 
 /* ── Animated Link ─────────────────────────────────────── */
