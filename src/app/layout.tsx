@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import Header from "@/components/Header";
+import CustomCursor from "@/components/CustomCursor";
 import "./global.css";
 
 export const bricolageGrotesque = Bricolage_Grotesque({
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className={`${bricolageGrotesque.variable} ${bricolageGrotesque.variable} antialiased`}>
         <Header />
         {children}
+        <CustomCursor />
       </body>
     </html>
   );
