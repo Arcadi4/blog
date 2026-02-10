@@ -1,0 +1,13 @@
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 999px;
+  background: var(--color-klein, #0048ff);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 1;
+  transition: transform 250ms cubic-bezier(0.2, 0.7, 0.2, 0.7);
+  will-change: transform;
+}

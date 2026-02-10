@@ -3,6 +3,8 @@ import { Bricolage_Grotesque } from "next/font/google";
 import Header from "@/components/Header";
 import CustomCursor from "@/components/CustomCursor";
 import "./global.css";
+import "../styles/animated-link.css";
+import "../styles/custom-cursor.css";
 
 export const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -11,11 +13,9 @@ export const bricolageGrotesque = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "My Personal Blog",
+  title: "Nextjs", //TODO: This is a placeholder
   description: "A personal blog built with Next.js, TypeScript, and Tailwind CSS",
 };
-
-
 
 export default function RootLayout({
   children,
