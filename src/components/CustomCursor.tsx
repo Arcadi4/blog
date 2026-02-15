@@ -6,7 +6,6 @@ const CURSOR_SIZE = 28;
 
 export default function CustomCursor() {
     const [position, setPosition] = useState({ x: -100, y: -100 });
-    const [enabled, setEnabled] = useState(false);
     const [isInteractive, setIsInteractive] = useState(false);
 
     useEffect(() => {
@@ -15,7 +14,6 @@ export default function CustomCursor() {
             return;
         }
 
-        setEnabled(true);
 
         const handlePointerMove = (event: PointerEvent) => {
             setPosition({ x: event.clientX, y: event.clientY });
@@ -39,16 +37,12 @@ export default function CustomCursor() {
         };
     }, []);
 
-    if (!enabled) {
-        return null;
-    }
-
     const scale = isInteractive ? 1.6 : 1;
 
     return (
         <div
             aria-hidden="true"
-            className="custom-cursor"
+            className="custom-cursor hidden md:block"
             style={{
                 width: CURSOR_SIZE,
                 height: CURSOR_SIZE,
