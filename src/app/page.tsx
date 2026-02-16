@@ -10,13 +10,13 @@ const latestPosts = posts.slice(0, 3);
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ homeName?: string; }>;
+  searchParams: Promise<{ homeName?: string }>;
 }) {
   const params = await searchParams;
   const homeName = params.homeName;
   const displayName =
     homeName &&
-      crypto.createHash("md5").update(homeName).digest("hex") ===
+    crypto.createHash("md5").update(homeName).digest("hex") ===
       "441be6a1cc1cc50f35b95395f20f6b55"
       ? homeName
       : "4rcadia";
@@ -29,14 +29,19 @@ export default async function Home({
         *
       </p>
       <section className="h-64 border-b-2 border-b-black">
-        <div className="h-full flex flex-row ">
-          <h1 className="h1-hero min-w-3/4 pl-14 select-none self-center">
-            {displayName}&apos;s<br />Blog
+        <div className="flex flex-row">
+          <h1 className="h1-hero min-w-3/4 pl-14 pt-4 select-none self-center">
+            {displayName}&apos;s
+            <br />
+            Blog
           </h1>
           <div className="relative h-full">
             <div className="absolute bg-magenta h-80 w-16 right-full -z-30" />
-            <div className=" flex flex-col pl-2 pt-2">
-              <ProximityLink href="https://github.com/arcadi4" className="large-link">
+            <div className=" flex flex-col pl-2 ">
+              <ProximityLink
+                href="https://github.com/arcadi4"
+                className="large-link"
+              >
                 GitHub
               </ProximityLink>
               <ProximityLink
@@ -46,15 +51,17 @@ export default async function Home({
                 bilibili
               </ProximityLink>
               <ProximityLink
-                href="https://x.com/_4rcadia" className="large-link">
+                href="https://x.com/_4rcadia"
+                className="large-link"
+              >
                 Twitter
               </ProximityLink>
             </div>
           </div>
         </div>
       </section>
-      <div className={"h-16 border-b-2 border-b-black"} />
-      <div className={"border-b-2 border-b-black "}>
+      <div className="h-16 border-b-2 border-b-black" />
+      <div className="border-b-2 border-b-black ">
         <div className="flex flex-row">
           <p className="large-p pl-16 min-w-3/4">LATEST ARTICLES</p>
           <div className="flex flex-col pl-2">
@@ -79,7 +86,7 @@ export default async function Home({
             {latestPosts.map((post) => (
               <article className="relative flex flex-row gap-4" key={post.slug}>
                 <div className="absolute h-full w-6 bg-klein " />
-                <div className="absolute h-full w-1/3 left-full bg-klein " />
+                <div className="absolute h-full w-1/3 left-full bg-klein" />
                 <div className="w-96 pl-16">
                   <Link href={`/posts/${post.slug}`} className="large-p">
                     {post.title}
