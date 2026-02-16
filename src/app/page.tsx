@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { getSortedPostsData } from "@/lib/posts";
 import { formatDate } from "@/lib/utils";
 import ProximityLink from "@/components/ProximityLink";
-import { TextEntrance } from "@/components/animations/EntranceText";
+import { SimpleEntrance } from "@/components/animations/EntranceSimple";
 import { StretchEntrance } from "@/components/animations/EntranceStretch";
 
 export default async function Home({
@@ -23,7 +23,7 @@ export default async function Home({
   const posts = getSortedPostsData();
   const latestPosts = posts.slice(0, 3);
 
-  const socialMediaLinks = [
+  const socialMediaItems = [
     { name: "GitHub", href: "https://github.com/arcadi4" },
     { name: "Bilibili", href: "https://space.bilibili.com/499244418" },
     { name: "Twitter", href: "https://x.com/_4rcadia" },
@@ -41,8 +41,13 @@ export default async function Home({
   const menuPartOne = menuItems.slice(0, 4);
   const menuPartTwo = menuItems.slice(4);
 
-  let linkAnimationOrder = 0;
-  const delayPerLink = 100;
+  let menuAnimationIndex = 0;
+  const delayPerMenuItem = 100;
+
+  const linkBaseDelay = 1200;
+  const lineBaseDelay = 800;
+  const patternBaseDelay = 100;
+  const articlesBaseDelay = 1400;
 
   return (
     <main className="relative min-h-[166dvh] flex flex-col">
@@ -69,17 +74,17 @@ export default async function Home({
           <div className="relative h-full">
             <div className="absolute bg-magenta h-80 w-16 right-full -z-30" />
             <div className="flex flex-col pl-2">
-              {socialMediaLinks.map((link) => {
-                linkAnimationOrder++;
+              {socialMediaItems.map((link) => {
+                menuAnimationIndex++;
                 return (
-                  <TextEntrance
+                  <SimpleEntrance
                     key={link.name}
-                    delayMs={linkAnimationOrder * delayPerLink}
+                    delayMs={menuAnimationIndex * delayPerMenuItem}
                   >
                     <ProximityLink href={link.href} className="large-link">
                       {link.name}
                     </ProximityLink>
-                  </TextEntrance>
+                  </SimpleEntrance>
                 );
               })}
             </div>
@@ -99,16 +104,16 @@ export default async function Home({
           <p className="large-p pl-16 min-w-3/4">LATEST ARTICLES</p>
           <div className="flex flex-col pl-2">
             {menuPartOne.map((link) => {
-              linkAnimationOrder++;
+              menuAnimationIndex++;
               return (
-                <TextEntrance
+                <SimpleEntrance
                   key={link.name}
-                  delayMs={linkAnimationOrder * delayPerLink}
+                  delayMs={menuAnimationIndex * delayPerMenuItem}
                 >
                   <ProximityLink href={link.href} className="large-link">
                     {link.name}
                   </ProximityLink>
-                </TextEntrance>
+                </SimpleEntrance>
               );
             })}
           </div>
@@ -138,16 +143,16 @@ export default async function Home({
         <div className="flex flex-col justify-between items-start">
           <div className="relative flex flex-col pl-2">
             {menuPartTwo.map((link) => {
-              linkAnimationOrder++;
+              menuAnimationIndex++;
               return (
-                <TextEntrance
+                <SimpleEntrance
                   key={link.name}
-                  delayMs={linkAnimationOrder * delayPerLink}
+                  delayMs={menuAnimationIndex * delayPerMenuItem}
                 >
                   <ProximityLink href={link.href} className="large-link">
                     {link.name}
                   </ProximityLink>
-                </TextEntrance>
+                </SimpleEntrance>
               );
             })}
             <div className="absolute bg-magenta h-96 w-16 top-full translate-y-4 -z-30" />

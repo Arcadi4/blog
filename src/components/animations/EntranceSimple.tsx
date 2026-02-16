@@ -13,7 +13,7 @@ const distanceClass: Record<TextFrom, Record<Distance, string>> = {
   right: { sm: "-translate-x-2", md: "-translate-x-4", lg: "-translate-x-8" },
 };
 
-type TextEntranceProps = {
+type SimpleEntranceProps = {
   as?: keyof JSX.IntrinsicElements;
   children: React.ReactNode;
   from?: TextFrom;
@@ -24,7 +24,7 @@ type TextEntranceProps = {
   disabled?: boolean;
 };
 
-export function TextEntrance({
+export function SimpleEntrance({
   as: Tag = "div",
   children,
   from = "up",
@@ -33,7 +33,7 @@ export function TextEntrance({
   durationMs = 1000,
   className = "",
   disabled = false,
-}: TextEntranceProps) {
+}: SimpleEntranceProps) {
   const { entered, reduceMotion } = useEntranceAnimation({ delayMs, disabled });
 
   // Tailwind 的 duration-[] 是 arbitrary value，能用，但更建议写 style 确保可控
