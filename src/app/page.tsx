@@ -24,18 +24,19 @@ export default async function Home({
     <main className="min-h-[166dvh] flex flex-col">
       <div className="absolute bg-acid right-0 top-0 h-128 w-1/2 -z-50" />
       <div className="absolute bg-none left-0 top-0 h-screen w-12 border-r-2 border-r-black" />
+      <p className="absolute -left-1/12 -top-1/2 text-[768pt] font-serif text-acid -z-10">
+        *
+      </p>
       <section className=" h-64 border-b-2 border-b-black">
         <div className="h-full flex flex-row ">
-          <h1 className=" h1-hero min-w-3/4 pt-4 pl-14 select-none">
+          <h1 className="h1-hero min-w-3/4 pl-14 select-none self-center">
             {displayName}&apos;s
             <br />
             Blog
           </h1>
           <div className="relative h-full">
-            <div
-              className={"absolute bg-magenta h-80 w-16 -right-full -z-10"}
-            />
-            <div className=" flex flex-col pl-4 mt-4">
+            <div className="absolute bg-magenta h-80 w-16 right-full -z-30" />
+            <div className=" flex flex-col pl-2 pt-2">
               <Link href="https://github.com/arcadi4" className="large-link">
                 GitHub
               </Link>
@@ -43,7 +44,7 @@ export default async function Home({
                 href="https://space.bilibili.com/499244418"
                 className="large-link"
               >
-                Bilibili
+                bilibili
               </Link>
               <Link href="https://x.com/_4rcadia" className="large-link">
                 Twitter
@@ -52,9 +53,6 @@ export default async function Home({
           </div>
         </div>
       </section>
-      {/*<p className="absolute select-none text-[768pt] text-magenta font-serif font-medium -z-30 left-0 -top-72">*/}
-      {/*  **/}
-      {/*</p>*/}
       <div className={"h-16 border-b-2 border-b-black"} />
       <div className={"border-b-2 border-b-black "}>
         <div className="flex flex-row">
@@ -80,10 +78,8 @@ export default async function Home({
           <div className="flex flex-col gap-8 max-w-2/3">
             {latestPosts.map((post) => (
               <article className="relative flex flex-row gap-4" key={post.slug}>
-                <div className={"absolute h-full w-6 bg-klein -z-10"} />
-                <div
-                  className={"absolute h-full w-1/3 left-full bg-klein -z-10"}
-                />
+                <div className="absolute h-full w-6 bg-klein " />
+                <div className="absolute h-full w-1/3 left-full bg-klein " />
                 <div className="w-96 pl-16">
                   <Link href={`/posts/${post.slug}`} className="large-p">
                     {post.title}
@@ -95,7 +91,7 @@ export default async function Home({
             ))}
           </div>
         </div>
-        <div className="absolute font-title font-bold text-[640pt] text-stroke right-0 -top-32 select-none">
+        <div className="absolute font-title font-bold text-[640pt] text-stroke left-1/2 -top-32 select-none -z-10">
           &
         </div>
         <div className="flex flex-col justify-between items-start">
@@ -106,9 +102,7 @@ export default async function Home({
             <Link href="/all" className="large-link">
               All Posts
             </Link>
-            <div
-              className={"absolute bg-magenta h-96 w-16 top-full translate-y-4"}
-            />
+            <div className="absolute bg-magenta h-96 w-16 top-full translate-y-4 -z-30" />
           </div>
         </div>
       </section>
