@@ -13,7 +13,7 @@ const originClass: Record<StretchFrom, string> = {
 };
 
 type EntranceStretchProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode; // made optional
   from?: StretchFrom;
   delayMs?: number;
   durationMs?: number;
@@ -30,7 +30,7 @@ type EntranceStretchProps = {
  * - from left/right => scale-x
  * - from top/bottom => scale-y
  */
-export function EntranceStretch({
+export function StretchEntrance({
   children,
   from = "left",
   delayMs = 0,
@@ -39,6 +39,7 @@ export function EntranceStretch({
   disabled = false,
   fade = false,
 }: EntranceStretchProps) {
+  // Call hook unconditionally to satisfy Rules of Hooks
   const { entered, reduceMotion } = useEntranceAnimation({ delayMs, disabled });
 
   const style: React.CSSProperties = reduceMotion

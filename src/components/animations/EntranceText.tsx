@@ -30,7 +30,7 @@ export function TextEntrance({
   from = "up",
   distance = "md",
   delayMs = 0,
-  durationMs = 600,
+  durationMs = 1000,
   className = "",
   disabled = false,
 }: TextEntranceProps) {
