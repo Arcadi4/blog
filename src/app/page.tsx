@@ -44,8 +44,8 @@ export default async function Home({
   let menuAnimationIndex = 0;
   const delayPerMenuItem = 100;
 
-  const patternBaseDelay = 0;
-  const lineBaseDelay = 400;
+  const backgroundBaseDelay = 0;
+  const figureBaseDelay = 400;
   const menuBaseDelay = 800;
   const articlesBaseDelay = 1400;
 
@@ -53,7 +53,7 @@ export default async function Home({
     <main className="relative min-h-[166dvh] flex flex-col">
       <StretchEntrance
         from="right"
-        delayMs={lineBaseDelay}
+        delayMs={figureBaseDelay}
         className="absolute bg-acid right-0 top-0 h-128 w-1/2 -z-50"
       />
       <StretchEntrance
@@ -63,7 +63,7 @@ export default async function Home({
       />
       <SimpleEntrance
         durationMs={450}
-        delayMs={patternBaseDelay}
+        delayMs={backgroundBaseDelay}
         className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10"
       >
         *
@@ -71,7 +71,7 @@ export default async function Home({
       <section className="relative h-64">
         <StretchEntrance
           from="left"
-          delayMs={lineBaseDelay + 200}
+          delayMs={figureBaseDelay + 200}
           className="absolute w-full bottom-0 border-b-2 border-b-black"
         />
         <div className="flex flex-row">
@@ -83,7 +83,7 @@ export default async function Home({
           <div className="relative h-full">
             <StretchEntrance
               from="top"
-              delayMs={lineBaseDelay}
+              delayMs={figureBaseDelay}
               className="absolute bg-magenta h-80 w-16 right-full -z-30"
             />
             <div className="flex flex-col pl-2">
@@ -108,13 +108,13 @@ export default async function Home({
       </section>
       <StretchEntrance
         from="left"
-        delayMs={lineBaseDelay + 100}
+        delayMs={figureBaseDelay + 100}
         className="h-16 w-full border-b-2 border-b-black"
       />
       <section className="relative">
         <StretchEntrance
           from="left"
-          delayMs={lineBaseDelay}
+          delayMs={figureBaseDelay}
           className="absolute bottom-0 w-full border-b-2 border-b-black"
         />
         <div className="flex flex-row">
@@ -181,7 +181,7 @@ export default async function Home({
         </div>
         <SimpleEntrance
           durationMs={450}
-          delayMs={patternBaseDelay}
+          delayMs={backgroundBaseDelay}
           className="absolute font-title font-bold text-[640pt] text-stroke left-1/2 -top-32 select-none -z-10"
         >
           &
@@ -205,7 +205,7 @@ export default async function Home({
             })}
             <StretchEntrance
               from="bottom"
-              delayMs={lineBaseDelay + 200}
+              delayMs={figureBaseDelay + 200}
               className="absolute bg-magenta h-96 w-16 top-full translate-y-4 -z-30"
             />
           </div>
