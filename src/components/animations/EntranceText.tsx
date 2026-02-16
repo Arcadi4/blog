@@ -1,7 +1,7 @@
 "use client";
 
 import React, { JSX } from "react";
-import { useEnterAnimation } from "./useEnterAnimation";
+import { useEntranceAnimation } from "./useEntranceAnimation";
 
 type TextFrom = "up" | "down" | "left" | "right";
 type Distance = "sm" | "md" | "lg";
@@ -13,7 +13,7 @@ const distanceClass: Record<TextFrom, Record<Distance, string>> = {
   right: { sm: "-translate-x-2", md: "-translate-x-4", lg: "-translate-x-8" },
 };
 
-type TextAnimatedEntranceProps = {
+type TextEntranceProps = {
   as?: keyof JSX.IntrinsicElements;
   children: React.ReactNode;
   from?: TextFrom;
@@ -24,7 +24,7 @@ type TextAnimatedEntranceProps = {
   disabled?: boolean;
 };
 
-export function TextAnimatedEntrance({
+export function TextEntrance({
   as: Tag = "div",
   children,
   from = "up",
@@ -33,8 +33,8 @@ export function TextAnimatedEntrance({
   durationMs = 600,
   className = "",
   disabled = false,
-}: TextAnimatedEntranceProps) {
-  const { entered, reduceMotion } = useEnterAnimation({ delayMs, disabled });
+}: TextEntranceProps) {
+  const { entered, reduceMotion } = useEntranceAnimation({ delayMs, disabled });
 
   // Tailwind 的 duration-[] 是 arbitrary value，能用，但更建议写 style 确保可控
   const style: React.CSSProperties = reduceMotion

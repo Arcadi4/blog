@@ -18,7 +18,7 @@ function prefersReducedMotion(): boolean {
  * 在组件挂载后触发 enter=true（支持延迟）。
  * 用于 “mount 时播放” 的 class 切换。
  */
-export function useEnterAnimation(options: EnterOptions = {}) {
+export function useEntranceAnimation(options: EnterOptions = {}) {
   const { delayMs = 0, disabled = false } = options;
   const [entered, setEntered] = useState(false);
 

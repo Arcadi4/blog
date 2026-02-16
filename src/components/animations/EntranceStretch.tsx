@@ -1,20 +1,20 @@
 "use client";
 
 import React from "react";
-import { useEnterAnimation } from "./useEnterAnimation";
+import { useEntranceAnimation } from "./useEntranceAnimation";
 
-type RevealFrom = "left" | "right" | "top" | "bottom";
+type StretchFrom = "left" | "right" | "top" | "bottom";
 
-const originClass: Record<RevealFrom, string> = {
+const originClass: Record<StretchFrom, string> = {
   left: "origin-left",
   right: "origin-right",
   top: "origin-top",
   bottom: "origin-bottom",
 };
 
-type AnimatedRevealProps = {
+type EntranceStretchProps = {
   children: React.ReactNode;
-  from?: RevealFrom;
+  from?: StretchFrom;
   delayMs?: number;
   durationMs?: number;
   className?: string;
@@ -30,7 +30,7 @@ type AnimatedRevealProps = {
  * - from left/right => scale-x
  * - from top/bottom => scale-y
  */
-export function AnimatedReveal({
+export function EntranceStretch({
   children,
   from = "left",
   delayMs = 0,
@@ -38,8 +38,8 @@ export function AnimatedReveal({
   className = "",
   disabled = false,
   fade = false,
-}: AnimatedRevealProps) {
-  const { entered, reduceMotion } = useEnterAnimation({ delayMs, disabled });
+}: EntranceStretchProps) {
+  const { entered, reduceMotion } = useEntranceAnimation({ delayMs, disabled });
 
   const style: React.CSSProperties = reduceMotion
     ? {}

@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { getSortedPostsData } from "@/lib/posts";
 import { formatDate } from "@/lib/utils";
 import ProximityLink from "@/components/ProximityLink";
-import { TextAnimatedEntrance } from "@/components/animations/EntranceText";
+import { TextEntrance } from "@/components/animations/EntranceText";
 
 export default async function Home({
   searchParams,
@@ -63,14 +63,14 @@ export default async function Home({
               {socialMediaLinks.map((link) => {
                 linkAnimationOrder++;
                 return (
-                  <TextAnimatedEntrance
+                  <TextEntrance
                     key={link.name}
                     delayMs={linkAnimationOrder * delayPerLink}
                   >
                     <ProximityLink href={link.href} className="large-link">
                       {link.name}
                     </ProximityLink>
-                  </TextAnimatedEntrance>
+                  </TextEntrance>
                 );
               })}
             </div>
@@ -85,14 +85,14 @@ export default async function Home({
             {menuPartOne.map((link) => {
               linkAnimationOrder++;
               return (
-                <TextAnimatedEntrance
+                <TextEntrance
                   key={link.name}
                   delayMs={linkAnimationOrder * delayPerLink}
                 >
                   <ProximityLink href={link.href} className="large-link">
                     {link.name}
                   </ProximityLink>
-                </TextAnimatedEntrance>
+                </TextEntrance>
               );
             })}
           </div>
@@ -124,14 +124,14 @@ export default async function Home({
             {menuPartTwo.map((link) => {
               linkAnimationOrder++;
               return (
-                <TextAnimatedEntrance
+                <TextEntrance
                   key={link.name}
                   delayMs={linkAnimationOrder * delayPerLink}
                 >
                   <ProximityLink href={link.href} className="large-link">
                     {link.name}
                   </ProximityLink>
-                </TextAnimatedEntrance>
+                </TextEntrance>
               );
             })}
           </div>
