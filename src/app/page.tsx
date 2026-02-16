@@ -4,6 +4,7 @@ import { getSortedPostsData } from "@/lib/posts";
 import { formatDate } from "@/lib/utils";
 import ProximityLink from "@/components/ProximityLink";
 import { TextEntrance } from "@/components/animations/EntranceText";
+import { EntranceStretch } from "@/components/animations/EntranceStretch";
 
 export default async function Home({
   searchParams,
@@ -46,7 +47,9 @@ export default async function Home({
   return (
     <main className="relative min-h-[166dvh] flex flex-col">
       <div className="absolute bg-acid right-0 top-0 h-128 w-1/2 -z-50" />
-      <div className="absolute bg-none left-0 top-0 h-full w-12 border-r-2 border-r-black" />
+      <EntranceStretch from="top" durationMs={2000} className="absolute h-full">
+        <div className="absolute left-0 top-0 h-full w-12 border-r-2 border-r-black" />
+      </EntranceStretch>
       <p className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10">
         *
       </p>
