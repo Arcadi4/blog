@@ -7,12 +7,11 @@ interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 
 /**
  * Animated link component with:
- * - Underline that reveals left-to-right with ease-in-out
- * - text-decoration-skip-ink-like effect via text-shadow
+ * - Underline that fades in on hover via text-decoration-color transition
+ * - Native text-decoration-skip-ink for descender gaps
  *
- * Set CSS variable `--link-bg` on any ancestor to match the
- * background color — this enables the skip-ink effect.
- * The underline and animation work regardless.
+ * Works on any background (solid, gradient, multi-colour) without
+ * needing a colour-matching CSS variable.
  */
 export default function Link({
     href,

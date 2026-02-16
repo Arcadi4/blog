@@ -2,6 +2,7 @@ import Link from "@/components/Link";
 import crypto from "crypto";
 import { getSortedPostsData } from "@/lib/posts";
 import { formatDate } from "@/lib/utils";
+import ProximityLink from "@/components/ProximityLink";
 
 const posts = getSortedPostsData();
 const latestPosts = posts.slice(0, 3);
@@ -9,13 +10,13 @@ const latestPosts = posts.slice(0, 3);
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ homeName?: string }>;
+  searchParams: Promise<{ homeName?: string; }>;
 }) {
   const params = await searchParams;
   const homeName = params.homeName;
   const displayName =
     homeName &&
-    crypto.createHash("md5").update(homeName).digest("hex") ===
+      crypto.createHash("md5").update(homeName).digest("hex") ===
       "441be6a1cc1cc50f35b95395f20f6b55"
       ? homeName
       : "4rcadia";
@@ -27,28 +28,27 @@ export default async function Home({
       <p className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10">
         *
       </p>
-      <section className=" h-64 border-b-2 border-b-black">
+      <section className="h-64 border-b-2 border-b-black">
         <div className="h-full flex flex-row ">
           <h1 className="h1-hero min-w-3/4 pl-14 select-none self-center">
-            {displayName}&apos;s
-            <br />
-            Blog
+            {displayName}&apos;s<br />Blog
           </h1>
           <div className="relative h-full">
             <div className="absolute bg-magenta h-80 w-16 right-full -z-30" />
             <div className=" flex flex-col pl-2 pt-2">
-              <Link href="https://github.com/arcadi4" className="large-link">
+              <ProximityLink href="https://github.com/arcadi4" className="large-link">
                 GitHub
-              </Link>
-              <Link
+              </ProximityLink>
+              <ProximityLink
                 href="https://space.bilibili.com/499244418"
                 className="large-link"
               >
                 bilibili
-              </Link>
-              <Link href="https://x.com/_4rcadia" className="large-link">
+              </ProximityLink>
+              <ProximityLink
+                href="https://x.com/_4rcadia" className="large-link">
                 Twitter
-              </Link>
+              </ProximityLink>
             </div>
           </div>
         </div>
@@ -58,18 +58,18 @@ export default async function Home({
         <div className="flex flex-row">
           <p className="large-p pl-16 min-w-3/4">LATEST ARTICLES</p>
           <div className="flex flex-col pl-2">
-            <Link href="/about" className="large-link">
+            <ProximityLink href="/about" className="large-link">
               About
-            </Link>
-            <Link href="/contact" className="large-link">
+            </ProximityLink>
+            <ProximityLink href="/contact" className="large-link">
               Contact
-            </Link>
-            <Link href="/projects" className="large-link">
+            </ProximityLink>
+            <ProximityLink href="/projects" className="large-link">
               Projects
-            </Link>
-            <Link href="/links" className="large-link">
+            </ProximityLink>
+            <ProximityLink href="/links" className="large-link">
               Friend Links
-            </Link>
+            </ProximityLink>
           </div>
         </div>
       </div>
@@ -96,12 +96,12 @@ export default async function Home({
         </div>
         <div className="flex flex-col justify-between items-start">
           <div className="relative flex flex-col pl-2">
-            <Link href="/tags" className="large-link">
+            <ProximityLink href="/tags" className="large-link">
               Tags
-            </Link>
-            <Link href="/all" className="large-link">
+            </ProximityLink>
+            <ProximityLink href="/all" className="large-link">
               All Posts
-            </Link>
+            </ProximityLink>
             <div className="absolute bg-magenta h-96 w-16 top-full translate-y-4 -z-30" />
           </div>
         </div>

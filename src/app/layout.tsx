@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Playfair_Display } from "next/font/google";
+import { Bricolage_Grotesque, IBM_Plex_Sans, Playfair_Display } from "next/font/google";
 import Header from "@/components/Header";
 import CustomCursor from "@/components/CustomCursor";
 import "./global.css";
 import "../styles/animated-link.css";
+import "../styles/proximity-link.css";
 import "../styles/custom-cursor.css";
 
 export const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--font-display",
-  weight: ["400", "500", "600", "700"],
+  weight: "variable",
+});
+
+export const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: "variable",
 });
 
 export const playfairDisplay = Playfair_Display({
@@ -36,7 +43,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${bricolageGrotesque.variable} ${playfairDisplay.variable} antialiased`}
+        className={`${bricolageGrotesque.variable} ${ibmPlexSans.variable} ${playfairDisplay.variable} antialiased`}
       >
         <Header />
         {children}

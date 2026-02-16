@@ -1,0 +1,7 @@
+.proximity-link {
+    display: inline-block;
+    width: fit-content;
+    position: relative;
+    text-decoration: none;
+    cursor: none;
+}
