@@ -44,25 +44,34 @@ export default async function Home({
   let menuAnimationIndex = 0;
   const delayPerMenuItem = 100;
 
-  const linkBaseDelay = 1200;
-  const lineBaseDelay = 800;
-  const patternBaseDelay = 100;
+  const patternBaseDelay = 0;
+  const lineBaseDelay = 400;
+  const menuBaseDelay = 800;
   const articlesBaseDelay = 1400;
 
   return (
     <main className="relative min-h-[166dvh] flex flex-col">
-      <div className="absolute bg-acid right-0 top-0 h-128 w-1/2 -z-50" />
+      <StretchEntrance
+        from="right"
+        delayMs={lineBaseDelay}
+        className="absolute bg-acid right-0 top-0 h-128 w-1/2 -z-50"
+      />
       <StretchEntrance
         from="bottom"
         durationMs={1200}
         className="absolute left-0 top-0 h-full w-12 border-r-2 border-r-black"
       />
-      <p className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10">
+      <SimpleEntrance
+        durationMs={450}
+        delayMs={patternBaseDelay}
+        className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10"
+      >
         *
-      </p>
+      </SimpleEntrance>
       <section className="relative h-64">
         <StretchEntrance
           from="left"
+          delayMs={lineBaseDelay + 200}
           className="absolute w-full bottom-0 border-b-2 border-b-black"
         />
         <div className="flex flex-row">
@@ -72,14 +81,20 @@ export default async function Home({
             Blog
           </h1>
           <div className="relative h-full">
-            <div className="absolute bg-magenta h-80 w-16 right-full -z-30" />
+            <StretchEntrance
+              from="top"
+              delayMs={lineBaseDelay}
+              className="absolute bg-magenta h-80 w-16 right-full -z-30"
+            />
             <div className="flex flex-col pl-2">
               {socialMediaItems.map((link) => {
                 menuAnimationIndex++;
                 return (
                   <SimpleEntrance
                     key={link.name}
-                    delayMs={menuAnimationIndex * delayPerMenuItem}
+                    delayMs={
+                      menuAnimationIndex * delayPerMenuItem + menuBaseDelay
+                    }
                   >
                     <ProximityLink href={link.href} className="large-link">
                       {link.name}
@@ -93,22 +108,31 @@ export default async function Home({
       </section>
       <StretchEntrance
         from="left"
+        delayMs={lineBaseDelay + 100}
         className="h-16 w-full border-b-2 border-b-black"
       />
       <section className="relative">
         <StretchEntrance
           from="left"
+          delayMs={lineBaseDelay}
           className="absolute bottom-0 w-full border-b-2 border-b-black"
         />
         <div className="flex flex-row">
-          <p className="large-p pl-16 min-w-3/4">LATEST ARTICLES</p>
+          <SimpleEntrance
+            delayMs={articlesBaseDelay}
+            className="large-p pl-16 min-w-3/4"
+          >
+            LATEST ARTICLES
+          </SimpleEntrance>
           <div className="flex flex-col pl-2">
             {menuPartOne.map((link) => {
               menuAnimationIndex++;
               return (
                 <SimpleEntrance
                   key={link.name}
-                  delayMs={menuAnimationIndex * delayPerMenuItem}
+                  delayMs={
+                    menuAnimationIndex * delayPerMenuItem + menuBaseDelay
+                  }
                 >
                   <ProximityLink href={link.href} className="large-link">
                     {link.name}
@@ -122,24 +146,46 @@ export default async function Home({
       <section className="flex flex-row flex-1">
         <div className="w-3/4">
           <div className="flex flex-col gap-8 max-w-2/3">
-            {latestPosts.map((post) => (
+            {latestPosts.map((post, index) => (
               <article className="relative flex flex-row gap-4" key={post.slug}>
-                <div className="absolute h-full w-6 bg-klein " />
-                <div className="absolute h-full w-1/3 left-full bg-klein" />
-                <div className="w-96 pl-16">
+                <StretchEntrance
+                  from="bottom"
+                  delayMs={articlesBaseDelay + index * 100}
+                  className="absolute h-full w-6 bg-klein "
+                />
+                <StretchEntrance
+                  from="right"
+                  delayMs={articlesBaseDelay + 200 + index * 100}
+                  className="absolute h-full w-1/3 left-full bg-klein"
+                />
+                <SimpleEntrance
+                  delayMs={articlesBaseDelay + index * 100}
+                  className="w-96 pl-16"
+                >
                   <Link href={`/posts/${post.slug}`} className="large-p">
                     {post.title}
                   </Link>
                   <p className="large-p">{formatDate(post.date)}</p>
-                </div>
-                {post.excerpt && <p className="large-p w-96">{post.excerpt}</p>}
+                </SimpleEntrance>
+                {post.excerpt && (
+                  <SimpleEntrance
+                    delayMs={articlesBaseDelay + 100 + index * 100}
+                    className="large-p w-96"
+                  >
+                    {post.excerpt}
+                  </SimpleEntrance>
+                )}
               </article>
             ))}
           </div>
         </div>
-        <div className="absolute font-title font-bold text-[640pt] text-stroke left-1/2 -top-32 select-none -z-10">
+        <SimpleEntrance
+          durationMs={450}
+          delayMs={patternBaseDelay}
+          className="absolute font-title font-bold text-[640pt] text-stroke left-1/2 -top-32 select-none -z-10"
+        >
           &
-        </div>
+        </SimpleEntrance>
         <div className="flex flex-col justify-between items-start">
           <div className="relative flex flex-col pl-2">
             {menuPartTwo.map((link) => {
@@ -147,7 +193,9 @@ export default async function Home({
               return (
                 <SimpleEntrance
                   key={link.name}
-                  delayMs={menuAnimationIndex * delayPerMenuItem}
+                  delayMs={
+                    menuAnimationIndex * delayPerMenuItem + menuBaseDelay
+                  }
                 >
                   <ProximityLink href={link.href} className="large-link">
                     {link.name}
@@ -155,7 +203,11 @@ export default async function Home({
                 </SimpleEntrance>
               );
             })}
-            <div className="absolute bg-magenta h-96 w-16 top-full translate-y-4 -z-30" />
+            <StretchEntrance
+              from="bottom"
+              delayMs={lineBaseDelay + 200}
+              className="absolute bg-magenta h-96 w-16 top-full translate-y-4 -z-30"
+            />
           </div>
         </div>
       </section>
