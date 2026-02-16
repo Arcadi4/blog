@@ -41,7 +41,8 @@ export function SimpleEntrance({
     ? {}
     : { transitionDuration: `${durationMs}ms` };
 
-  const base = "will-change-transform will-change-opacity transition ease-out";
+  const base =
+    "will-change-transform will-change-opacity transition ease-in-out";
   const hidden = `opacity-0 ${distanceClass[from][distance]}`;
   const shown = "opacity-100 translate-x-0 translate-y-0";
 

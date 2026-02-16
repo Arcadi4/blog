@@ -13,16 +13,13 @@ const originClass: Record<StretchFrom, string> = {
 };
 
 type EntranceStretchProps = {
-  children?: React.ReactNode; // made optional
+  children?: React.ReactNode; // optional
   from?: StretchFrom;
   delayMs?: number;
   durationMs?: number;
   className?: string;
   disabled?: boolean;
-  /**
-   * 额外加一点透明度淡入（有时更自然）
-   */
-  fade?: boolean;
+  fade?: boolean; //额外加一点透明度淡入（有时更自然）
 };
 
 /**
@@ -46,7 +43,7 @@ export function StretchEntrance({
     ? {}
     : { transitionDuration: `${durationMs}ms` };
 
-  const base = `will-change-transform transition ease-out ${originClass[from]}`;
+  const base = `will-change-transform transition ease-in-out ${originClass[from]}`;
   const axisHidden =
     from === "left" || from === "right" ? "scale-x-0" : "scale-y-0";
   const axisShown =

@@ -91,7 +91,7 @@ export default async function Home({
               delayMs={figureBaseDelay}
               className="absolute bg-magenta h-80 w-16 right-full -z-30"
             />
-            <div className="flex flex-col pl-2">
+            <div className="flex flex-col pl-2 pt-2">
               {socialMediaItems.map((link) => {
                 menuAnimationIndex++;
                 return (
@@ -161,7 +161,7 @@ export default async function Home({
                 <StretchEntrance
                   from="right"
                   delayMs={articlesBaseDelay + 200 + index * 100}
-                  className="absolute h-full w-1/4 translate-x-[calc(100%-64px)] left-full bg-klein"
+                  className="absolute h-full w-[calc(50%-128px)] translate-x-16 left-full bg-klein"
                 />
                 <SimpleEntrance
                   delayMs={articlesBaseDelay + index * 100}
