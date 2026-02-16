@@ -6,6 +6,8 @@ import "../styles/animated-link.css";
 import "../styles/proximity-link.css";
 import "../styles/custom-cursor.css";
 import { bricolageGrotesque, ibmPlexSans, playfairDisplay } from "@/app/fonts";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Nextjs", //TODO: This is a placeholder
@@ -26,6 +28,8 @@ export default function RootLayout({
         <Header />
         {children}
         <CustomCursor />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
