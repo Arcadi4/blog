@@ -75,11 +75,16 @@ export default async function Home({
           className="absolute w-full bottom-0 border-b-2 border-b-black"
         />
         <div className="flex flex-row">
-          <h1 className="h1-hero min-w-3/4 pl-14 pt-4 select-none self-center">
-            {displayName}&apos;s
-            <br />
-            Blog
-          </h1>
+          <SimpleEntrance
+            delayMs={figureBaseDelay}
+            className="h1-hero min-w-3/4 pl-14 pt-4 select-none self-center"
+          >
+            <h1>
+              {displayName}&apos;s
+              <br />
+              Blog
+            </h1>
+          </SimpleEntrance>
           <div className="relative h-full">
             <StretchEntrance
               from="top"
