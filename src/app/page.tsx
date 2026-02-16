@@ -3,9 +3,7 @@ import crypto from "crypto";
 import { getSortedPostsData } from "@/lib/posts";
 import { formatDate } from "@/lib/utils";
 import ProximityLink from "@/components/ProximityLink";
-
-const posts = getSortedPostsData();
-const latestPosts = posts.slice(0, 3);
+import { TextAnimatedEntrance } from "@/components/animations/EntranceText";
 
 export default async function Home({
   searchParams,
@@ -20,6 +18,30 @@ export default async function Home({
       "441be6a1cc1cc50f35b95395f20f6b55"
       ? homeName
       : "4rcadia";
+
+  const posts = getSortedPostsData();
+  const latestPosts = posts.slice(0, 3);
+
+  const socialMediaLinks = [
+    { name: "GitHub", href: "https://github.com/arcadi4" },
+    { name: "Bilibili", href: "https://space.bilibili.com/499244418" },
+    { name: "Twitter", href: "https://x.com/_4rcadia" },
+  ];
+
+  const menuItems = [
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
+    { name: "Projects", href: "/projects" },
+    { name: "Friend Links", href: "/links" },
+    { name: "Tags", href: "/tags" },
+    { name: "All Posts", href: "/all" },
+  ];
+
+  const menuPartOne = menuItems.slice(0, 4);
+  const menuPartTwo = menuItems.slice(4);
+
+  let linkAnimationOrder = 0;
+  const delayPerLink = 100;
 
   return (
     <main className="relative min-h-[166dvh] flex flex-col">
@@ -38,24 +60,19 @@ export default async function Home({
           <div className="relative h-full">
             <div className="absolute bg-magenta h-80 w-16 right-full -z-30" />
             <div className="flex flex-col pl-2">
-              <ProximityLink
-                href="https://github.com/arcadi4"
-                className="large-link"
-              >
-                GitHub
-              </ProximityLink>
-              <ProximityLink
-                href="https://space.bilibili.com/499244418"
-                className="large-link"
-              >
-                bilibili
-              </ProximityLink>
-              <ProximityLink
-                href="https://x.com/_4rcadia"
-                className="large-link"
-              >
-                Twitter
-              </ProximityLink>
+              {socialMediaLinks.map((link) => {
+                linkAnimationOrder++;
+                return (
+                  <TextAnimatedEntrance
+                    key={link.name}
+                    delayMs={linkAnimationOrder * delayPerLink}
+                  >
+                    <ProximityLink href={link.href} className="large-link">
+                      {link.name}
+                    </ProximityLink>
+                  </TextAnimatedEntrance>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -65,18 +82,19 @@ export default async function Home({
         <div className="flex flex-row">
           <p className="large-p pl-16 min-w-3/4">LATEST ARTICLES</p>
           <div className="flex flex-col pl-2">
-            <ProximityLink href="/about" className="large-link">
-              About
-            </ProximityLink>
-            <ProximityLink href="/contact" className="large-link">
-              Contact
-            </ProximityLink>
-            <ProximityLink href="/projects" className="large-link">
-              Projects
-            </ProximityLink>
-            <ProximityLink href="/links" className="large-link">
-              Friend Links
-            </ProximityLink>
+            {menuPartOne.map((link) => {
+              linkAnimationOrder++;
+              return (
+                <TextAnimatedEntrance
+                  key={link.name}
+                  delayMs={linkAnimationOrder * delayPerLink}
+                >
+                  <ProximityLink href={link.href} className="large-link">
+                    {link.name}
+                  </ProximityLink>
+                </TextAnimatedEntrance>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -102,14 +120,20 @@ export default async function Home({
           &
         </div>
         <div className="flex flex-col justify-between items-start">
-          <div className="relative flex flex-col pl-2">
-            <ProximityLink href="/tags" className="large-link">
-              Tags
-            </ProximityLink>
-            <ProximityLink href="/all" className="large-link">
-              All Posts
-            </ProximityLink>
-            <div className="absolute bg-magenta h-96 w-16 top-full translate-y-4 -z-30" />
+          <div className="flex flex-col pl-2">
+            {menuPartTwo.map((link) => {
+              linkAnimationOrder++;
+              return (
+                <TextAnimatedEntrance
+                  key={link.name}
+                  delayMs={linkAnimationOrder * delayPerLink}
+                >
+                  <ProximityLink href={link.href} className="large-link">
+                    {link.name}
+                  </ProximityLink>
+                </TextAnimatedEntrance>
+              );
+            })}
           </div>
         </div>
       </section>
