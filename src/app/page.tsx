@@ -119,7 +119,7 @@ export default async function Home({
         />
         <div className="flex flex-row">
           <SimpleEntrance
-            delayMs={articlesBaseDelay}
+            delayMs={articlesBaseDelay - 200}
             className="large-p pl-16 min-w-3/4"
           >
             LATEST ARTICLES
@@ -156,7 +156,7 @@ export default async function Home({
                 <StretchEntrance
                   from="right"
                   delayMs={articlesBaseDelay + 200 + index * 100}
-                  className="absolute h-full w-1/3 left-full bg-klein"
+                  className="absolute h-full w-1/4 translate-x-[calc(100%-64px)] left-full bg-klein"
                 />
                 <SimpleEntrance
                   delayMs={articlesBaseDelay + index * 100}
