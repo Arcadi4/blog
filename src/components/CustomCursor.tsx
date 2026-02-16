@@ -5,49 +5,59 @@ import { useEffect, useState } from "react";
 const CURSOR_SIZE = 28;
 
 export default function CustomCursor() {
-    const [position, setPosition] = useState({ x: -100, y: -100 });
-    const [isInteractive, setIsInteractive] = useState(false);
+  const [position, setPosition] = useState({ x: -100, y: -100 });
+  const [isInteractive, setIsInteractive] = useState(false);
 
-    useEffect(() => {
-        const mediaQuery = window.matchMedia("(pointer: fine)");
-        if (!mediaQuery.matches) {
-            return;
-        }
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(pointer: fine)");
+    if (!mediaQuery.matches) {
+      return;
+    }
 
+    const handlePointerMove = (event: PointerEvent) => {
+      setPosition({ x: event.clientX, y: event.clientY });
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        return;
+      }
 
-        const handlePointerMove = (event: PointerEvent) => {
-            setPosition({ x: event.clientX, y: event.clientY });
-            const target = event.target;
-            if (!(target instanceof Element)) {
-                return;
-            }
+      const interactive = Boolean(
+        target.closest(
+          "[data-cursor='interactive'], a, button, summary, [role='button'], input, select, textarea, label",
+        ),
+      );
+      setIsInteractive(interactive);
+    };
 
-            const interactive = Boolean(
-                target.closest(
-                    "[data-cursor='interactive'], a, button, summary, [role='button'], input, select, textarea, label"
-                )
-            );
-            setIsInteractive(interactive);
-        };
+    window.addEventListener("pointermove", handlePointerMove, {
+      passive: true,
+    });
 
-        window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+    };
+  }, []);
 
-        return () => {
-            window.removeEventListener("pointermove", handlePointerMove);
-        };
-    }, []);
+  const scale = isInteractive ? 1.667 : 1;
+  const color = isInteractive ? "var(--color-magenta)" : "var(--color-klein)";
 
-    const scale = isInteractive ? 1.6 : 1;
-
-    return (
-        <div
-            aria-hidden="true"
-            className="custom-cursor hidden md:block"
-            style={{
-                width: CURSOR_SIZE,
-                height: CURSOR_SIZE,
-                transform: `translate3d(${position.x - CURSOR_SIZE / 2}px, ${position.y - CURSOR_SIZE / 2}px, 0) scale(${scale})`,
-            }}
-        />
-    );
+  return (
+    <div
+      aria-hidden="true"
+      className="custom-cursor hidden md:block"
+      style={{
+        transform: `translate3d(${position.x - CURSOR_SIZE / 2}px, ${position.y - CURSOR_SIZE / 2}px, 0)`,
+      }}
+    >
+      <div
+        className="custom-cursor-dot"
+        style={{
+          width: CURSOR_SIZE,
+          height: CURSOR_SIZE,
+          transform: `scale(${scale})`,
+          backgroundColor: color,
+        }}
+      />
+    </div>
+  );
 }
