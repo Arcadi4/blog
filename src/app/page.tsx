@@ -21,10 +21,10 @@ export default async function Home({
       : "4rcadia";
 
   return (
-    <main className="min-h-[166dvh] flex flex-col">
+    <main className="relative min-h-[166dvh] flex flex-col">
       <div className="absolute bg-acid right-0 top-0 h-128 w-1/2 -z-50" />
-      <div className="absolute bg-none left-0 top-0 h-screen w-12 border-r-2 border-r-black" />
-      <p className="absolute -left-1/12 -top-1/2 text-[768pt] font-serif text-acid -z-10">
+      <div className="absolute bg-none left-0 top-0 h-full w-12 border-r-2 border-r-black" />
+      <p className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10">
         *
       </p>
       <section className=" h-64 border-b-2 border-b-black">
