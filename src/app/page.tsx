@@ -47,13 +47,18 @@ export default async function Home({
   return (
     <main className="relative min-h-[166dvh] flex flex-col">
       <div className="absolute bg-acid right-0 top-0 h-128 w-1/2 -z-50" />
-      <EntranceStretch from="top" durationMs={2000} className="absolute h-full">
+      <EntranceStretch
+        from="bottom"
+        durationMs={1200}
+        className="absolute h-full"
+      >
         <div className="absolute left-0 top-0 h-full w-12 border-r-2 border-r-black" />
       </EntranceStretch>
       <p className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10">
         *
       </p>
-      <section className="h-64 border-b-2 border-b-black">
+      <section className="relative h-64">
+        <div className="absolute w-full bottom-0 border-b-2 border-b-black" />
         <div className="flex flex-row">
           <h1 className="h1-hero min-w-3/4 pl-14 pt-4 select-none self-center">
             {displayName}&apos;s
@@ -81,7 +86,7 @@ export default async function Home({
         </div>
       </section>
       <div className="h-16 border-b-2 border-b-black" />
-      <div className="border-b-2 border-b-black ">
+      <section className="border-b-2 border-b-black ">
         <div className="flex flex-row">
           <p className="large-p pl-16 min-w-3/4">LATEST ARTICLES</p>
           <div className="flex flex-col pl-2">
@@ -100,7 +105,7 @@ export default async function Home({
             })}
           </div>
         </div>
-      </div>
+      </section>
       <section className="flex flex-row flex-1">
         <div className="w-3/4">
           <div className="flex flex-col gap-8 max-w-2/3">
@@ -123,7 +128,7 @@ export default async function Home({
           &
         </div>
         <div className="flex flex-col justify-between items-start">
-          <div className="flex flex-col pl-2">
+          <div className="relative flex flex-col pl-2">
             {menuPartTwo.map((link) => {
               linkAnimationOrder++;
               return (
@@ -137,6 +142,7 @@ export default async function Home({
                 </TextEntrance>
               );
             })}
+            <div className="absolute bg-magenta h-96 w-16 top-full translate-y-4 -z-30" />
           </div>
         </div>
       </section>
