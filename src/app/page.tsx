@@ -37,7 +37,7 @@ export default async function Home({
           </h1>
           <div className="relative h-full">
             <div className="absolute bg-magenta h-80 w-16 right-full -z-30" />
-            <div className=" flex flex-col pl-2 ">
+            <div className="flex flex-col pl-2">
               <ProximityLink
                 href="https://github.com/arcadi4"
                 className="large-link"

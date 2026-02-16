@@ -28,12 +28,14 @@ A modern, clean personal blog built with Next.js, TypeScript, and Tailwind CSS.
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/Arcadi4/blog.git
 cd blog
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 # or
@@ -43,6 +45,7 @@ pnpm install
 ```
 
 3. Run the development server:
+
 ```bash
 npm run dev
 # or
@@ -103,6 +106,7 @@ Your post content goes here...
 ### Updating Site Information
 
 Edit `src/app/layout.tsx` to update:
+
 - Site title
 - Meta description
 - Other metadata
@@ -110,7 +114,7 @@ Edit `src/app/layout.tsx` to update:
 ### Styling
 
 - Global styles: `src/app/globals.css`
-- Tailwind config: `tailwind.config.ts` (if needed)
+- Tailwind config: `tailwind.config.js` (if needed)
 - Component styles: Use Tailwind utility classes
 
 ### Adding Pages
@@ -130,6 +134,7 @@ The easiest way to deploy is using [Vercel](https://vercel.com):
 ### Other Platforms
 
 You can also deploy to:
+
 - Netlify
 - AWS Amplify
 - Cloudflare Pages
