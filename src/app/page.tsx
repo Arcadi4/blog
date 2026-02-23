@@ -10,17 +10,17 @@ import { menuItems } from "@/app/posts/menuItems";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ displayName?: string }>;
+  searchParams: Promise<{ displayName?: string; }>;
 }) {
   const params = await searchParams;
   const displayName = params.displayName || "";
   const hash = crypto.createHash("md5").update(displayName).digest("hex");
   const heroName =
     displayName &&
-    [
-      "441be6a1cc1cc50f35b95395f20f6b55",
-      "b38319dfed46aed62f00dca6d58e964a",
-    ].includes(hash)
+      [
+        "441be6a1cc1cc50f35b95395f20f6b55",
+        "b38319dfed46aed62f00dca6d58e964a",
+      ].includes(hash)
       ? displayName
       : "4rcadia";
 
