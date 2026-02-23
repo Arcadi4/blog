@@ -50,7 +50,7 @@ export default async function Home({
   const articlesBaseDelay = 1400;
 
   return (
-    <main className="relative min-h-screen overflow-hidden flex flex-col">
+    <main className="relative flex min-h-screen w-full max-w-full flex-col overflow-hidden overflow-x-clip">
       <StretchEntrance
         from="right"
         delayMs={figureBaseDelay}
@@ -69,7 +69,7 @@ export default async function Home({
       <SimpleEntrance
         durationMs={450}
         delayMs={backgroundBaseDelay}
-        className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10"
+        className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10 pointer-events-none select-none"
       >
         *
       </SimpleEntrance>
@@ -192,7 +192,7 @@ export default async function Home({
         <SimpleEntrance
           durationMs={450}
           delayMs={backgroundBaseDelay}
-          className="absolute font-title font-bold text-[640pt] text-stroke left-1/2 -top-32 select-none -z-10"
+          className="absolute font-title font-bold text-[640pt] text-stroke left-1/2 -top-32 select-none -z-10 pointer-events-none"
         >
           &
         </SimpleEntrance>

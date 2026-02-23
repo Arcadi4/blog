@@ -4,6 +4,7 @@ import "../styles/proximity-link.css";
 import "./global.css";
 import CustomCursor from "@/components/CustomCursor";
 import Footer from "@/components/Footer";
+import MobileGate from "@/components/MobileGate";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -28,6 +29,7 @@ export default function RootLayout({
         <Analytics />
         <SpeedInsights />
         <CustomCursor />
+        <MobileGate />
         {children}
         <Footer />
       </body>
