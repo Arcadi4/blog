@@ -50,7 +50,7 @@ h6,
 
 @layer components {
     .h1-hero {
-        @apply text-9xl font-bold leading-[0.8];
+        @apply text-8xl font-bold leading-[0.8];
     }
 
     .large-p {

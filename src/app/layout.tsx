@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import Header from "@/components/Header";
-import CustomCursor from "@/components/CustomCursor";
-import "./global.css";
 import "../styles/animated-link.css";
-import "../styles/proximity-link.css";
 import "../styles/custom-cursor.css";
-import { bricolageGrotesque, ibmPlexSans, playfairDisplay } from "@/app/fonts";
+import "../styles/proximity-link.css";
+import "./global.css";
+import CustomCursor from "@/components/CustomCursor";
+import Footer from "@/components/Footer";
+import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { bricolageGrotesque, ibmPlexSans, playfairDisplay } from "@/app/fonts";
 
 export const metadata: Metadata = {
   title: "Nextjs", //TODO: This is a placeholder
@@ -25,11 +25,11 @@ export default function RootLayout({
       <body
         className={`${bricolageGrotesque.variable} ${ibmPlexSans.variable} ${playfairDisplay.variable} antialiased`}
       >
-        <Header />
-        {children}
-        <CustomCursor />
         <Analytics />
         <SpeedInsights />
+        <CustomCursor />
+        {children}
+        <Footer />
       </body>
     </html>
   );

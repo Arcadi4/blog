@@ -9,15 +9,15 @@ import { StretchEntrance } from "@/components/animations/EntranceStretch";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ homeName?: string }>;
+  searchParams: Promise<{ displayName?: string }>;
 }) {
   const params = await searchParams;
-  const homeName = params.homeName;
-  const displayName =
-    homeName &&
-    crypto.createHash("md5").update(homeName).digest("hex") ===
+  const displayName = params.displayName;
+  const heroName =
+    displayName &&
+    crypto.createHash("md5").update(displayName).digest("hex") ===
       "441be6a1cc1cc50f35b95395f20f6b55"
-      ? homeName
+      ? displayName
       : "4rcadia";
 
   const posts = getSortedPostsData();
@@ -50,7 +50,7 @@ export default async function Home({
   const articlesBaseDelay = 1400;
 
   return (
-    <main className="relative min-h-[166dvh] flex flex-col">
+    <main className="relative min-h-screen overflow-hidden flex flex-col">
       <StretchEntrance
         from="right"
         delayMs={figureBaseDelay}
@@ -59,7 +59,12 @@ export default async function Home({
       <StretchEntrance
         from="bottom"
         durationMs={1200}
-        className="absolute left-0 top-0 h-full w-12 border-r-2 border-r-black"
+        className="absolute left-[calc(50%+64px)] top-0 h-full w-16 border-x-2 border-x-black z-20"
+      />
+      <StretchEntrance
+        from="bottom"
+        durationMs={1200}
+        className="absolute left-0 top-0 h-full w-12 border-r-2 border-r-black z-20"
       />
       <SimpleEntrance
         durationMs={450}
@@ -68,7 +73,7 @@ export default async function Home({
       >
         *
       </SimpleEntrance>
-      <section className="relative h-64">
+      <section className="relative h-52">
         <StretchEntrance
           from="left"
           delayMs={figureBaseDelay + 200}
@@ -80,9 +85,9 @@ export default async function Home({
             className="h1-hero min-w-3/4 pl-14 pt-4 select-none self-center"
           >
             <h1>
-              {displayName}&apos;s
+              Hello, here&apos;s
               <br />
-              Blog
+              {heroName}
             </h1>
           </SimpleEntrance>
           <div className="relative h-full">
@@ -150,7 +155,7 @@ export default async function Home({
       </section>
       <section className="flex flex-row flex-1">
         <div className="w-3/4">
-          <div className="flex flex-col gap-8 max-w-2/3">
+          <div className=" flex flex-col gap-8 max-w-2/3">
             {latestPosts.map((post, index) => (
               <article className="relative flex flex-row gap-4" key={post.slug}>
                 <StretchEntrance
@@ -161,7 +166,7 @@ export default async function Home({
                 <StretchEntrance
                   from="right"
                   delayMs={articlesBaseDelay + 200 + index * 100}
-                  className="absolute h-full w-[calc(50%-128px)] translate-x-16 left-full bg-klein"
+                  className="absolute h-full bottom-0 w-[calc(50%-64px)] translate-x-0 left-full bg-klein"
                 />
                 <SimpleEntrance
                   delayMs={articlesBaseDelay + index * 100}
@@ -191,7 +196,7 @@ export default async function Home({
         >
           &
         </SimpleEntrance>
-        <div className="flex flex-col justify-between items-start">
+        <div className=" flex flex-col justify-between items-start">
           <div className="relative flex flex-col pl-2">
             {menuPartTwo.map((link) => {
               menuAnimationIndex++;
@@ -209,14 +214,13 @@ export default async function Home({
               );
             })}
             <StretchEntrance
-              from="bottom"
-              delayMs={figureBaseDelay + 200}
-              className="absolute bg-magenta h-96 w-16 top-full translate-y-4 -z-30"
+              from="top"
+              delayMs={figureBaseDelay}
+              className="absolute bg-magenta left-0 top-full h-screen w-16"
             />
           </div>
         </div>
       </section>
-      <footer className="h-80 bg-klein"></footer>
     </main>
   );
 }

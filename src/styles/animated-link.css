@@ -1,36 +1,38 @@
 .animated-link {
-  display: inline-block;
-  width: fit-content;
-  position: relative;
-  cursor: none;
+    display: inline-block;
+    width: fit-content;
+    position: relative;
+    cursor: none;
 
-  /*
-   * Native skip-ink: the browser automatically leaves gaps in the
-   * underline where descenders (g p y …) cross it.
-   * Works on any background — solid, gradient, image, multi-colour —
-   * with no colour-matching CSS variable required.
-   */
-  text-decoration-line: underline;
-  text-decoration-skip-ink: auto;
-  text-decoration-color: transparent;
-  text-decoration-thickness: var(--underline-thickness, 2px);
-  text-underline-offset: 3px;
-  transition: text-decoration-color 0.4s cubic-bezier(0.33, 0, 0.2, 1);
+    /*
+     * Native skip-ink: the browser automatically leaves gaps in the
+     * underline where descenders (g p y …) cross it.
+     * Works on any background — solid, gradient, image, multi-colour —
+     * with no colour-matching CSS variable required.
+     */
+    text-decoration-line: underline;
+    text-decoration-skip-ink: auto;
+    text-decoration-color: transparent;
+    /* Use em-based thickness so the underline scales with font-size */
+    text-decoration-thickness: var(--underline-thickness, 0.08em);
+    /* Use em-based offset so spacing also scales */
+    text-underline-offset: var(--underline-offset, 0.1em);
+    transition: text-decoration-color 0.4s cubic-bezier(0.33, 0, 0.2, 1);
 }
 
 .animated-link:hover,
 .animated-link:focus-visible {
-  text-decoration-color: currentColor;
+    text-decoration-color: currentColor;
 }
 
 .animated-link::selection {
-  background: currentColor;
-  color: var(--background);
-  text-decoration-color: transparent;
+    background: currentColor;
+    color: var(--background);
+    text-decoration-color: transparent;
 }
 
 .animated-link::-moz-selection {
-  background: currentColor;
-  color: var(--background);
-  text-decoration-color: transparent;
+    background: currentColor;
+    color: var(--background);
+    text-decoration-color: transparent;
 }
