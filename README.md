@@ -1,3 +1,3 @@
-# Personal Blog/Homepage
+# Personal Blog / Homepage
 
-Incomplete.
+I would say this is now in beta.
