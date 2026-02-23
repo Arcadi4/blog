@@ -11,7 +11,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { bricolageGrotesque, ibmPlexSans, playfairDisplay } from "@/app/fonts";
 
 export const metadata: Metadata = {
-  title: "Nextjs", //TODO: This is a placeholder
+  title: "Next.js", //TODO: This is a placeholder
   description:
     "A personal blog built with Next.js, TypeScript, and Tailwind CSS",
 };
