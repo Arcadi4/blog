@@ -37,6 +37,7 @@ interface ProximityLinkProps extends Omit<
   shadowColor?: string;
   allowShadowYFollow?: boolean;
   reverseShadowDirection?: boolean;
+  reverseShadowNearStronger?: boolean;
   shadowTuning?: Partial<ProximityShadowTuning>;
 }
 
@@ -51,8 +52,20 @@ interface ProximityInteractiveTextProps {
   shadowColor: string;
   allowShadowYFollow: boolean;
   reverseShadowDirection: boolean;
+  reverseShadowNearStronger: boolean;
   shadowTuning: ProximityShadowTuning;
 }
+
+const DEFAULT_PROXIMITY_LINK_PROPS = {
+  fromFontVariationSettings: "'wght' 300",
+  toFontVariationSettings: "'wght' 900",
+  radius: 256,
+  falloff: "exponential" as FalloffMode,
+  shadowColor: "var(--color-magenta)",
+  allowShadowYFollow: false,
+  reverseShadowDirection: true,
+  reverseShadowNearStronger: true,
+};
 
 type FrameSubscriber = () => boolean;
 
@@ -164,6 +177,7 @@ function ProximityInteractiveText({
   shadowColor,
   allowShadowYFollow,
   reverseShadowDirection,
+  reverseShadowNearStronger,
   shadowTuning,
 }: ProximityInteractiveTextProps) {
   const glyphRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -223,6 +237,7 @@ function ProximityInteractiveText({
   const radiusRef = useRef(radius);
   const allowShadowYFollowRef = useRef(allowShadowYFollow);
   const reverseShadowDirectionRef = useRef(reverseShadowDirection);
+  const reverseShadowNearStrongerRef = useRef(reverseShadowNearStronger);
   const shadowTuningRef = useRef(shadowTuning);
 
   parsedSettingsRef.current = parsedSettings;
@@ -232,6 +247,7 @@ function ProximityInteractiveText({
   radiusRef.current = radius;
   allowShadowYFollowRef.current = allowShadowYFollow;
   reverseShadowDirectionRef.current = reverseShadowDirection;
+  reverseShadowNearStrongerRef.current = reverseShadowNearStronger;
   shadowTuningRef.current = shadowTuning;
 
   /**
@@ -473,6 +489,7 @@ function ProximityInteractiveText({
           isHovered: isHoveredRef.current,
           allowShadowYFollow: allowShadowYFollowRef.current,
           reverseDirection: reverseShadowDirectionRef.current,
+          reverseNearStronger: reverseShadowNearStrongerRef.current,
           previousOffset,
           shadowTuning: currentShadowTuning,
         });
@@ -638,6 +655,7 @@ function ProximityInteractiveText({
                   style={{
                     position: "absolute",
                     inset: 0,
+                    zIndex: 0,
                     pointerEvents: "none",
                     color: shadowColor,
                     opacity: 0,
@@ -655,6 +673,7 @@ function ProximityInteractiveText({
                   style={{
                     display: "inline-block",
                     position: "relative",
+                    zIndex: 1,
                     fontVariationSettings: fromFontVariationSettings,
                   }}
                   aria-hidden="true"
@@ -678,13 +697,14 @@ export default function ProximityLink({
   href,
   children,
   label,
-  fromFontVariationSettings = "'wght' 300",
-  toFontVariationSettings = "'wght' 900",
-  radius = 192,
-  falloff = "exponential",
-  shadowColor = "var(--color-magenta)",
-  allowShadowYFollow = false,
-  reverseShadowDirection = false,
+  fromFontVariationSettings = DEFAULT_PROXIMITY_LINK_PROPS.fromFontVariationSettings,
+  toFontVariationSettings = DEFAULT_PROXIMITY_LINK_PROPS.toFontVariationSettings,
+  radius = DEFAULT_PROXIMITY_LINK_PROPS.radius,
+  falloff = DEFAULT_PROXIMITY_LINK_PROPS.falloff,
+  shadowColor = DEFAULT_PROXIMITY_LINK_PROPS.shadowColor,
+  allowShadowYFollow = DEFAULT_PROXIMITY_LINK_PROPS.allowShadowYFollow,
+  reverseShadowDirection = DEFAULT_PROXIMITY_LINK_PROPS.reverseShadowDirection,
+  reverseShadowNearStronger = DEFAULT_PROXIMITY_LINK_PROPS.reverseShadowNearStronger,
   shadowTuning,
   className = "",
   onMouseEnter,
@@ -717,6 +737,7 @@ export default function ProximityLink({
       shadowColor={shadowColor}
       allowShadowYFollow={allowShadowYFollow}
       reverseShadowDirection={reverseShadowDirection}
+      reverseShadowNearStronger={reverseShadowNearStronger}
       shadowTuning={resolvedShadowTuning}
     />
   );

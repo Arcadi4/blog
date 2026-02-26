@@ -12,6 +12,7 @@ export interface ProximityShadowTuning {
   falloffExponent: number;
   maxOffset: number;
   maxOffsetXOnly: number;
+  maxOffsetReverse: number;
   directionSoftness: number;
   innerDeadZone: number;
   offsetEnterLerp: number;
@@ -31,14 +32,15 @@ export const defaultShadowTuning: ProximityShadowTuning = {
   hoverLeaveLerp: 0.2,
   falloffExponent: 0.75,
   maxOffset: 24,
-  maxOffsetXOnly: 20,
+  maxOffsetXOnly: 30,
+  maxOffsetReverse: 24,
   directionSoftness: 8,
   innerDeadZone: 8,
   offsetEnterLerp: 0.16,
   offsetLeaveLerp: 0.24,
   visibilityThreshold: 0.08,
-  wghtBoost: 220,
-  wghtMaxExtra: 280,
+  wghtBoost: 200,
+  wghtMaxExtra: 400,
 };
 
 export function clamp(value: number, min: number, max: number) {
@@ -133,6 +135,7 @@ export function getShadowOffset({
   isHovered,
   allowShadowYFollow,
   reverseDirection,
+  reverseNearStronger,
   previousOffset,
   shadowTuning,
 }: {
@@ -145,19 +148,38 @@ export function getShadowOffset({
   isHovered: boolean;
   allowShadowYFollow: boolean;
   reverseDirection: boolean;
+  reverseNearStronger: boolean;
   previousOffset: ShadowOffset;
   shadowTuning: ProximityShadowTuning;
 }) {
-  const activeMaxOffset = allowShadowYFollow
-    ? shadowTuning.maxOffset
-    : shadowTuning.maxOffsetXOnly;
+  const activeMaxOffset = reverseDirection
+    ? shadowTuning.maxOffsetReverse
+    : allowShadowYFollow
+      ? shadowTuning.maxOffset
+      : shadowTuning.maxOffsetXOnly;
   const shadowDistance = activeMaxOffset * shadowStrength;
   const innerRadiusRange = Math.max(radius - shadowTuning.innerDeadZone, 1);
-  const centerRamp = clamp(
+  const distanceRamp = clamp(
     (distance - shadowTuning.innerDeadZone) / innerRadiusRange,
     0,
     1,
   );
+  const deadZoneExitRamp = clamp(
+    (distance - shadowTuning.innerDeadZone) /
+      Math.max(shadowTuning.innerDeadZone, 1),
+    0,
+    1,
+  );
+  const exponent = Math.max(shadowTuning.falloffExponent, 0.0001);
+  const reverseNearNormalization =
+    Math.pow(exponent, exponent) / Math.pow(exponent + 1, exponent + 1);
+  const offsetRamp = reverseDirection
+    ? distance <= shadowTuning.innerDeadZone
+      ? 0
+      : reverseNearStronger
+        ? (1 - distanceRamp) * deadZoneExitRamp * reverseNearNormalization
+        : distanceRamp
+    : distanceRamp;
   const directionScale =
     shadowDistance /
     Math.sqrt(
@@ -168,9 +190,9 @@ export function getShadowOffset({
   const directionMultiplier = reverseDirection ? -1 : 1;
 
   const targetOffsetX =
-    deltaX * directionScale * centerRamp * directionMultiplier;
+    deltaX * directionScale * offsetRamp * directionMultiplier;
   const targetOffsetY = allowShadowYFollow
-    ? deltaY * directionScale * centerRamp * directionMultiplier
+    ? deltaY * directionScale * offsetRamp * directionMultiplier
     : 0;
   const offsetLerp = isHovered
     ? shadowTuning.offsetEnterLerp
