@@ -29,9 +29,9 @@ export interface ShadowOffset {
 export const defaultShadowTuning: ProximityShadowTuning = {
   hoverEnterLerp: 0.12,
   hoverLeaveLerp: 0.2,
-  falloffExponent: 0.8,
+  falloffExponent: 0.75,
   maxOffset: 24,
-  maxOffsetXOnly: 24,
+  maxOffsetXOnly: 20,
   directionSoftness: 8,
   innerDeadZone: 8,
   offsetEnterLerp: 0.16,
@@ -132,6 +132,7 @@ export function getShadowOffset({
   hoverProgress,
   isHovered,
   allowShadowYFollow,
+  reverseDirection,
   previousOffset,
   shadowTuning,
 }: {
@@ -143,6 +144,7 @@ export function getShadowOffset({
   hoverProgress: number;
   isHovered: boolean;
   allowShadowYFollow: boolean;
+  reverseDirection: boolean;
   previousOffset: ShadowOffset;
   shadowTuning: ProximityShadowTuning;
 }) {
@@ -163,10 +165,12 @@ export function getShadowOffset({
         deltaY * deltaY +
         shadowTuning.directionSoftness * shadowTuning.directionSoftness,
     );
+  const directionMultiplier = reverseDirection ? -1 : 1;
 
-  const targetOffsetX = deltaX * directionScale * centerRamp;
+  const targetOffsetX =
+    deltaX * directionScale * centerRamp * directionMultiplier;
   const targetOffsetY = allowShadowYFollow
-    ? deltaY * directionScale * centerRamp
+    ? deltaY * directionScale * centerRamp * directionMultiplier
     : 0;
   const offsetLerp = isHovered
     ? shadowTuning.offsetEnterLerp

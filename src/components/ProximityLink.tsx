@@ -9,17 +9,17 @@ import {
   useRef,
   useState,
 } from "react";
+import type {
+  AxisRange,
+  FalloffMode,
+  ProximityShadowTuning,
+} from "./proximityLinkMath";
 import {
   buildLayerVariationSettings,
   defaultShadowTuning,
   getFalloffValue,
   getShadowOffset,
   parseVariationSettings,
-} from "./proximityLinkMath";
-import type {
-  AxisRange,
-  FalloffMode,
-  ProximityShadowTuning,
 } from "./proximityLinkMath";
 
 interface ProximityLinkProps extends Omit<
@@ -43,6 +43,8 @@ interface ProximityLinkProps extends Omit<
   shadowColor?: string;
   /** Allow Y-axis shadow follow in addition to X-axis */
   allowShadowYFollow?: boolean;
+  /** Reverse shadow direction so it moves away from cursor */
+  reverseShadowDirection?: boolean;
   /** Advanced tuning for shadow movement and weight boosting */
   shadowTuning?: Partial<ProximityShadowTuning>;
 }
@@ -57,6 +59,7 @@ interface ProximityInteractiveTextProps {
   isHovered: boolean;
   shadowColor: string;
   allowShadowYFollow: boolean;
+  reverseShadowDirection: boolean;
   shadowTuning: ProximityShadowTuning;
 }
 
@@ -117,6 +120,7 @@ function ProximityInteractiveText({
   isHovered,
   shadowColor,
   allowShadowYFollow,
+  reverseShadowDirection,
   shadowTuning,
 }: ProximityInteractiveTextProps) {
   const glyphRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -226,6 +230,7 @@ function ProximityInteractiveText({
         hoverProgress: hoverProgressRef.current,
         isHovered,
         allowShadowYFollow,
+        reverseDirection: reverseShadowDirection,
         previousOffset,
         shadowTuning,
       });
@@ -326,11 +331,12 @@ export default function ProximityLink({
   children,
   label,
   fromFontVariationSettings = "'wght' 300",
-  toFontVariationSettings = "'wght' 850",
+  toFontVariationSettings = "'wght' 900",
   radius = 192,
   falloff = "exponential",
   shadowColor = "var(--color-magenta)",
   allowShadowYFollow = false,
+  reverseShadowDirection = false,
   shadowTuning,
   className = "",
   onMouseEnter,
@@ -364,6 +370,7 @@ export default function ProximityLink({
       isHovered={isHovered}
       shadowColor={shadowColor}
       allowShadowYFollow={allowShadowYFollow}
+      reverseShadowDirection={reverseShadowDirection}
       shadowTuning={resolvedShadowTuning}
     />
   );
