@@ -10,6 +10,14 @@ import {
   useState,
 } from "react";
 
+type FalloffMode = "linear" | "exponential" | "gaussian";
+
+interface AxisRange {
+  axis: string;
+  fromValue: number;
+  toValue: number;
+}
+
 interface ProximityShadowTuning {
   /** Hover progress lerp while entering */
   hoverEnterLerp: number;
@@ -19,6 +27,8 @@ interface ProximityShadowTuning {
   falloffExponent: number;
   /** Max shadow offset in px */
   maxOffset: number;
+  /** Max shadow offset in px when Y-follow is disabled */
+  maxOffsetXOnly: number;
   /** Softens direction vector near glyph center */
   directionSoftness: number;
   /** Radius where shadow offset is suppressed */
@@ -33,12 +43,6 @@ interface ProximityShadowTuning {
   wghtBoost: number;
   /** Extra max clamp for weight-axis boost */
   wghtMaxExtra: number;
-  /** Width-axis boost when Y-follow is disabled */
-  wdthBoost: number;
-  /** Extra max clamp for width-axis boost */
-  wdthMaxExtra: number;
-  /** Base wdth value used when wdth axis is absent */
-  wdthFallbackBase: number;
 }
 
 const defaultShadowTuning: ProximityShadowTuning = {
@@ -46,6 +50,7 @@ const defaultShadowTuning: ProximityShadowTuning = {
   hoverLeaveLerp: 0.2,
   falloffExponent: 0.8,
   maxOffset: 24,
+  maxOffsetXOnly: 24,
   directionSoftness: 8,
   innerDeadZone: 8,
   offsetEnterLerp: 0.16,
@@ -53,9 +58,6 @@ const defaultShadowTuning: ProximityShadowTuning = {
   visibilityThreshold: 0.08,
   wghtBoost: 220,
   wghtMaxExtra: 280,
-  wdthBoost: 18,
-  wdthMaxExtra: 24,
-  wdthFallbackBase: 100,
 };
 
 interface ProximityLinkProps extends Omit<
@@ -74,12 +76,12 @@ interface ProximityLinkProps extends Omit<
   /** Effect radius in px (default 192) */
   radius?: number;
   /** Distance falloff curve */
-  falloff?: "linear" | "exponential" | "gaussian";
+  falloff?: FalloffMode;
   /** Shadow color used on hover */
   shadowColor?: string;
   /** Allow Y-axis shadow follow in addition to X-axis */
   allowShadowYFollow?: boolean;
-  /** Advanced tuning for shadow movement and axis boosting */
+  /** Advanced tuning for shadow movement and weight boosting */
   shadowTuning?: Partial<ProximityShadowTuning>;
 }
 
@@ -89,11 +91,93 @@ interface ProximityInteractiveTextProps {
   fromFontVariationSettings: string;
   toFontVariationSettings: string;
   radius: number;
-  falloff: "linear" | "exponential" | "gaussian";
+  falloff: FalloffMode;
   isHovered: boolean;
   shadowColor: string;
   allowShadowYFollow: boolean;
   shadowTuning: ProximityShadowTuning;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function parseVariationSettings(settingsStr: string) {
+  return new Map(
+    settingsStr
+      .split(",")
+      .map((item) => item.trim())
+      .map((item) => {
+        const [rawAxis, rawValue] = item.split(/\s+/);
+        return [rawAxis.replace(/['"]/g, ""), parseFloat(rawValue)] as const;
+      })
+      .filter(([, value]) => Number.isFinite(value)),
+  );
+}
+
+function formatVariationSettings(
+  settings: Array<{ axis: string; value: number }>,
+) {
+  return settings.map(({ axis, value }) => `'${axis}' ${value}`).join(", ");
+}
+
+function getFalloffValue(
+  distance: number,
+  radius: number,
+  falloff: FalloffMode,
+) {
+  const norm = clamp(1 - distance / radius, 0, 1);
+  switch (falloff) {
+    case "exponential":
+      return norm ** 2;
+    case "gaussian":
+      return Math.exp(-((distance / (radius / 2)) ** 2) / 2);
+    case "linear":
+    default:
+      return norm;
+  }
+}
+
+function buildLayerVariationSettings({
+  parsedSettings,
+  wghtAxisRange,
+  falloffValue,
+  allowShadowYFollow,
+  shadowStrength,
+  shadowTuning,
+}: {
+  parsedSettings: AxisRange[];
+  wghtAxisRange?: AxisRange;
+  falloffValue: number;
+  allowShadowYFollow: boolean;
+  shadowStrength: number;
+  shadowTuning: ProximityShadowTuning;
+}) {
+  const interpolatedAxisValues = parsedSettings.map(
+    ({ axis, fromValue, toValue }) => ({
+      axis,
+      value: fromValue + (toValue - fromValue) * falloffValue,
+    }),
+  );
+  const baseSettings = formatVariationSettings(interpolatedAxisValues);
+
+  if (!allowShadowYFollow || !wghtAxisRange) {
+    return { baseSettings, shadowSettings: baseSettings };
+  }
+
+  const axisMin = Math.min(wghtAxisRange.fromValue, wghtAxisRange.toValue);
+  const axisMax =
+    Math.max(wghtAxisRange.fromValue, wghtAxisRange.toValue) +
+    shadowTuning.wghtMaxExtra;
+  const shadowSettings = formatVariationSettings(
+    interpolatedAxisValues.map(({ axis, value }) => {
+      if (axis !== "wght") return { axis, value };
+      const boostedValue = value + shadowTuning.wghtBoost * shadowStrength;
+      return { axis, value: clamp(boostedValue, axisMin, axisMax) };
+    }),
+  );
+
+  return { baseSettings, shadowSettings };
 }
 
 // Frame loop utility so motion stays in sync with cursor updates.
@@ -159,7 +243,6 @@ function ProximityInteractiveText({
   const baseLetterRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const shadowLetterRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const shadowOffsetRefs = useRef<{ x: number; y: number }[]>([]);
-  const interpolatedSettingsRef = useRef<string[]>([]);
   const mousePositionRef = useMousePositionRef(containerRef);
   const hoverProgressRef = useRef(0);
   const lastFrameRef = useRef<{
@@ -173,20 +256,9 @@ function ProximityInteractiveText({
   });
 
   // Parses axis settings once so per-frame interpolation is cheap.
-  const parsedSettings = useMemo(() => {
-    const parseSettings = (settingsStr: string) =>
-      new Map(
-        settingsStr
-          .split(",")
-          .map((s) => s.trim())
-          .map((s) => {
-            const [name, value] = s.split(" ");
-            return [name.replace(/['"]/g, ""), parseFloat(value)];
-          }),
-      );
-
-    const fromSettings = parseSettings(fromFontVariationSettings);
-    const toSettings = parseSettings(toFontVariationSettings);
+  const parsedSettings = useMemo<AxisRange[]>(() => {
+    const fromSettings = parseVariationSettings(fromFontVariationSettings);
+    const toSettings = parseVariationSettings(toFontVariationSettings);
 
     return Array.from(fromSettings.entries()).map(([axis, fromValue]) => ({
       axis,
@@ -194,22 +266,10 @@ function ProximityInteractiveText({
       toValue: toSettings.get(axis) ?? fromValue,
     }));
   }, [fromFontVariationSettings, toFontVariationSettings]);
-
-  const calculateDistance = (x1: number, y1: number, x2: number, y2: number) =>
-    Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-
-  const calculateFalloff = (distance: number) => {
-    const norm = Math.min(Math.max(1 - distance / radius, 0), 1);
-    switch (falloff) {
-      case "exponential":
-        return norm ** 2;
-      case "gaussian":
-        return Math.exp(-((distance / (radius / 2)) ** 2) / 2);
-      case "linear":
-      default:
-        return norm;
-    }
-  };
+  const wghtAxisRange = useMemo(
+    () => parsedSettings.find((entry) => entry.axis === "wght"),
+    [parsedSettings],
+  );
 
   // Per-frame loop: keep interpolation responsive to cursor motion.
   useAnimationFrame(() => {
@@ -247,8 +307,6 @@ function ProximityInteractiveText({
     // Geometry stabilizers: reduce jitter near glyph center.
     const shadowSoftNorm = shadowTuning.directionSoftness;
     const shadowInnerRadius = shadowTuning.innerDeadZone;
-    const hasWdthAxis = parsedSettings.some(({ axis }) => axis === "wdth");
-
     glyphRefs.current.forEach((glyphRef, index) => {
       const baseRef = baseLetterRefs.current[index];
       const shadowRef = shadowLetterRefs.current[index];
@@ -258,8 +316,9 @@ function ProximityInteractiveText({
       const letterCenterY = glyphRef.offsetTop + glyphRef.offsetHeight / 2;
       const deltaX = x - letterCenterX;
       const deltaY = y - letterCenterY;
-      const distance = calculateDistance(x, y, letterCenterX, letterCenterY);
-      const falloffValue = distance >= radius ? 0 : calculateFalloff(distance);
+      const distance = Math.hypot(deltaX, deltaY);
+      const falloffValue =
+        distance >= radius ? 0 : getFalloffValue(distance, radius, falloff);
 
       // Shadow intensity uses a separate curve for earlier/later activation.
       const shadowFalloff = Math.pow(
@@ -267,68 +326,24 @@ function ProximityInteractiveText({
         shadowTuning.falloffExponent,
       );
       const shadowStrength = shadowFalloff * hoverProgressRef.current;
-      // Base layer keeps normal proximity interpolation behavior.
-      const baseSettings = parsedSettings
-        .map(({ axis, fromValue, toValue }) => {
-          const interpolatedValue =
-            fromValue + (toValue - fromValue) * falloffValue;
-          return `'${axis}' ${interpolatedValue}`;
-        })
-        .join(", ");
-      // Shadow layer can favor wdth-only or wght-only boost by mode.
-      const shadowSettingsParts = parsedSettings.map(
-        ({ axis, fromValue, toValue }) => {
-          const interpolatedValue =
-            fromValue + (toValue - fromValue) * falloffValue;
+      // Base and shadow layers share interpolation, with optional shadow `wght` boost.
+      const { baseSettings, shadowSettings } = buildLayerVariationSettings({
+        parsedSettings,
+        wghtAxisRange,
+        falloffValue,
+        allowShadowYFollow,
+        shadowStrength,
+        shadowTuning,
+      });
 
-          if (!allowShadowYFollow) {
-            if (axis !== "wdth") {
-              return `'${axis}' ${interpolatedValue}`;
-            }
-
-            const boostedValue =
-              interpolatedValue + shadowTuning.wdthBoost * shadowStrength;
-            const axisMin = Math.min(fromValue, toValue);
-            const axisMax =
-              Math.max(fromValue, toValue) + shadowTuning.wdthMaxExtra;
-            const clampedValue = Math.min(
-              Math.max(boostedValue, axisMin),
-              axisMax,
-            );
-            return `'${axis}' ${clampedValue}`;
-          }
-
-          if (axis !== "wght") {
-            return `'${axis}' ${interpolatedValue}`;
-          }
-
-          const boostedValue =
-            interpolatedValue + shadowTuning.wghtBoost * shadowStrength;
-          const axisMin = Math.min(fromValue, toValue);
-          const axisMax =
-            Math.max(fromValue, toValue) + shadowTuning.wghtMaxExtra;
-          const clampedValue = Math.min(
-            Math.max(boostedValue, axisMin),
-            axisMax,
-          );
-          return `'${axis}' ${clampedValue}`;
-        },
-      );
-      // Fallback for fonts that don't expose wdth in incoming settings.
-      if (!allowShadowYFollow && !hasWdthAxis) {
-        shadowSettingsParts.push(
-          `'wdth' ${shadowTuning.wdthFallbackBase + shadowTuning.wdthBoost * shadowStrength}`,
-        );
-      }
-      const shadowSettings = shadowSettingsParts.join(", ");
-
-      interpolatedSettingsRef.current[index] = baseSettings;
       baseRef.style.fontVariationSettings = baseSettings;
       shadowRef.style.fontVariationSettings = shadowSettings;
 
       // Cursor-directed offset creates the magnetic follow illusion.
-      const shadowDistance =
-        shadowTuning.maxOffset * shadowFalloff * hoverProgressRef.current;
+      const activeMaxOffset = allowShadowYFollow
+        ? shadowTuning.maxOffset
+        : shadowTuning.maxOffsetXOnly;
+      const shadowDistance = activeMaxOffset * shadowStrength;
       const innerRadiusRange = Math.max(radius - shadowInnerRadius, 1);
       const centerRamp = Math.min(
         Math.max((distance - shadowInnerRadius) / innerRadiusRange, 0),
@@ -399,9 +414,7 @@ function ProximityInteractiveText({
                     color: shadowColor,
                     opacity: 0,
                     transform: "translate3d(0, 0, 0)",
-                    fontVariationSettings:
-                      interpolatedSettingsRef.current[currentLetterIndex] ??
-                      fromFontVariationSettings,
+                    fontVariationSettings: fromFontVariationSettings,
                   }}
                   aria-hidden="true"
                 >
@@ -415,9 +428,7 @@ function ProximityInteractiveText({
                   style={{
                     display: "inline-block",
                     position: "relative",
-                    fontVariationSettings:
-                      interpolatedSettingsRef.current[currentLetterIndex] ??
-                      fromFontVariationSettings,
+                    fontVariationSettings: fromFontVariationSettings,
                   }}
                   aria-hidden="true"
                 >
