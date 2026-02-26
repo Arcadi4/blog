@@ -9,12 +9,19 @@ export default function CustomCursor() {
   const [isInteractive, setIsInteractive] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(pointer: fine)");
-    if (!mediaQuery.matches) {
+    const hasFinePointer = window.matchMedia("(any-pointer: fine)").matches;
+    const hasHover = window.matchMedia("(any-hover: hover)").matches;
+    const forcedColors = window.matchMedia("(forced-colors: active)").matches;
+
+    if (!hasFinePointer || !hasHover || forcedColors) {
       return;
     }
 
-    const handlePointerMove = (event: PointerEvent) => {
+    const handlePointerMove = (event: MouseEvent) => {
+      if (!document.body.classList.contains("custom-cursor-enabled")) {
+        document.body.classList.add("custom-cursor-enabled");
+      }
+
       setPosition({ x: event.clientX, y: event.clientY });
       const target = event.target;
       if (!(target instanceof Element)) {
@@ -29,12 +36,13 @@ export default function CustomCursor() {
       setIsInteractive(interactive);
     };
 
-    window.addEventListener("pointermove", handlePointerMove, {
+    window.addEventListener("mousemove", handlePointerMove, {
       passive: true,
     });
 
     return () => {
-      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("mousemove", handlePointerMove);
+      document.body.classList.remove("custom-cursor-enabled");
     };
   }, []);
 
@@ -44,7 +52,7 @@ export default function CustomCursor() {
   return (
     <div
       aria-hidden="true"
-      className="custom-cursor hidden md:block"
+      className="custom-cursor"
       style={{
         transform: `translate3d(${position.x - CURSOR_SIZE / 2}px, ${position.y - CURSOR_SIZE / 2}px, 0)`,
       }}
