@@ -3,28 +3,31 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-    --background: #fafafa;
-    --foreground: #0f0f0f;
-    --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-title: "Bricolage Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    --font-mono: "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --font-serif: "Playfair Display", "Georgia", serif;
-    --color-acid: #c3ff00;
-    --color-klein: #0048ff;
-    --color-magenta: #ff00a6;
+  --background: #fafafa;
+  --foreground: #0f0f0f;
+  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-title:
+    "Bricolage Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono:
+    "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --font-serif: "Playfair Display", "Georgia", serif;
+  --color-acid: #c3ff00;
+  --color-klein: #0048ff;
+  --color-magenta: #ff00a6;
 }
 
 @theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-sans);
-    --font-display: var(--font-display);
-    --font-mono: var(--font-mono);
-    --font-title: var(--font-title);
-    --font-serif: var(--font-serif);
-    --color-acid: var(--color-acid);
-    --color-klein: var(--color-klein);
-    --color-magenta: var(--color-magenta);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+  --font-title: var(--font-title);
+  --font-serif: var(--font-serif);
+  --color-acid: var(--color-acid);
+  --color-klein: var(--color-klein);
+  --color-magenta: var(--color-magenta);
 }
 
 /* 
@@ -45,39 +48,43 @@ h4,
 h5,
 h6,
 .title {
-    font-family: var(--font-title), serif;
+  font-family: var(--font-title), serif;
 }
 
 @layer components {
-    .h1-hero {
-        @apply text-8xl font-bold leading-[0.8];
-    }
+  .h1-hero {
+    @apply text-8xl font-bold leading-[0.8];
+  }
 
-    .large-p {
-        @apply text-2xl leading-none;
-    }
+  .large-p {
+    @apply text-2xl leading-none;
+  }
 
-    .large-link {
-        @apply text-5xl leading-none;
-    }
+  .large-link {
+    @apply text-5xl leading-none;
+  }
 }
 
 body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-sans), sans-serif;
-    isolation: isolate;
-    cursor: none;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+  isolation: isolate;
+}
+
+.custom-cursor-enabled,
+.custom-cursor-enabled * {
+  cursor: none !important;
 }
 
 @layer utilities {
-    .font-display {
-        font-family: var(--font-display), serif;
-    }
+  .font-display {
+    font-family: var(--font-display), serif;
+  }
 }
 
 .text-stroke {
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: black;
-    color: transparent;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  color: transparent;
 }
