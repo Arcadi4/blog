@@ -9,56 +9,18 @@ import {
   useRef,
   useState,
 } from "react";
-
-type FalloffMode = "linear" | "exponential" | "gaussian";
-
-interface AxisRange {
-  axis: string;
-  fromValue: number;
-  toValue: number;
-}
-
-interface ProximityShadowTuning {
-  /** Hover progress lerp while entering */
-  hoverEnterLerp: number;
-  /** Hover progress lerp while leaving */
-  hoverLeaveLerp: number;
-  /** Shadow-specific falloff exponent */
-  falloffExponent: number;
-  /** Max shadow offset in px */
-  maxOffset: number;
-  /** Max shadow offset in px when Y-follow is disabled */
-  maxOffsetXOnly: number;
-  /** Softens direction vector near glyph center */
-  directionSoftness: number;
-  /** Radius where shadow offset is suppressed */
-  innerDeadZone: number;
-  /** Offset interpolation while entering */
-  offsetEnterLerp: number;
-  /** Offset interpolation while leaving */
-  offsetLeaveLerp: number;
-  /** Hide shadow when offset is below this value */
-  visibilityThreshold: number;
-  /** Weight-axis boost when Y-follow is enabled */
-  wghtBoost: number;
-  /** Extra max clamp for weight-axis boost */
-  wghtMaxExtra: number;
-}
-
-const defaultShadowTuning: ProximityShadowTuning = {
-  hoverEnterLerp: 0.12,
-  hoverLeaveLerp: 0.2,
-  falloffExponent: 0.8,
-  maxOffset: 24,
-  maxOffsetXOnly: 24,
-  directionSoftness: 8,
-  innerDeadZone: 8,
-  offsetEnterLerp: 0.16,
-  offsetLeaveLerp: 0.24,
-  visibilityThreshold: 0.08,
-  wghtBoost: 220,
-  wghtMaxExtra: 280,
-};
+import {
+  buildLayerVariationSettings,
+  defaultShadowTuning,
+  getFalloffValue,
+  getShadowOffset,
+  parseVariationSettings,
+} from "./proximityLinkMath";
+import type {
+  AxisRange,
+  FalloffMode,
+  ProximityShadowTuning,
+} from "./proximityLinkMath";
 
 interface ProximityLinkProps extends Omit<
   AnchorHTMLAttributes<HTMLAnchorElement>,
@@ -96,88 +58,6 @@ interface ProximityInteractiveTextProps {
   shadowColor: string;
   allowShadowYFollow: boolean;
   shadowTuning: ProximityShadowTuning;
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
-}
-
-function parseVariationSettings(settingsStr: string) {
-  return new Map(
-    settingsStr
-      .split(",")
-      .map((item) => item.trim())
-      .map((item) => {
-        const [rawAxis, rawValue] = item.split(/\s+/);
-        return [rawAxis.replace(/['"]/g, ""), parseFloat(rawValue)] as const;
-      })
-      .filter(([, value]) => Number.isFinite(value)),
-  );
-}
-
-function formatVariationSettings(
-  settings: Array<{ axis: string; value: number }>,
-) {
-  return settings.map(({ axis, value }) => `'${axis}' ${value}`).join(", ");
-}
-
-function getFalloffValue(
-  distance: number,
-  radius: number,
-  falloff: FalloffMode,
-) {
-  const norm = clamp(1 - distance / radius, 0, 1);
-  switch (falloff) {
-    case "exponential":
-      return norm ** 2;
-    case "gaussian":
-      return Math.exp(-((distance / (radius / 2)) ** 2) / 2);
-    case "linear":
-    default:
-      return norm;
-  }
-}
-
-function buildLayerVariationSettings({
-  parsedSettings,
-  wghtAxisRange,
-  falloffValue,
-  allowShadowYFollow,
-  shadowStrength,
-  shadowTuning,
-}: {
-  parsedSettings: AxisRange[];
-  wghtAxisRange?: AxisRange;
-  falloffValue: number;
-  allowShadowYFollow: boolean;
-  shadowStrength: number;
-  shadowTuning: ProximityShadowTuning;
-}) {
-  const interpolatedAxisValues = parsedSettings.map(
-    ({ axis, fromValue, toValue }) => ({
-      axis,
-      value: fromValue + (toValue - fromValue) * falloffValue,
-    }),
-  );
-  const baseSettings = formatVariationSettings(interpolatedAxisValues);
-
-  if (!allowShadowYFollow || !wghtAxisRange) {
-    return { baseSettings, shadowSettings: baseSettings };
-  }
-
-  const axisMin = Math.min(wghtAxisRange.fromValue, wghtAxisRange.toValue);
-  const axisMax =
-    Math.max(wghtAxisRange.fromValue, wghtAxisRange.toValue) +
-    shadowTuning.wghtMaxExtra;
-  const shadowSettings = formatVariationSettings(
-    interpolatedAxisValues.map(({ axis, value }) => {
-      if (axis !== "wght") return { axis, value };
-      const boostedValue = value + shadowTuning.wghtBoost * shadowStrength;
-      return { axis, value: clamp(boostedValue, axisMin, axisMax) };
-    }),
-  );
-
-  return { baseSettings, shadowSettings };
 }
 
 // Frame loop utility so motion stays in sync with cursor updates.
@@ -304,9 +184,6 @@ function ProximityInteractiveText({
       hoverProgress: hoverProgressRef.current,
     };
 
-    // Geometry stabilizers: reduce jitter near glyph center.
-    const shadowSoftNorm = shadowTuning.directionSoftness;
-    const shadowInnerRadius = shadowTuning.innerDeadZone;
     glyphRefs.current.forEach((glyphRef, index) => {
       const baseRef = baseLetterRefs.current[index];
       const shadowRef = shadowLetterRefs.current[index];
@@ -339,40 +216,24 @@ function ProximityInteractiveText({
       baseRef.style.fontVariationSettings = baseSettings;
       shadowRef.style.fontVariationSettings = shadowSettings;
 
-      // Cursor-directed offset creates the magnetic follow illusion.
-      const activeMaxOffset = allowShadowYFollow
-        ? shadowTuning.maxOffset
-        : shadowTuning.maxOffsetXOnly;
-      const shadowDistance = activeMaxOffset * shadowStrength;
-      const innerRadiusRange = Math.max(radius - shadowInnerRadius, 1);
-      const centerRamp = Math.min(
-        Math.max((distance - shadowInnerRadius) / innerRadiusRange, 0),
-        1,
-      );
-      const directionScale =
-        shadowDistance /
-        Math.sqrt(deltaX * deltaX + deltaY * deltaY + shadowSoftNorm ** 2);
-      const targetOffsetX = deltaX * directionScale * centerRamp;
-      const targetOffsetY = allowShadowYFollow
-        ? deltaY * directionScale * centerRamp
-        : 0;
       const previousOffset = shadowOffsetRefs.current[index] ?? { x: 0, y: 0 };
-      const offsetLerp = isHovered
-        ? shadowTuning.offsetEnterLerp
-        : shadowTuning.offsetLeaveLerp;
-      const nextOffsetX =
-        previousOffset.x + (targetOffsetX - previousOffset.x) * offsetLerp;
-      const nextOffsetY =
-        previousOffset.y + (targetOffsetY - previousOffset.y) * offsetLerp;
-      const nextOffsetMagnitude = Math.hypot(nextOffsetX, nextOffsetY);
-      const shouldShowShadow =
-        hoverProgressRef.current > 0.01 &&
-        nextOffsetMagnitude > shadowTuning.visibilityThreshold;
+      const nextShadow = getShadowOffset({
+        deltaX,
+        deltaY,
+        distance,
+        radius,
+        shadowStrength,
+        hoverProgress: hoverProgressRef.current,
+        isHovered,
+        allowShadowYFollow,
+        previousOffset,
+        shadowTuning,
+      });
 
       // Persist smoothed offset so exit animation can settle naturally.
-      shadowOffsetRefs.current[index] = { x: nextOffsetX, y: nextOffsetY };
-      shadowRef.style.transform = `translate3d(${nextOffsetX}px, ${nextOffsetY}px, 0)`;
-      shadowRef.style.opacity = shouldShowShadow ? "1" : "0";
+      shadowOffsetRefs.current[index] = { x: nextShadow.x, y: nextShadow.y };
+      shadowRef.style.transform = `translate3d(${nextShadow.x}px, ${nextShadow.y}px, 0)`;
+      shadowRef.style.opacity = nextShadow.visible ? "1" : "0";
     });
   });
 

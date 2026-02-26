@@ -1,0 +1,180 @@
+export type FalloffMode = "linear" | "exponential" | "gaussian";
+
+export interface AxisRange {
+  axis: string;
+  fromValue: number;
+  toValue: number;
+}
+
+export interface ProximityShadowTuning {
+  hoverEnterLerp: number;
+  hoverLeaveLerp: number;
+  falloffExponent: number;
+  maxOffset: number;
+  maxOffsetXOnly: number;
+  directionSoftness: number;
+  innerDeadZone: number;
+  offsetEnterLerp: number;
+  offsetLeaveLerp: number;
+  visibilityThreshold: number;
+  wghtBoost: number;
+  wghtMaxExtra: number;
+}
+
+export interface ShadowOffset {
+  x: number;
+  y: number;
+}
+
+export const defaultShadowTuning: ProximityShadowTuning = {
+  hoverEnterLerp: 0.12,
+  hoverLeaveLerp: 0.2,
+  falloffExponent: 0.8,
+  maxOffset: 24,
+  maxOffsetXOnly: 24,
+  directionSoftness: 8,
+  innerDeadZone: 8,
+  offsetEnterLerp: 0.16,
+  offsetLeaveLerp: 0.24,
+  visibilityThreshold: 0.08,
+  wghtBoost: 220,
+  wghtMaxExtra: 280,
+};
+
+export function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+export function parseVariationSettings(settingsStr: string) {
+  return new Map(
+    settingsStr
+      .split(",")
+      .map((item) => item.trim())
+      .map((item) => {
+        const [rawAxis, rawValue] = item.split(/\s+/);
+        return [rawAxis.replace(/['"]/g, ""), parseFloat(rawValue)] as const;
+      })
+      .filter(([, value]) => Number.isFinite(value)),
+  );
+}
+
+export function formatVariationSettings(
+  settings: Array<{ axis: string; value: number }>,
+) {
+  return settings.map(({ axis, value }) => `'${axis}' ${value}`).join(", ");
+}
+
+export function getFalloffValue(
+  distance: number,
+  radius: number,
+  falloff: FalloffMode,
+) {
+  const norm = clamp(1 - distance / radius, 0, 1);
+  switch (falloff) {
+    case "exponential":
+      return norm ** 2;
+    case "gaussian":
+      return Math.exp(-((distance / (radius / 2)) ** 2) / 2);
+    case "linear":
+    default:
+      return norm;
+  }
+}
+
+export function buildLayerVariationSettings({
+  parsedSettings,
+  wghtAxisRange,
+  falloffValue,
+  allowShadowYFollow,
+  shadowStrength,
+  shadowTuning,
+}: {
+  parsedSettings: AxisRange[];
+  wghtAxisRange?: AxisRange;
+  falloffValue: number;
+  allowShadowYFollow: boolean;
+  shadowStrength: number;
+  shadowTuning: ProximityShadowTuning;
+}) {
+  const interpolatedAxisValues = parsedSettings.map(
+    ({ axis, fromValue, toValue }) => ({
+      axis,
+      value: fromValue + (toValue - fromValue) * falloffValue,
+    }),
+  );
+  const baseSettings = formatVariationSettings(interpolatedAxisValues);
+
+  if (!allowShadowYFollow || !wghtAxisRange) {
+    return { baseSettings, shadowSettings: baseSettings };
+  }
+
+  const axisMin = Math.min(wghtAxisRange.fromValue, wghtAxisRange.toValue);
+  const axisMax =
+    Math.max(wghtAxisRange.fromValue, wghtAxisRange.toValue) +
+    shadowTuning.wghtMaxExtra;
+  const shadowSettings = formatVariationSettings(
+    interpolatedAxisValues.map(({ axis, value }) => {
+      if (axis !== "wght") return { axis, value };
+      const boostedValue = value + shadowTuning.wghtBoost * shadowStrength;
+      return { axis, value: clamp(boostedValue, axisMin, axisMax) };
+    }),
+  );
+
+  return { baseSettings, shadowSettings };
+}
+
+export function getShadowOffset({
+  deltaX,
+  deltaY,
+  distance,
+  radius,
+  shadowStrength,
+  hoverProgress,
+  isHovered,
+  allowShadowYFollow,
+  previousOffset,
+  shadowTuning,
+}: {
+  deltaX: number;
+  deltaY: number;
+  distance: number;
+  radius: number;
+  shadowStrength: number;
+  hoverProgress: number;
+  isHovered: boolean;
+  allowShadowYFollow: boolean;
+  previousOffset: ShadowOffset;
+  shadowTuning: ProximityShadowTuning;
+}) {
+  const activeMaxOffset = allowShadowYFollow
+    ? shadowTuning.maxOffset
+    : shadowTuning.maxOffsetXOnly;
+  const shadowDistance = activeMaxOffset * shadowStrength;
+  const innerRadiusRange = Math.max(radius - shadowTuning.innerDeadZone, 1);
+  const centerRamp = clamp(
+    (distance - shadowTuning.innerDeadZone) / innerRadiusRange,
+    0,
+    1,
+  );
+  const directionScale =
+    shadowDistance /
+    Math.sqrt(
+      deltaX * deltaX +
+        deltaY * deltaY +
+        shadowTuning.directionSoftness * shadowTuning.directionSoftness,
+    );
+
+  const targetOffsetX = deltaX * directionScale * centerRamp;
+  const targetOffsetY = allowShadowYFollow
+    ? deltaY * directionScale * centerRamp
+    : 0;
+  const offsetLerp = isHovered
+    ? shadowTuning.offsetEnterLerp
+    : shadowTuning.offsetLeaveLerp;
+  const x = previousOffset.x + (targetOffsetX - previousOffset.x) * offsetLerp;
+  const y = previousOffset.y + (targetOffsetY - previousOffset.y) * offsetLerp;
+  const visible =
+    hoverProgress > 0.01 && Math.hypot(x, y) > shadowTuning.visibilityThreshold;
+
+  return { x, y, visible };
+}
