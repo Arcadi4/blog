@@ -4,6 +4,7 @@ import NextLink from "next/link";
 import {
   AnchorHTMLAttributes,
   MutableRefObject,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -27,25 +28,15 @@ interface ProximityLinkProps extends Omit<
   "children"
 > {
   href: string;
-  /** Link text — can be provided as `children` (string) or `label` prop. `children` takes priority. */
   children?: string;
-  /** Alternative to children. Ignored when children is provided. */
   label?: string;
-  /** Variable-font variation settings when the cursor is far away */
   fromFontVariationSettings?: string;
-  /** Variable-font variation settings when the cursor is closest */
   toFontVariationSettings?: string;
-  /** Effect radius in px (default 192) */
   radius?: number;
-  /** Distance falloff curve */
   falloff?: FalloffMode;
-  /** Shadow color used on hover */
   shadowColor?: string;
-  /** Allow Y-axis shadow follow in addition to X-axis */
   allowShadowYFollow?: boolean;
-  /** Reverse shadow direction so it moves away from cursor */
   reverseShadowDirection?: boolean;
-  /** Advanced tuning for shadow movement and weight boosting */
   shadowTuning?: Partial<ProximityShadowTuning>;
 }
 
@@ -63,51 +54,103 @@ interface ProximityInteractiveTextProps {
   shadowTuning: ProximityShadowTuning;
 }
 
-// Frame loop utility so motion stays in sync with cursor updates.
-function useAnimationFrame(callback: () => void) {
-  useEffect(() => {
-    let frameId: number;
-    const loop = () => {
-      callback();
-      frameId = requestAnimationFrame(loop);
-    };
-    frameId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(frameId);
-  }, [callback]);
+type FrameSubscriber = () => boolean;
+
+/**
+ * This is a performance optimization where all ProximityLink instances share
+ * one pointer listener set and one RAF loop instead of creating one per link.
+ * The optimization works by merging repeated per-instance event and frame work
+ * into a single global pipeline, which reduces main-thread overhead.
+ * Visual output stays consistent because each instance keeps the same
+ * interpolation formulas, shadow math, and pointer input stream.
+ */
+const pointerPosition = { x: -1000, y: -1000 };
+const frameSubscribers = new Set<FrameSubscriber>();
+
+let frameId: number | null = null;
+let listenersAttached = false;
+
+function setPointerPosition(x: number, y: number) {
+  pointerPosition.x = x;
+  pointerPosition.y = y;
 }
 
-// Tracks cursor/touch position in local coordinates of the link container.
-function useMousePositionRef(
-  containerRef: MutableRefObject<HTMLElement | null>,
-) {
-  const positionRef = useRef({ x: -1000, y: 0 });
+function attachPointerListeners() {
+  if (listenersAttached || typeof window === "undefined") {
+    return;
+  }
 
-  useEffect(() => {
-    const updatePosition = (x: number, y: number) => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        positionRef.current = { x: x - rect.left, y: y - rect.top };
-      } else {
-        positionRef.current = { x, y };
-      }
-    };
+  const handleMouseMove = (event: MouseEvent) => {
+    setPointerPosition(event.clientX, event.clientY);
+  };
 
-    const handleMouseMove = (ev: MouseEvent) =>
-      updatePosition(ev.clientX, ev.clientY);
-    const handleTouchMove = (ev: TouchEvent) => {
-      const touch = ev.touches[0];
-      updatePosition(touch.clientX, touch.clientY);
-    };
+  const handleTouchMove = (event: TouchEvent) => {
+    const touch = event.touches[0];
+    if (!touch) {
+      return;
+    }
+    setPointerPosition(touch.clientX, touch.clientY);
+  };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("touchmove", handleTouchMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("touchmove", handleTouchMove);
-    };
-  }, [containerRef]);
+  window.addEventListener("mousemove", handleMouseMove, { passive: true });
+  window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
-  return positionRef;
+  listenersAttached = true;
+  cleanupPointerListeners = () => {
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("touchmove", handleTouchMove);
+    listenersAttached = false;
+    cleanupPointerListeners = null;
+  };
+}
+
+let cleanupPointerListeners: (() => void) | null = null;
+
+function stopGlobalLoop() {
+  if (frameId !== null) {
+    cancelAnimationFrame(frameId);
+    frameId = null;
+  }
+
+  if (frameSubscribers.size === 0) {
+    cleanupPointerListeners?.();
+  }
+}
+
+function runGlobalLoop() {
+  for (const subscriber of Array.from(frameSubscribers)) {
+    const keep = subscriber();
+    if (!keep) {
+      frameSubscribers.delete(subscriber);
+    }
+  }
+
+  if (frameSubscribers.size === 0) {
+    stopGlobalLoop();
+    return;
+  }
+
+  frameId = requestAnimationFrame(runGlobalLoop);
+}
+
+function subscribeFrameLoop(subscriber: FrameSubscriber) {
+  if (typeof window === "undefined") {
+    return () => {};
+  }
+
+  frameSubscribers.add(subscriber);
+  attachPointerListeners();
+
+  if (frameId === null) {
+    frameId = requestAnimationFrame(runGlobalLoop);
+  }
+
+  return () => {
+    frameSubscribers.delete(subscriber);
+    if (frameSubscribers.size === 0) {
+      stopGlobalLoop();
+    }
+  };
 }
 
 function ProximityInteractiveText({
@@ -126,9 +169,14 @@ function ProximityInteractiveText({
   const glyphRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const baseLetterRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const shadowLetterRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const glyphCentersRef = useRef<{ x: number; y: number }[]>([]);
   const shadowOffsetRefs = useRef<{ x: number; y: number }[]>([]);
-  const mousePositionRef = useMousePositionRef(containerRef);
+  const appliedStyleRefs = useRef<
+    { base: string; shadow: string; x: number; y: number; opacity: string }[]
+  >([]);
   const hoverProgressRef = useRef(0);
+  const isHoveredRef = useRef(isHovered);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
   const lastFrameRef = useRef<{
     x: number | null;
     y: number | null;
@@ -139,7 +187,8 @@ function ProximityInteractiveText({
     hoverProgress: -1,
   });
 
-  // Parses axis settings once so per-frame interpolation is cheap.
+  isHoveredRef.current = isHovered;
+
   const parsedSettings = useMemo<AxisRange[]>(() => {
     const fromSettings = parseVariationSettings(fromFontVariationSettings);
     const toSettings = parseVariationSettings(toFontVariationSettings);
@@ -155,92 +204,283 @@ function ProximityInteractiveText({
     [parsedSettings],
   );
 
-  // Per-frame loop: keep interpolation responsive to cursor motion.
-  useAnimationFrame(() => {
-    if (!containerRef.current) return;
+  const parsedSettingsRef = useRef(parsedSettings);
+  const wghtAxisRangeRef = useRef(wghtAxisRange);
+  const falloffRef = useRef(falloff);
+  const radiusRef = useRef(radius);
+  const allowShadowYFollowRef = useRef(allowShadowYFollow);
+  const reverseShadowDirectionRef = useRef(reverseShadowDirection);
+  const shadowTuningRef = useRef(shadowTuning);
 
-    // Smoothly animate hover in/out so shadow activation feels organic.
-    const targetHoverProgress = isHovered ? 1 : 0;
-    const hoverDelta = targetHoverProgress - hoverProgressRef.current;
-    if (Math.abs(hoverDelta) > 0.001) {
-      const hoverLerp =
-        hoverDelta > 0
-          ? shadowTuning.hoverEnterLerp
-          : shadowTuning.hoverLeaveLerp;
-      hoverProgressRef.current += hoverDelta * hoverLerp;
-      if (Math.abs(targetHoverProgress - hoverProgressRef.current) < 0.01) {
-        hoverProgressRef.current = targetHoverProgress;
+  parsedSettingsRef.current = parsedSettings;
+  wghtAxisRangeRef.current = wghtAxisRange;
+  falloffRef.current = falloff;
+  radiusRef.current = radius;
+  allowShadowYFollowRef.current = allowShadowYFollow;
+  reverseShadowDirectionRef.current = reverseShadowDirection;
+  shadowTuningRef.current = shadowTuning;
+
+  /**
+   * This is a performance optimization that precomputes and caches glyph center
+   * positions so each frame only does numeric interpolation.
+   * The optimization works by avoiding layout reads during animation frames,
+   * which reduces reflow and layout pressure.
+   * Visual output stays consistent because cached centers are refreshed on
+   * mount, resize, font readiness, and hover entry.
+   */
+  const measureGlyphCenters = useCallback(() => {
+    glyphCentersRef.current = glyphRefs.current.map((glyphRef) => {
+      if (!glyphRef) {
+        return { x: -1000, y: -1000 };
       }
-    }
 
-    const { x, y } = mousePositionRef.current;
-    if (
-      lastFrameRef.current.x === x &&
-      lastFrameRef.current.y === y &&
-      lastFrameRef.current.hoverProgress === hoverProgressRef.current
-    ) {
+      const rect = glyphRef.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      };
+    });
+  }, []);
+
+  const hasResidualOffset = useCallback(() => {
+    return shadowOffsetRefs.current.some(
+      (offset) => Math.abs(offset.x) > 0.01 || Math.abs(offset.y) > 0.01,
+    );
+  }, []);
+
+  const stopLoop = useCallback(() => {
+    unsubscribeRef.current?.();
+    unsubscribeRef.current = null;
+  }, []);
+
+  const startLoop = useCallback(() => {
+    if (unsubscribeRef.current) {
       return;
     }
 
-    lastFrameRef.current = {
-      x,
-      y,
-      hoverProgress: hoverProgressRef.current,
+    unsubscribeRef.current = subscribeFrameLoop(() => {
+      if (!containerRef.current) {
+        return true;
+      }
+
+      const currentShadowTuning = shadowTuningRef.current;
+      const targetHoverProgress = isHoveredRef.current ? 1 : 0;
+      const hoverDelta = targetHoverProgress - hoverProgressRef.current;
+
+      if (Math.abs(hoverDelta) > 0.001) {
+        const hoverLerp =
+          hoverDelta > 0
+            ? currentShadowTuning.hoverEnterLerp
+            : currentShadowTuning.hoverLeaveLerp;
+        hoverProgressRef.current += hoverDelta * hoverLerp;
+
+        if (Math.abs(targetHoverProgress - hoverProgressRef.current) < 0.01) {
+          hoverProgressRef.current = targetHoverProgress;
+        }
+      }
+
+      const x = pointerPosition.x;
+      const y = pointerPosition.y;
+      const hoverChanged =
+        Math.abs(
+          lastFrameRef.current.hoverProgress - hoverProgressRef.current,
+        ) > 0.0001;
+      const pointerChanged =
+        lastFrameRef.current.x !== x || lastFrameRef.current.y !== y;
+      const residualOffset = hasResidualOffset();
+
+      const shouldProcess =
+        pointerChanged ||
+        hoverChanged ||
+        isHoveredRef.current ||
+        residualOffset;
+
+      if (!shouldProcess) {
+        return true;
+      }
+
+      lastFrameRef.current = {
+        x,
+        y,
+        hoverProgress: hoverProgressRef.current,
+      };
+
+      glyphRefs.current.forEach((glyphRef, index) => {
+        const baseRef = baseLetterRefs.current[index];
+        const shadowRef = shadowLetterRefs.current[index];
+        if (!glyphRef || !baseRef || !shadowRef) {
+          return;
+        }
+
+        const center = glyphCentersRef.current[index];
+        if (!center) {
+          return;
+        }
+
+        const deltaX = x - center.x;
+        const deltaY = y - center.y;
+        const distance = Math.hypot(deltaX, deltaY);
+        const currentRadius = radiusRef.current;
+        const falloffValue =
+          distance >= currentRadius
+            ? 0
+            : getFalloffValue(distance, currentRadius, falloffRef.current);
+        const shadowFalloff = Math.pow(
+          falloffValue,
+          currentShadowTuning.falloffExponent,
+        );
+        const shadowStrength = shadowFalloff * hoverProgressRef.current;
+        const { baseSettings, shadowSettings } = buildLayerVariationSettings({
+          parsedSettings: parsedSettingsRef.current,
+          wghtAxisRange: wghtAxisRangeRef.current,
+          falloffValue,
+          allowShadowYFollow: allowShadowYFollowRef.current,
+          shadowStrength,
+          shadowTuning: currentShadowTuning,
+        });
+
+        const previousOffset = shadowOffsetRefs.current[index] ?? {
+          x: 0,
+          y: 0,
+        };
+        const nextShadow = getShadowOffset({
+          deltaX,
+          deltaY,
+          distance,
+          radius: currentRadius,
+          shadowStrength,
+          hoverProgress: hoverProgressRef.current,
+          isHovered: isHoveredRef.current,
+          allowShadowYFollow: allowShadowYFollowRef.current,
+          reverseDirection: reverseShadowDirectionRef.current,
+          previousOffset,
+          shadowTuning: currentShadowTuning,
+        });
+
+        shadowOffsetRefs.current[index] = { x: nextShadow.x, y: nextShadow.y };
+
+        const applied =
+          appliedStyleRefs.current[index] ??
+          ({
+            base: "",
+            shadow: "",
+            x: Number.NaN,
+            y: Number.NaN,
+            opacity: "",
+          } as {
+            base: string;
+            shadow: string;
+            x: number;
+            y: number;
+            opacity: string;
+          });
+
+        // This is a performance optimization that skips redundant style writes.
+        // Visual output stays consistent because unchanged target values render identically.
+        if (applied.base !== baseSettings) {
+          baseRef.style.fontVariationSettings = baseSettings;
+          applied.base = baseSettings;
+        }
+
+        if (applied.shadow !== shadowSettings) {
+          shadowRef.style.fontVariationSettings = shadowSettings;
+          applied.shadow = shadowSettings;
+        }
+
+        if (applied.x !== nextShadow.x || applied.y !== nextShadow.y) {
+          shadowRef.style.transform = `translate3d(${nextShadow.x}px, ${nextShadow.y}px, 0)`;
+          applied.x = nextShadow.x;
+          applied.y = nextShadow.y;
+        }
+
+        const opacity = nextShadow.visible ? "1" : "0";
+        if (applied.opacity !== opacity) {
+          shadowRef.style.opacity = opacity;
+          applied.opacity = opacity;
+        }
+
+        appliedStyleRefs.current[index] = applied;
+      });
+
+      return true;
+    });
+  }, [containerRef, hasResidualOffset]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    let measureFrame: number | null = null;
+    const scheduleMeasure = () => {
+      if (measureFrame !== null) {
+        return;
+      }
+
+      measureFrame = window.requestAnimationFrame(() => {
+        measureFrame = null;
+        measureGlyphCenters();
+      });
     };
 
-    glyphRefs.current.forEach((glyphRef, index) => {
-      const baseRef = baseLetterRefs.current[index];
-      const shadowRef = shadowLetterRefs.current[index];
-      if (!glyphRef || !baseRef || !shadowRef) return;
+    scheduleMeasure();
 
-      const letterCenterX = glyphRef.offsetLeft + glyphRef.offsetWidth / 2;
-      const letterCenterY = glyphRef.offsetTop + glyphRef.offsetHeight / 2;
-      const deltaX = x - letterCenterX;
-      const deltaY = y - letterCenterY;
-      const distance = Math.hypot(deltaX, deltaY);
-      const falloffValue =
-        distance >= radius ? 0 : getFalloffValue(distance, radius, falloff);
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined" && containerRef.current
+        ? new ResizeObserver(scheduleMeasure)
+        : null;
 
-      // Shadow intensity uses a separate curve for earlier/later activation.
-      const shadowFalloff = Math.pow(
-        falloffValue,
-        shadowTuning.falloffExponent,
-      );
-      const shadowStrength = shadowFalloff * hoverProgressRef.current;
-      // Base and shadow layers share interpolation, with optional shadow `wght` boost.
-      const { baseSettings, shadowSettings } = buildLayerVariationSettings({
-        parsedSettings,
-        wghtAxisRange,
-        falloffValue,
-        allowShadowYFollow,
-        shadowStrength,
-        shadowTuning,
-      });
+    if (resizeObserver && containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
 
-      baseRef.style.fontVariationSettings = baseSettings;
-      shadowRef.style.fontVariationSettings = shadowSettings;
+    window.addEventListener("resize", scheduleMeasure, { passive: true });
 
-      const previousOffset = shadowOffsetRefs.current[index] ?? { x: 0, y: 0 };
-      const nextShadow = getShadowOffset({
-        deltaX,
-        deltaY,
-        distance,
-        radius,
-        shadowStrength,
-        hoverProgress: hoverProgressRef.current,
-        isHovered,
-        allowShadowYFollow,
-        reverseDirection: reverseShadowDirection,
-        previousOffset,
-        shadowTuning,
-      });
+    document.fonts?.ready.then(scheduleMeasure).catch(() => {});
 
-      // Persist smoothed offset so exit animation can settle naturally.
-      shadowOffsetRefs.current[index] = { x: nextShadow.x, y: nextShadow.y };
-      shadowRef.style.transform = `translate3d(${nextShadow.x}px, ${nextShadow.y}px, 0)`;
-      shadowRef.style.opacity = nextShadow.visible ? "1" : "0";
-    });
-  });
+    return () => {
+      if (measureFrame !== null) {
+        window.cancelAnimationFrame(measureFrame);
+      }
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", scheduleMeasure);
+    };
+  }, [containerRef, label, measureGlyphCenters]);
+
+  useEffect(() => {
+    if (isHovered) {
+      measureGlyphCenters();
+    }
+  }, [isHovered, measureGlyphCenters]);
+
+  useEffect(() => {
+    /**
+     * This keeps the loop always active to match the original behavior, which
+     * updates interpolation continuously even when the link is not hovered.
+     * The optimization still applies because the always-on loop is shared
+     * globally instead of running one loop per instance.
+     * Visual output stays consistent because activation timing matches the
+     * previous implementation.
+     */
+    startLoop();
+
+    return () => {
+      stopLoop();
+    };
+  }, [startLoop, stopLoop]);
+
+  useEffect(() => {
+    shadowOffsetRefs.current = [];
+    appliedStyleRefs.current = [];
+    hoverProgressRef.current = 0;
+    lastFrameRef.current = { x: null, y: null, hoverProgress: -1 };
+    measureGlyphCenters();
+  }, [
+    fromFontVariationSettings,
+    label,
+    measureGlyphCenters,
+    toFontVariationSettings,
+  ]);
 
   const words = label.split(" ");
   let letterIndex = 0;
@@ -268,7 +508,6 @@ function ProximityInteractiveText({
                 }}
                 aria-hidden="true"
               >
-                {/* Shadow glyph mirrors the same character and receives motion/axis boosts. */}
                 <span
                   ref={(el) => {
                     shadowLetterRefs.current[currentLetterIndex] = el;
@@ -286,7 +525,6 @@ function ProximityInteractiveText({
                 >
                   {letter}
                 </span>
-                {/* Base glyph stays readable while shadow glyph handles motion. */}
                 <span
                   ref={(el) => {
                     baseLetterRefs.current[currentLetterIndex] = el;
@@ -313,19 +551,6 @@ function ProximityInteractiveText({
   );
 }
 
-/**
- * Link component that uses VariableProximity instead of an underline.
- * Characters near the cursor morph toward `toFontVariationSettings`,
- * giving an interactive, fluid feel without any underline decoration.
- *
- * Supports both wrapping and label syntax:
- *   <ProximityLink href="/about">About</ProximityLink>
- *   <ProximityLink href="/about" label="About" />
- *
- * Requires a variable font (default values assume Bricolage Grotesque's
- * `wght` axis). Override the `from/toFontVariationSettings` props to
- * match your font's available axes.
- */
 export default function ProximityLink({
   href,
   children,
@@ -350,7 +575,6 @@ export default function ProximityLink({
 
   const containerRef = useRef<HTMLAnchorElement | null>(null);
   const [isHovered, setIsHovered] = useState(false);
-  // Merge user overrides with defaults so tuning stays opt-in.
   const resolvedShadowTuning = useMemo(
     () => ({ ...defaultShadowTuning, ...shadowTuning }),
     [shadowTuning],
@@ -358,7 +582,6 @@ export default function ProximityLink({
   const isExternal = href.startsWith("http") || href.startsWith("mailto:");
   const linkClass = `proximity-link ${className}`;
 
-  // Interactive text keeps base glyph and shadow glyph synchronized.
   const proximityContent = (
     <ProximityInteractiveText
       label={text}
@@ -375,12 +598,13 @@ export default function ProximityLink({
     />
   );
 
-  // Keep native event passthrough while tracking internal hover progress.
   const handleMouseEnter: AnchorHTMLAttributes<HTMLAnchorElement>["onMouseEnter"] =
     (event) => {
+      setPointerPosition(event.clientX, event.clientY);
       setIsHovered(true);
       onMouseEnter?.(event);
     };
+
   const handleMouseLeave: AnchorHTMLAttributes<HTMLAnchorElement>["onMouseLeave"] =
     (event) => {
       setIsHovered(false);

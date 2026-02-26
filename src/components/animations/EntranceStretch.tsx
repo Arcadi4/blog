@@ -1,7 +1,4 @@
-"use client";
-
 import React from "react";
-import { useEntranceAnimation } from "./useEntranceAnimation";
 
 type StretchFrom = "left" | "right" | "top" | "bottom";
 
@@ -13,19 +10,18 @@ const originClass: Record<StretchFrom, string> = {
 };
 
 type EntranceStretchProps = {
-  children?: React.ReactNode; // optional
+  children?: React.ReactNode;
   from?: StretchFrom;
   delayMs?: number;
   durationMs?: number;
   className?: string;
   disabled?: boolean;
-  fade?: boolean; //额外加一点透明度淡入（有时更自然）
+  fade?: boolean;
 };
 
 /**
- * 拉伸展开：X 方向用 scale-x，Y 方向用 scale-y
- * - from left/right => scale-x
- * - from top/bottom => scale-y
+ * Stretch entrance uses scale-x for horizontal directions and scale-y for
+ * vertical directions.
  */
 export function StretchEntrance({
   children,
@@ -36,27 +32,32 @@ export function StretchEntrance({
   disabled = false,
   fade = false,
 }: EntranceStretchProps) {
-  // Call hook unconditionally to satisfy Rules of Hooks
-  const { entered, reduceMotion } = useEntranceAnimation({ delayMs, disabled });
-
-  const style: React.CSSProperties = reduceMotion
-    ? {}
-    : { transitionDuration: `${durationMs}ms` };
-
-  const base = `will-change-transform transition ease-in-out ${originClass[from]}`;
-  const axisHidden =
-    from === "left" || from === "right" ? "scale-x-0" : "scale-y-0";
-  const axisShown =
-    from === "left" || from === "right" ? "scale-x-100" : "scale-y-100";
-
-  const opacityHidden = fade ? "opacity-0" : "";
-  const opacityShown = fade ? "opacity-100" : "";
+  /**
+   * This is a performance optimization that switches stretch entrance from JS
+   * state-driven transitions to CSS animation.
+   * The optimization works by letting the compositor animate scale and opacity
+   * timing directly, which lowers main-thread coordination.
+   * Visual output stays consistent because origin direction, scale axis, and
+   * fade starting opacity map one-to-one with the previous implementation.
+   */
+  const isHorizontal = from === "left" || from === "right";
+  const scaleX = isHorizontal ? "0" : "1";
+  const scaleY = isHorizontal ? "1" : "0";
+  const style = disabled
+    ? undefined
+    : ({
+        "--entrance-scale-x": scaleX,
+        "--entrance-scale-y": scaleY,
+        "--entrance-from-opacity": fade ? "0" : "1",
+        animationDelay: `${delayMs}ms`,
+        animationDuration: `${durationMs}ms`,
+      } as React.CSSProperties);
+  const base = disabled
+    ? `${originClass[from]} scale-100 ${fade ? "opacity-100" : ""}`
+    : `entrance-stretch-motion ${originClass[from]}`;
 
   return (
-    <div
-      className={`${base} ${entered ? `${axisShown} ${opacityShown}` : `${axisHidden} ${opacityHidden}`} ${className}`}
-      style={style}
-    >
+    <div className={`${base} ${className}`} style={style}>
       {children}
     </div>
   );

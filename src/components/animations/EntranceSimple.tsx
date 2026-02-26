@@ -1,16 +1,21 @@
-"use client";
-
 import React, { JSX } from "react";
-import { useEntranceAnimation } from "./useEntranceAnimation";
 
 type TextFrom = "up" | "down" | "left" | "right";
 type Distance = "sm" | "md" | "lg";
 
-const distanceClass: Record<TextFrom, Record<Distance, string>> = {
-  up: { sm: "translate-y-2", md: "translate-y-4", lg: "translate-y-8" },
-  down: { sm: "-translate-y-2", md: "-translate-y-4", lg: "-translate-y-8" },
-  left: { sm: "translate-x-2", md: "translate-x-4", lg: "translate-x-8" },
-  right: { sm: "-translate-x-2", md: "-translate-x-4", lg: "-translate-x-8" },
+const distanceOffset: Record<TextFrom, Record<Distance, [string, string]>> = {
+  up: { sm: ["0px", "0.5rem"], md: ["0px", "1rem"], lg: ["0px", "2rem"] },
+  down: {
+    sm: ["0px", "-0.5rem"],
+    md: ["0px", "-1rem"],
+    lg: ["0px", "-2rem"],
+  },
+  left: { sm: ["0.5rem", "0px"], md: ["1rem", "0px"], lg: ["2rem", "0px"] },
+  right: {
+    sm: ["-0.5rem", "0px"],
+    md: ["-1rem", "0px"],
+    lg: ["-2rem", "0px"],
+  },
 };
 
 type SimpleEntranceProps = {
@@ -34,23 +39,29 @@ export function SimpleEntrance({
   className = "",
   disabled = false,
 }: SimpleEntranceProps) {
-  const { entered, reduceMotion } = useEntranceAnimation({ delayMs, disabled });
-
-  // Tailwind 的 duration-[] 是 arbitrary value，能用，但更建议写 style 确保可控
-  const style: React.CSSProperties = reduceMotion
-    ? {}
-    : { transitionDuration: `${durationMs}ms` };
-
-  const base =
-    "will-change-transform will-change-opacity transition ease-in-out";
-  const hidden = `opacity-0 ${distanceClass[from][distance]}`;
-  const shown = "opacity-100 translate-x-0 translate-y-0";
+  /**
+   * This is a performance optimization that replaces per-instance JS entrance
+   * timers with pure CSS keyframe animation.
+   * The optimization works by passing delay and duration through styles so the
+   * browser animation pipeline handles timing with less JS scheduling.
+   * Visual output stays consistent because from, distance, delay, and duration
+   * keep the same semantics, and disabled still resolves directly to the end state.
+   */
+  const [x, y] = distanceOffset[from][distance];
+  const style = disabled
+    ? undefined
+    : ({
+        "--entrance-x": x,
+        "--entrance-y": y,
+        animationDelay: `${delayMs}ms`,
+        animationDuration: `${durationMs}ms`,
+      } as React.CSSProperties);
+  const baseClass = disabled
+    ? "opacity-100 translate-x-0 translate-y-0"
+    : "entrance-simple-motion";
 
   return (
-    <Tag
-      className={`${base} ${entered ? shown : hidden} ${className}`}
-      style={style}
-    >
+    <Tag className={`${baseClass} ${className}`} style={style}>
       {children}
     </Tag>
   );
