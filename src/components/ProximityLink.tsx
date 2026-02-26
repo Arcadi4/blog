@@ -170,11 +170,23 @@ function ProximityInteractiveText({
   const baseLetterRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const shadowLetterRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const glyphCentersRef = useRef<{ x: number; y: number }[]>([]);
+  // This stores a lightweight proximity box for each link container.
+  // The optimization works by skipping per-glyph math when the pointer is far
+  // outside the effective radius of the container.
+  // Visual output stays consistent because interpolation still runs unchanged
+  // whenever the pointer enters the radius band or hover/exit animation is active.
+  const containerBoundsRef = useRef<{
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+  } | null>(null);
   const shadowOffsetRefs = useRef<{ x: number; y: number }[]>([]);
   const appliedStyleRefs = useRef<
     { base: string; shadow: string; x: number; y: number; opacity: string }[]
   >([]);
   const hoverProgressRef = useRef(0);
+  const isRestedRef = useRef(true);
   const isHoveredRef = useRef(isHovered);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const lastFrameRef = useRef<{
@@ -206,6 +218,7 @@ function ProximityInteractiveText({
 
   const parsedSettingsRef = useRef(parsedSettings);
   const wghtAxisRangeRef = useRef(wghtAxisRange);
+  const fromSettingsRef = useRef(fromFontVariationSettings);
   const falloffRef = useRef(falloff);
   const radiusRef = useRef(radius);
   const allowShadowYFollowRef = useRef(allowShadowYFollow);
@@ -214,6 +227,7 @@ function ProximityInteractiveText({
 
   parsedSettingsRef.current = parsedSettings;
   wghtAxisRangeRef.current = wghtAxisRange;
+  fromSettingsRef.current = fromFontVariationSettings;
   falloffRef.current = falloff;
   radiusRef.current = radius;
   allowShadowYFollowRef.current = allowShadowYFollow;
@@ -229,6 +243,16 @@ function ProximityInteractiveText({
    * mount, resize, font readiness, and hover entry.
    */
   const measureGlyphCenters = useCallback(() => {
+    const containerRect = containerRef.current?.getBoundingClientRect();
+    containerBoundsRef.current = containerRect
+      ? {
+          left: containerRect.left,
+          right: containerRect.right,
+          top: containerRect.top,
+          bottom: containerRect.bottom,
+        }
+      : null;
+
     glyphCentersRef.current = glyphRefs.current.map((glyphRef) => {
       if (!glyphRef) {
         return { x: -1000, y: -1000 };
@@ -240,7 +264,7 @@ function ProximityInteractiveText({
         y: rect.top + rect.height / 2,
       };
     });
-  }, []);
+  }, [containerRef]);
 
   const hasResidualOffset = useCallback(() => {
     return shadowOffsetRefs.current.some(
@@ -251,6 +275,72 @@ function ProximityInteractiveText({
   const stopLoop = useCallback(() => {
     unsubscribeRef.current?.();
     unsubscribeRef.current = null;
+  }, []);
+
+  /**
+   * This is a performance optimization that snaps letters back to the exact
+   * base state once the pointer is far away and no exit motion is in flight.
+   * The optimization works by applying one final reset write and then avoiding
+   * repeated per-frame updates while the link is fully at rest.
+   * Visual output stays consistent because the reset uses the same base
+   * variation settings and zero-offset shadow state as the natural end state.
+   */
+  const resetToRestState = useCallback(() => {
+    const fromSettings = fromSettingsRef.current;
+
+    glyphRefs.current.forEach((glyphRef, index) => {
+      if (!glyphRef) {
+        return;
+      }
+
+      const baseRef = baseLetterRefs.current[index];
+      const shadowRef = shadowLetterRefs.current[index];
+      if (!baseRef || !shadowRef) {
+        return;
+      }
+
+      const applied =
+        appliedStyleRefs.current[index] ??
+        ({
+          base: "",
+          shadow: "",
+          x: Number.NaN,
+          y: Number.NaN,
+          opacity: "",
+        } as {
+          base: string;
+          shadow: string;
+          x: number;
+          y: number;
+          opacity: string;
+        });
+
+      if (applied.base !== fromSettings) {
+        baseRef.style.fontVariationSettings = fromSettings;
+        applied.base = fromSettings;
+      }
+
+      if (applied.shadow !== fromSettings) {
+        shadowRef.style.fontVariationSettings = fromSettings;
+        applied.shadow = fromSettings;
+      }
+
+      if (applied.x !== 0 || applied.y !== 0) {
+        shadowRef.style.transform = "translate3d(0px, 0px, 0)";
+        applied.x = 0;
+        applied.y = 0;
+      }
+
+      if (applied.opacity !== "0") {
+        shadowRef.style.opacity = "0";
+        applied.opacity = "0";
+      }
+
+      appliedStyleRefs.current[index] = applied;
+      shadowOffsetRefs.current[index] = { x: 0, y: 0 };
+    });
+
+    isRestedRef.current = true;
   }, []);
 
   const startLoop = useCallback(() => {
@@ -288,6 +378,35 @@ function ProximityInteractiveText({
       const pointerChanged =
         lastFrameRef.current.x !== x || lastFrameRef.current.y !== y;
       const residualOffset = hasResidualOffset();
+      const bounds = containerBoundsRef.current;
+      const currentRadius = radiusRef.current;
+      const nearContainer =
+        !bounds ||
+        (x >= bounds.left - currentRadius &&
+          x <= bounds.right + currentRadius &&
+          y >= bounds.top - currentRadius &&
+          y <= bounds.bottom + currentRadius);
+      const shouldAnimateExit =
+        hoverChanged || isHoveredRef.current || residualOffset;
+
+      // This is a proximity-gated fast path for pointer tracking.
+      // The optimization works by short-circuiting full glyph interpolation when
+      // the cursor is outside the link radius and no exit animation is needed.
+      // Visual output stays consistent because active and near-range states still
+      // follow the same frame-by-frame formulas as before.
+      if (!nearContainer && !shouldAnimateExit) {
+        if (!isRestedRef.current) {
+          resetToRestState();
+        }
+
+        lastFrameRef.current = {
+          x,
+          y,
+          hoverProgress: hoverProgressRef.current,
+        };
+
+        return true;
+      }
 
       const shouldProcess =
         pointerChanged ||
@@ -298,6 +417,8 @@ function ProximityInteractiveText({
       if (!shouldProcess) {
         return true;
       }
+
+      isRestedRef.current = false;
 
       lastFrameRef.current = {
         x,
@@ -320,7 +441,6 @@ function ProximityInteractiveText({
         const deltaX = x - center.x;
         const deltaY = y - center.y;
         const distance = Math.hypot(deltaX, deltaY);
-        const currentRadius = radiusRef.current;
         const falloffValue =
           distance >= currentRadius
             ? 0
@@ -404,7 +524,7 @@ function ProximityInteractiveText({
 
       return true;
     });
-  }, [containerRef, hasResidualOffset]);
+  }, [containerRef, hasResidualOffset, resetToRestState]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -435,6 +555,7 @@ function ProximityInteractiveText({
     }
 
     window.addEventListener("resize", scheduleMeasure, { passive: true });
+    window.addEventListener("scroll", scheduleMeasure, { passive: true });
 
     document.fonts?.ready.then(scheduleMeasure).catch(() => {});
 
@@ -444,6 +565,7 @@ function ProximityInteractiveText({
       }
       resizeObserver?.disconnect();
       window.removeEventListener("resize", scheduleMeasure);
+      window.removeEventListener("scroll", scheduleMeasure);
     };
   }, [containerRef, label, measureGlyphCenters]);
 
@@ -473,6 +595,7 @@ function ProximityInteractiveText({
     shadowOffsetRefs.current = [];
     appliedStyleRefs.current = [];
     hoverProgressRef.current = 0;
+    isRestedRef.current = true;
     lastFrameRef.current = { x: null, y: null, hoverProgress: -1 };
     measureGlyphCenters();
   }, [
