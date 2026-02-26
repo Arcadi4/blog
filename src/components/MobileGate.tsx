@@ -7,11 +7,43 @@ const PHONE_UA_REGEX =
 const PHONE_PLATFORM_REGEX = /iPhone|iPod|Windows Phone/i;
 const TABLET_UA_REGEX =
   /iPad|Tablet|PlayBook|Silk|Kindle|Nexus 7|Nexus 9|Nexus 10|SM-T/i;
+const DESKTOP_UA_REGEX =
+  /Macintosh|MacIntel|Windows NT|Win64|X11|CrOS|Linux x86_64/i;
 const BLOCK_MAX_WIDTH = 960;
 
 type NavigatorWithUAData = Navigator & {
   userAgentData?: { mobile?: boolean; platform?: string };
 };
+
+type DeviceContext = {
+  userAgent: string;
+  vendor: string;
+  platform: string;
+  uaPlatform: string;
+  uaMobile?: boolean;
+  hasTouch: boolean;
+};
+
+function getDeviceContext(): DeviceContext {
+  const navigatorWithUAData = navigator as NavigatorWithUAData;
+
+  return {
+    userAgent: navigator.userAgent || "",
+    vendor: navigator.vendor || "",
+    platform: navigator.platform || "",
+    uaPlatform: navigatorWithUAData.userAgentData?.platform || "",
+    uaMobile: navigatorWithUAData.userAgentData?.mobile,
+    hasTouch: navigator.maxTouchPoints > 1,
+  };
+}
+
+function isDesktopIpadLike(context: DeviceContext) {
+  return (
+    /Macintosh/i.test(context.userAgent) &&
+    /Mobile/i.test(context.userAgent) &&
+    context.hasTouch
+  );
+}
 
 function getViewportWidth() {
   const widths = [
@@ -27,54 +59,59 @@ function getViewportWidth() {
   return Math.min(...widths);
 }
 
-function isPhoneLikeDevice() {
-  const navigatorWithUAData = navigator as NavigatorWithUAData;
-
-  if (navigatorWithUAData.userAgentData?.mobile === true) {
+function isPhoneLikeDevice(context: DeviceContext) {
+  if (context.uaMobile === true) {
     return true;
   }
 
-  const userAgent = navigator.userAgent || "";
-  const vendor = navigator.vendor || "";
-  const platform = navigator.platform || "";
-  const uaPlatform = navigatorWithUAData.userAgentData?.platform || "";
-
-  if (PHONE_PLATFORM_REGEX.test(`${platform} ${uaPlatform}`)) {
+  if (PHONE_PLATFORM_REGEX.test(`${context.platform} ${context.uaPlatform}`)) {
     return true;
   }
 
-  return PHONE_UA_REGEX.test(`${userAgent} ${vendor}`);
+  return PHONE_UA_REGEX.test(`${context.userAgent} ${context.vendor}`);
 }
 
-function isTabletLikeDevice() {
-  const navigatorWithUAData = navigator as NavigatorWithUAData;
-
-  const userAgent = navigator.userAgent || "";
-  const platform = navigator.platform || "";
-  const uaPlatform = navigatorWithUAData.userAgentData?.platform || "";
-  const hasTouch = navigator.maxTouchPoints > 1;
-
+function isTabletLikeDevice(context: DeviceContext) {
   const isAndroidTablet =
-    /Android/i.test(userAgent) && !/Mobile/i.test(userAgent);
+    /Android/i.test(context.userAgent) && !/Mobile/i.test(context.userAgent);
   const isTabletUA = TABLET_UA_REGEX.test(
-    `${userAgent} ${platform} ${uaPlatform}`,
+    `${context.userAgent} ${context.platform} ${context.uaPlatform}`,
   );
-  const isDesktopIpadUA = /Macintosh/i.test(userAgent) && hasTouch;
+  const isDesktopIpadUA = isDesktopIpadLike(context);
 
   return isAndroidTablet || isTabletUA || isDesktopIpadUA;
 }
 
-function shouldBlockMobileAccess() {
-  const viewportWidth = getViewportWidth();
-  if (viewportWidth <= BLOCK_MAX_WIDTH) {
-    return true;
-  }
-
-  if (isTabletLikeDevice()) {
+function isDesktopLikeDevice(context: DeviceContext) {
+  if (isDesktopIpadLike(context)) {
     return false;
   }
 
-  return isPhoneLikeDevice();
+  if (context.uaMobile === false) {
+    return true;
+  }
+
+  return DESKTOP_UA_REGEX.test(
+    `${context.userAgent} ${context.platform} ${context.uaPlatform}`,
+  );
+}
+
+function shouldBlockMobileAccess() {
+  const context = getDeviceContext();
+
+  if (isDesktopLikeDevice(context)) {
+    return false;
+  }
+
+  if (getViewportWidth() > BLOCK_MAX_WIDTH) {
+    return false;
+  }
+
+  return (
+    isPhoneLikeDevice(context) ||
+    isTabletLikeDevice(context) ||
+    window.matchMedia("(any-pointer: coarse)").matches
+  );
 }
 
 export default function MobileGate() {
