@@ -5,6 +5,7 @@ import { formatDate } from "@/lib/utils";
 import ProximityLink from "@/components/ProximityLink";
 import { SimpleEntrance } from "@/components/animations/EntranceSimple";
 import { StretchEntrance } from "@/components/animations/EntranceStretch";
+import { menuItems } from "@/app/posts/menuItems";
 
 export default async function Home({
   searchParams,
@@ -12,11 +13,14 @@ export default async function Home({
   searchParams: Promise<{ displayName?: string }>;
 }) {
   const params = await searchParams;
-  const displayName = params.displayName;
+  const displayName = params.displayName || "";
+  const hash = crypto.createHash("md5").update(displayName).digest("hex");
   const heroName =
     displayName &&
-    crypto.createHash("md5").update(displayName).digest("hex") ===
-      "441be6a1cc1cc50f35b95395f20f6b55"
+    [
+      "441be6a1cc1cc50f35b95395f20f6b55",
+      "b38319dfed46aed62f00dca6d58e964a",
+    ].includes(hash)
       ? displayName
       : "4rcadia";
 
@@ -29,17 +33,8 @@ export default async function Home({
     { name: "Twitter", href: "https://x.com/_4rcadia" },
   ];
 
-  const menuItems = [
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-    { name: "Projects", href: "/projects" },
-    { name: "Friend Links", href: "/links" },
-    { name: "Tags", href: "/tags" },
-    { name: "All Posts", href: "/all" },
-  ];
-
-  const menuPartOne = menuItems.slice(0, 4);
-  const menuPartTwo = menuItems.slice(4);
+  const menuPartOne = menuItems.slice(1, 5);
+  const menuPartTwo = menuItems.slice(5);
 
   let menuAnimationIndex = 0;
   const delayPerMenuItem = 100;
@@ -135,17 +130,17 @@ export default async function Home({
             LATEST ARTICLES
           </SimpleEntrance>
           <div className="flex flex-col pl-2">
-            {menuPartOne.map((link) => {
+            {menuPartOne.map((menuItem) => {
               menuAnimationIndex++;
               return (
                 <SimpleEntrance
-                  key={link.name}
+                  key={menuItem.name}
                   delayMs={
                     menuAnimationIndex * delayPerMenuItem + menuBaseDelay
                   }
                 >
-                  <ProximityLink href={link.href} className="large-link">
-                    {link.name}
+                  <ProximityLink href={menuItem.href} className="large-link">
+                    {menuItem.name}
                   </ProximityLink>
                 </SimpleEntrance>
               );
@@ -198,17 +193,17 @@ export default async function Home({
         </SimpleEntrance>
         <div className=" flex flex-col justify-between items-start">
           <div className="relative flex flex-col pl-2">
-            {menuPartTwo.map((link) => {
+            {menuPartTwo.map((menuItem) => {
               menuAnimationIndex++;
               return (
                 <SimpleEntrance
-                  key={link.name}
+                  key={menuItem.name}
                   delayMs={
                     menuAnimationIndex * delayPerMenuItem + menuBaseDelay
                   }
                 >
-                  <ProximityLink href={link.href} className="large-link">
-                    {link.name}
+                  <ProximityLink href={menuItem.href} className="large-link">
+                    {menuItem.name}
                   </ProximityLink>
                 </SimpleEntrance>
               );
