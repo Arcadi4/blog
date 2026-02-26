@@ -101,11 +101,7 @@ export default async function Home({
                       menuAnimationIndex * delayPerMenuItem + menuBaseDelay
                     }
                   >
-                    <ProximityLink
-                      href={link.href}
-                      disableShadowYFollow={true}
-                      className="large-link"
-                    >
+                    <ProximityLink href={link.href} className="large-link">
                       {link.name}
                     </ProximityLink>
                   </SimpleEntrance>
@@ -143,11 +139,7 @@ export default async function Home({
                     menuAnimationIndex * delayPerMenuItem + menuBaseDelay
                   }
                 >
-                  <ProximityLink
-                    href={menuItem.href}
-                    disableShadowYFollow={true}
-                    className="large-link"
-                  >
+                  <ProximityLink href={menuItem.href} className="large-link">
                     {menuItem.name}
                   </ProximityLink>
                 </SimpleEntrance>
@@ -210,11 +202,7 @@ export default async function Home({
                     menuAnimationIndex * delayPerMenuItem + menuBaseDelay
                   }
                 >
-                  <ProximityLink
-                    href={menuItem.href}
-                    disableShadowYFollow={true}
-                    className="large-link"
-                  >
+                  <ProximityLink href={menuItem.href} className="large-link">
                     {menuItem.name}
                   </ProximityLink>
                 </SimpleEntrance>

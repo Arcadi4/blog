@@ -10,6 +10,54 @@ import {
   useState,
 } from "react";
 
+interface ProximityShadowTuning {
+  /** Hover progress lerp while entering */
+  hoverEnterLerp: number;
+  /** Hover progress lerp while leaving */
+  hoverLeaveLerp: number;
+  /** Shadow-specific falloff exponent */
+  falloffExponent: number;
+  /** Max shadow offset in px */
+  maxOffset: number;
+  /** Softens direction vector near glyph center */
+  directionSoftness: number;
+  /** Radius where shadow offset is suppressed */
+  innerDeadZone: number;
+  /** Offset interpolation while entering */
+  offsetEnterLerp: number;
+  /** Offset interpolation while leaving */
+  offsetLeaveLerp: number;
+  /** Hide shadow when offset is below this value */
+  visibilityThreshold: number;
+  /** Weight-axis boost when Y-follow is enabled */
+  wghtBoost: number;
+  /** Extra max clamp for weight-axis boost */
+  wghtMaxExtra: number;
+  /** Width-axis boost when Y-follow is disabled */
+  wdthBoost: number;
+  /** Extra max clamp for width-axis boost */
+  wdthMaxExtra: number;
+  /** Base wdth value used when wdth axis is absent */
+  wdthFallbackBase: number;
+}
+
+const defaultShadowTuning: ProximityShadowTuning = {
+  hoverEnterLerp: 0.12,
+  hoverLeaveLerp: 0.2,
+  falloffExponent: 0.8,
+  maxOffset: 24,
+  directionSoftness: 8,
+  innerDeadZone: 8,
+  offsetEnterLerp: 0.16,
+  offsetLeaveLerp: 0.24,
+  visibilityThreshold: 0.08,
+  wghtBoost: 220,
+  wghtMaxExtra: 280,
+  wdthBoost: 18,
+  wdthMaxExtra: 24,
+  wdthFallbackBase: 100,
+};
+
 interface ProximityLinkProps extends Omit<
   AnchorHTMLAttributes<HTMLAnchorElement>,
   "children"
@@ -23,14 +71,16 @@ interface ProximityLinkProps extends Omit<
   fromFontVariationSettings?: string;
   /** Variable-font variation settings when the cursor is closest */
   toFontVariationSettings?: string;
-  /** Effect radius in px (default 80) */
+  /** Effect radius in px (default 192) */
   radius?: number;
   /** Distance falloff curve */
   falloff?: "linear" | "exponential" | "gaussian";
   /** Shadow color used on hover */
   shadowColor?: string;
-  /** Disable Y-axis shadow follow while keeping X-axis follow */
-  disableShadowYFollow?: boolean;
+  /** Allow Y-axis shadow follow in addition to X-axis */
+  allowShadowYFollow?: boolean;
+  /** Advanced tuning for shadow movement and axis boosting */
+  shadowTuning?: Partial<ProximityShadowTuning>;
 }
 
 interface ProximityInteractiveTextProps {
@@ -42,9 +92,11 @@ interface ProximityInteractiveTextProps {
   falloff: "linear" | "exponential" | "gaussian";
   isHovered: boolean;
   shadowColor: string;
-  disableShadowYFollow: boolean;
+  allowShadowYFollow: boolean;
+  shadowTuning: ProximityShadowTuning;
 }
 
+// Frame loop utility so motion stays in sync with cursor updates.
 function useAnimationFrame(callback: () => void) {
   useEffect(() => {
     let frameId: number;
@@ -57,6 +109,7 @@ function useAnimationFrame(callback: () => void) {
   }, [callback]);
 }
 
+// Tracks cursor/touch position in local coordinates of the link container.
 function useMousePositionRef(
   containerRef: MutableRefObject<HTMLElement | null>,
 ) {
@@ -99,7 +152,8 @@ function ProximityInteractiveText({
   falloff,
   isHovered,
   shadowColor,
-  disableShadowYFollow,
+  allowShadowYFollow,
+  shadowTuning,
 }: ProximityInteractiveTextProps) {
   const glyphRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const baseLetterRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -118,6 +172,7 @@ function ProximityInteractiveText({
     hoverProgress: -1,
   });
 
+  // Parses axis settings once so per-frame interpolation is cheap.
   const parsedSettings = useMemo(() => {
     const parseSettings = (settingsStr: string) =>
       new Map(
@@ -156,13 +211,18 @@ function ProximityInteractiveText({
     }
   };
 
+  // Per-frame loop: keep interpolation responsive to cursor motion.
   useAnimationFrame(() => {
     if (!containerRef.current) return;
 
+    // Smoothly animate hover in/out so shadow activation feels organic.
     const targetHoverProgress = isHovered ? 1 : 0;
     const hoverDelta = targetHoverProgress - hoverProgressRef.current;
     if (Math.abs(hoverDelta) > 0.001) {
-      const hoverLerp = hoverDelta > 0 ? 0.12 : 0.2;
+      const hoverLerp =
+        hoverDelta > 0
+          ? shadowTuning.hoverEnterLerp
+          : shadowTuning.hoverLeaveLerp;
       hoverProgressRef.current += hoverDelta * hoverLerp;
       if (Math.abs(targetHoverProgress - hoverProgressRef.current) < 0.01) {
         hoverProgressRef.current = targetHoverProgress;
@@ -184,8 +244,10 @@ function ProximityInteractiveText({
       hoverProgress: hoverProgressRef.current,
     };
 
-    const shadowSoftNorm = 8;
-    const shadowInnerRadius = 8;
+    // Geometry stabilizers: reduce jitter near glyph center.
+    const shadowSoftNorm = shadowTuning.directionSoftness;
+    const shadowInnerRadius = shadowTuning.innerDeadZone;
+    const hasWdthAxis = parsedSettings.some(({ axis }) => axis === "wdth");
 
     glyphRefs.current.forEach((glyphRef, index) => {
       const baseRef = baseLetterRefs.current[index];
@@ -199,8 +261,13 @@ function ProximityInteractiveText({
       const distance = calculateDistance(x, y, letterCenterX, letterCenterY);
       const falloffValue = distance >= radius ? 0 : calculateFalloff(distance);
 
-      const shadowFalloff = Math.pow(falloffValue, 0.8);
+      // Shadow intensity uses a separate curve for earlier/later activation.
+      const shadowFalloff = Math.pow(
+        falloffValue,
+        shadowTuning.falloffExponent,
+      );
       const shadowStrength = shadowFalloff * hoverProgressRef.current;
+      // Base layer keeps normal proximity interpolation behavior.
       const baseSettings = parsedSettings
         .map(({ axis, fromValue, toValue }) => {
           const interpolatedValue =
@@ -208,30 +275,60 @@ function ProximityInteractiveText({
           return `'${axis}' ${interpolatedValue}`;
         })
         .join(", ");
-      const shadowSettings = parsedSettings
-        .map(({ axis, fromValue, toValue }) => {
+      // Shadow layer can favor wdth-only or wght-only boost by mode.
+      const shadowSettingsParts = parsedSettings.map(
+        ({ axis, fromValue, toValue }) => {
           const interpolatedValue =
             fromValue + (toValue - fromValue) * falloffValue;
+
+          if (!allowShadowYFollow) {
+            if (axis !== "wdth") {
+              return `'${axis}' ${interpolatedValue}`;
+            }
+
+            const boostedValue =
+              interpolatedValue + shadowTuning.wdthBoost * shadowStrength;
+            const axisMin = Math.min(fromValue, toValue);
+            const axisMax =
+              Math.max(fromValue, toValue) + shadowTuning.wdthMaxExtra;
+            const clampedValue = Math.min(
+              Math.max(boostedValue, axisMin),
+              axisMax,
+            );
+            return `'${axis}' ${clampedValue}`;
+          }
+
           if (axis !== "wght") {
             return `'${axis}' ${interpolatedValue}`;
           }
 
-          const boostedValue = interpolatedValue + 220 * shadowStrength;
+          const boostedValue =
+            interpolatedValue + shadowTuning.wghtBoost * shadowStrength;
           const axisMin = Math.min(fromValue, toValue);
-          const axisMax = Math.max(fromValue, toValue) + 280;
+          const axisMax =
+            Math.max(fromValue, toValue) + shadowTuning.wghtMaxExtra;
           const clampedValue = Math.min(
             Math.max(boostedValue, axisMin),
             axisMax,
           );
           return `'${axis}' ${clampedValue}`;
-        })
-        .join(", ");
+        },
+      );
+      // Fallback for fonts that don't expose wdth in incoming settings.
+      if (!allowShadowYFollow && !hasWdthAxis) {
+        shadowSettingsParts.push(
+          `'wdth' ${shadowTuning.wdthFallbackBase + shadowTuning.wdthBoost * shadowStrength}`,
+        );
+      }
+      const shadowSettings = shadowSettingsParts.join(", ");
 
       interpolatedSettingsRef.current[index] = baseSettings;
       baseRef.style.fontVariationSettings = baseSettings;
       shadowRef.style.fontVariationSettings = shadowSettings;
 
-      const shadowDistance = 24 * shadowFalloff * hoverProgressRef.current;
+      // Cursor-directed offset creates the magnetic follow illusion.
+      const shadowDistance =
+        shadowTuning.maxOffset * shadowFalloff * hoverProgressRef.current;
       const innerRadiusRange = Math.max(radius - shadowInnerRadius, 1);
       const centerRamp = Math.min(
         Math.max((distance - shadowInnerRadius) / innerRadiusRange, 0),
@@ -241,19 +338,23 @@ function ProximityInteractiveText({
         shadowDistance /
         Math.sqrt(deltaX * deltaX + deltaY * deltaY + shadowSoftNorm ** 2);
       const targetOffsetX = deltaX * directionScale * centerRamp;
-      const targetOffsetY = disableShadowYFollow
-        ? 0
-        : deltaY * directionScale * centerRamp;
+      const targetOffsetY = allowShadowYFollow
+        ? deltaY * directionScale * centerRamp
+        : 0;
       const previousOffset = shadowOffsetRefs.current[index] ?? { x: 0, y: 0 };
-      const offsetLerp = isHovered ? 0.16 : 0.24;
+      const offsetLerp = isHovered
+        ? shadowTuning.offsetEnterLerp
+        : shadowTuning.offsetLeaveLerp;
       const nextOffsetX =
         previousOffset.x + (targetOffsetX - previousOffset.x) * offsetLerp;
       const nextOffsetY =
         previousOffset.y + (targetOffsetY - previousOffset.y) * offsetLerp;
       const nextOffsetMagnitude = Math.hypot(nextOffsetX, nextOffsetY);
       const shouldShowShadow =
-        hoverProgressRef.current > 0.01 && nextOffsetMagnitude > 0.08;
+        hoverProgressRef.current > 0.01 &&
+        nextOffsetMagnitude > shadowTuning.visibilityThreshold;
 
+      // Persist smoothed offset so exit animation can settle naturally.
       shadowOffsetRefs.current[index] = { x: nextOffsetX, y: nextOffsetY };
       shadowRef.style.transform = `translate3d(${nextOffsetX}px, ${nextOffsetY}px, 0)`;
       shadowRef.style.opacity = shouldShowShadow ? "1" : "0";
@@ -286,6 +387,7 @@ function ProximityInteractiveText({
                 }}
                 aria-hidden="true"
               >
+                {/* Shadow glyph mirrors the same character and receives motion/axis boosts. */}
                 <span
                   ref={(el) => {
                     shadowLetterRefs.current[currentLetterIndex] = el;
@@ -305,6 +407,7 @@ function ProximityInteractiveText({
                 >
                   {letter}
                 </span>
+                {/* Base glyph stays readable while shadow glyph handles motion. */}
                 <span
                   ref={(el) => {
                     baseLetterRefs.current[currentLetterIndex] = el;
@@ -355,7 +458,8 @@ export default function ProximityLink({
   radius = 192,
   falloff = "exponential",
   shadowColor = "var(--color-magenta)",
-  disableShadowYFollow = false,
+  allowShadowYFollow = false,
+  shadowTuning,
   className = "",
   onMouseEnter,
   onMouseLeave,
@@ -368,9 +472,15 @@ export default function ProximityLink({
 
   const containerRef = useRef<HTMLAnchorElement | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+  // Merge user overrides with defaults so tuning stays opt-in.
+  const resolvedShadowTuning = useMemo(
+    () => ({ ...defaultShadowTuning, ...shadowTuning }),
+    [shadowTuning],
+  );
   const isExternal = href.startsWith("http") || href.startsWith("mailto:");
   const linkClass = `proximity-link ${className}`;
 
+  // Interactive text keeps base glyph and shadow glyph synchronized.
   const proximityContent = (
     <ProximityInteractiveText
       label={text}
@@ -381,10 +491,12 @@ export default function ProximityLink({
       falloff={falloff}
       isHovered={isHovered}
       shadowColor={shadowColor}
-      disableShadowYFollow={disableShadowYFollow}
+      allowShadowYFollow={allowShadowYFollow}
+      shadowTuning={resolvedShadowTuning}
     />
   );
 
+  // Keep native event passthrough while tracking internal hover progress.
   const handleMouseEnter: AnchorHTMLAttributes<HTMLAnchorElement>["onMouseEnter"] =
     (event) => {
       setIsHovered(true);
