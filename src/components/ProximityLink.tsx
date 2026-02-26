@@ -351,7 +351,7 @@ export default function ProximityLink({
   children,
   label,
   fromFontVariationSettings = "'wght' 300",
-  toFontVariationSettings = "'wght' 700",
+  toFontVariationSettings = "'wght' 850",
   radius = 192,
   falloff = "exponential",
   shadowColor = "var(--color-magenta)",
