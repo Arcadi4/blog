@@ -42,3 +42,10 @@ next-env.d.ts
 
 # jetbrains
 .idea
+
+# agents
+.sisyphus
+AGENTS.md
+
+# worktrees
+.worktrees
