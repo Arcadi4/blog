@@ -196,23 +196,15 @@ h6,
   }
 
   .article-exit-panel {
-    @apply border-t-4 border-t-black mt-20 pt-16 pb-12 px-8 bg-white flex flex-col gap-8;
+    @apply border-t-4 border-t-black mt-20 pt-12 pb-16 px-8 bg-white relative;
   }
 
   .article-exit-panel .exit-marker {
-    @apply font-mono text-3xl font-bold text-black mb-6 tracking-tight;
+    @apply font-mono text-2xl md:text-3xl font-bold text-black tracking-tight;
   }
 
   .article-exit-panel .exit-label {
-    @apply text-xs font-mono uppercase tracking-widest border-2 border-black px-3 py-2 inline-block font-bold;
-  }
-
-  .article-exit-panel .exit-cta-section {
-    @apply border-b-2 border-b-black pb-8 mb-8;
-  }
-
-  .article-exit-panel .exit-license {
-    @apply flex flex-col gap-3 pb-8;
+    @apply text-xs font-mono uppercase tracking-widest border-2 border-black px-3 py-2 inline-block font-bold bg-white;
   }
 }
 

@@ -201,24 +201,60 @@ export default async function Post({
                   delayMs={proseDelay + 200}
                   className="article-exit-panel"
                 >
-                  <div className="exit-marker">&gt;&gt;&gt;</div>
-
-                  <div className="exit-cta-section">
-                    <p className="exit-label mb-6">End of Article</p>
-                    <Link href="/" className="large-link" data-reader-exit-link>
-                      ← Back Home
-                    </Link>
+                  <div className="flex flex-row justify-between items-start mb-8">
+                    <div className="exit-marker">&gt;&gt;&gt;</div>
+                    <div className="exit-marker">&gt;&gt;&gt;</div>
                   </div>
 
-                  <div className="exit-license">
-                    <p className="exit-label">License</p>
-                    <p className="text-xs font-mono text-black/75 leading-relaxed">
-                      All articles and web design licensed under CC BY-NC 4.0
-                      unless otherwise specified.
+                  <div className="absolute top-4 right-8 text-right">
+                    <p className="text-xs font-mono text-black/40 leading-tight">
+                      {post.title}
+                      <br />
+                      {slug}
                     </p>
                   </div>
 
-                  <div className="exit-marker text-right">&gt;&gt;&gt;</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-b-2 border-b-black pb-8 mb-8">
+                    <div>
+                      <p className="exit-label mb-4">Status</p>
+                      <p className="text-sm font-mono text-black leading-relaxed">
+                        Article complete. Reader at end of content.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="exit-label mb-4">Navigation</p>
+                      <Link
+                        href="/"
+                        className="large-link"
+                        data-reader-exit-link
+                      >
+                        ← Back Home
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pb-8">
+                    <div>
+                      <p className="exit-label mb-4">License</p>
+                      <p className="text-xs font-mono text-black/75 leading-relaxed">
+                        All articles and web design licensed under CC BY-NC 4.0
+                        unless otherwise specified.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="exit-label mb-4">Metadata</p>
+                      <p className="text-xs font-mono text-black/60 leading-relaxed">
+                        Slug: {slug}
+                        <br />
+                        Date: {formatDate(post.date)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-row justify-between items-end">
+                    <div className="exit-marker">&gt;&gt;&gt;</div>
+                    <div className="exit-marker">&gt;&gt;&gt;</div>
+                  </div>
                 </SimpleEntrance>
               </div>
             </article>
