@@ -143,7 +143,7 @@ export default function ErrorPage({
             </h1>
             <h1
               className={
-                "h1-hero" + (resolvedCodeDisplay === "503" ? " text-6xl" : "")
+                "h1-hero" + resolvedCodeDisplay === "503" ? " text-6xl" : ""
               }
             >
               {resolvedTitleLines.map((line, index) => {

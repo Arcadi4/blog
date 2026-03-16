@@ -31,6 +31,7 @@ export default async function Post({
 }) {
   const { slug } = await params;
   const post = await getPostData(slug);
+  const pathname = `/posts/${slug}`;
 
   const heroDelay = 0;
   const railDelay = 400;
@@ -54,7 +55,7 @@ export default async function Post({
                     key={index}
                     className="font-mono text-lg md:text-2xl leading-none"
                   >
-                    {slug}
+                    {pathname}
                   </p>
                 ))}
               </div>
@@ -66,7 +67,7 @@ export default async function Post({
                     key={index}
                     className="font-mono text-lg md:text-2xl leading-none"
                   >
-                    {slug}
+                    {pathname}
                   </p>
                 ))}
               </div>
@@ -176,7 +177,7 @@ export default async function Post({
           <div className="hidden md:flex flex-col gap-1 absolute bottom-12 left-4 opacity-20 pointer-events-none">
             {Array.from({ length: 3 }, (_, index) => (
               <p key={index} className="font-mono text-xs">
-                {slug}
+                {pathname}
               </p>
             ))}
           </div>
