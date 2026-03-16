@@ -99,22 +99,38 @@ h6,
   }
 
   .article-prose h2 {
-    @apply text-4xl font-bold font-title mt-16 mb-8 text-black border-t-2 border-t-black pt-8 leading-tight;
+    @apply text-4xl font-bold font-title mt-16 mb-8 text-black border-2 border-black bg-white pt-8 pb-4 px-6 leading-tight relative;
+  }
+
+  .article-prose h2::before {
+    content: "§";
+    @apply absolute -left-8 top-8 text-magenta text-2xl font-mono;
   }
 
   @media (max-width: 768px) {
     .article-prose h2 {
-      @apply text-2xl mt-10 mb-5 pt-5;
+      @apply text-2xl mt-10 mb-5 pt-5 px-4;
+    }
+    .article-prose h2::before {
+      @apply -left-6 top-5 text-xl;
     }
   }
 
   .article-prose h3 {
-    @apply text-2xl font-bold font-title mt-10 mb-5 text-black border-l-4 border-l-black pl-4 leading-snug;
+    @apply text-2xl font-bold font-title mt-10 mb-5 text-black border-l-4 border-l-klein border-2 border-black pl-6 pr-4 py-3 bg-white leading-snug relative;
+  }
+
+  .article-prose h3::after {
+    content: "///";
+    @apply absolute -right-8 top-3 text-klein text-sm font-mono;
   }
 
   @media (max-width: 768px) {
     .article-prose h3 {
-      @apply text-lg mt-6 mb-3;
+      @apply text-lg mt-6 mb-3 pl-4 py-2;
+    }
+    .article-prose h3::after {
+      @apply -right-6 top-2 text-xs;
     }
   }
 
@@ -128,7 +144,13 @@ h6,
 
   .article-prose ul,
   .article-prose ol {
-    @apply ml-8 mb-6 space-y-2;
+    @apply ml-0 mb-6 space-y-2 border-l-2 border-l-acid pl-8 py-4 bg-white relative;
+  }
+
+  .article-prose ul::before,
+  .article-prose ol::before {
+    content: "LIST";
+    @apply absolute -top-3 left-2 text-xs font-mono tracking-wider bg-white px-2 border border-black;
   }
 
   .article-prose li {
@@ -136,19 +158,29 @@ h6,
   }
 
   .article-prose blockquote {
-    @apply border-l-4 border-black pl-6 font-mono text-black bg-white my-8 py-6 px-6 border-2 border-l-4 text-sm leading-relaxed;
+    @apply border-l-4 border-l-magenta border-2 border-black pl-6 pr-6 font-mono text-black bg-white my-8 py-6 text-sm leading-relaxed relative;
+  }
+
+  .article-prose blockquote::before {
+    content: "QUOTE";
+    @apply absolute -top-3 left-4 text-xs font-mono tracking-wider bg-white px-2 border border-black;
   }
 
   .article-prose code {
-    @apply bg-black text-acid px-2 py-1 font-mono text-sm rounded-sm;
+    @apply bg-black text-acid px-2 py-1 font-mono text-sm border border-acid;
   }
 
   .article-prose pre {
-    @apply bg-black text-acid p-6 overflow-x-auto my-8 border-2 border-black font-mono text-sm leading-relaxed;
+    @apply bg-black text-acid p-6 overflow-x-auto my-8 border-4 border-black font-mono text-sm leading-relaxed relative;
+  }
+
+  .article-prose pre::before {
+    content: "CODE";
+    @apply absolute -top-3 left-4 text-xs font-mono tracking-wider bg-black text-acid px-2 border-2 border-acid;
   }
 
   .article-prose pre code {
-    @apply bg-transparent text-acid px-0 py-0;
+    @apply bg-transparent text-acid px-0 py-0 border-0;
   }
 
   .article-prose a {

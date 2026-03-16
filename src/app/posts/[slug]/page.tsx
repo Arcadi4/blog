@@ -39,76 +39,88 @@ export default async function Post({
   return (
     <main className="min-h-dvh flex flex-col" data-reader-page>
       <section
-        className="h-screen w-full bg-white relative border-b-2 border-b-black"
+        className="h-auto min-h-screen md:h-screen w-full bg-white relative border-b-2 border-b-black"
         data-reader-hero
       >
         <div className="absolute inset-0 -z-50 bg-white" />
 
-        <div className="flex flex-row h-full w-full p-6 gap-6">
+        <div className="flex flex-col md:flex-row h-full w-full p-4 md:p-6 gap-4 md:gap-6">
           {/* Left zone: repeated slug text */}
-          <div className="flex-1 h-full relative">
+          <div className="flex-1 h-auto min-h-[33vh] md:h-full relative">
             <SimpleEntrance delayMs={heroDelay}>
               <div className="flex flex-col z-20 gap-1 absolute left-0 top-0">
-                {Array.from({ length: 5 }, (_, index) => (
-                  <p key={index} className="font-mono large-p">
+                {Array.from({ length: 3 }, (_, index) => (
+                  <p
+                    key={index}
+                    className="font-mono text-lg md:text-2xl leading-none"
+                  >
                     {slug}
                   </p>
                 ))}
               </div>
             </SimpleEntrance>
             <SimpleEntrance delayMs={heroDelay + 200}>
-              <div className="flex flex-col z-20 gap-1 absolute left-0 bottom-[calc(1/3*100%+.5rem)]">
-                {Array.from({ length: 5 }, (_, index) => (
-                  <p key={index} className="font-mono large-p">
+              <div className="flex flex-col z-20 gap-1 absolute left-0 bottom-0 md:bottom-[calc(1/3*100%+.5rem)]">
+                {Array.from({ length: 3 }, (_, index) => (
+                  <p
+                    key={index}
+                    className="font-mono text-lg md:text-2xl leading-none"
+                  >
                     {slug}
                   </p>
                 ))}
               </div>
             </SimpleEntrance>
             <SimpleEntrance delayMs={heroDelay + 400}>
-              <div className="absolute left-0 bottom-0 w-full h-1/4 bg-klein -z-10" />
+              <div className="absolute left-0 bottom-0 w-full h-16 md:h-1/4 bg-klein -z-10" />
             </SimpleEntrance>
           </div>
 
           {/* Center zone: navigation/meta */}
-          <div className="flex-1 h-full relative border-x-2 border-x-black">
+          <div className="flex-1 h-auto min-h-[33vh] md:h-full relative border-y-2 md:border-y-0 md:border-x-2 border-black">
             <SimpleEntrance delayMs={heroDelay + 600}>
               <div
-                className="flex flex-col items-end absolute right-6 top-[calc(2/3*100%-6*3rem+.5rem)]"
+                className="flex flex-col items-start md:items-end absolute left-4 md:left-auto md:right-6 top-4 md:top-[calc(2/3*100%-6*3rem+.5rem)]"
                 data-reader-meta-strip
               >
-                <ProximityLink href="/" className="large-link select-none">
+                <ProximityLink
+                  href="/"
+                  className="text-3xl md:text-5xl leading-none select-none"
+                >
                   Home
                 </ProximityLink>
               </div>
             </SimpleEntrance>
             <SimpleEntrance delayMs={heroDelay + 800}>
-              <pre className="large-p absolute left-6 bottom-6">
+              <pre className="text-lg md:text-2xl leading-none absolute left-4 md:left-6 bottom-4 md:bottom-6">
                 {formatDate(post.date)}
               </pre>
             </SimpleEntrance>
             <SimpleEntrance delayMs={heroDelay + 1000}>
-              <pre className="large-p absolute left-6 top-6">
+              <pre className="text-lg md:text-2xl leading-none absolute left-4 md:left-6 top-16 md:top-6 right-4 md:right-auto max-w-[calc(100%-2rem)] md:max-w-none">
                 {post.excerpt || ""}
               </pre>
             </SimpleEntrance>
             <SimpleEntrance delayMs={heroDelay + 400}>
-              <div className="absolute right-0 top-0 w-1/2 h-1/3 bg-magenta -z-10" />
+              <div className="absolute right-0 top-0 w-1/3 md:w-1/2 h-20 md:h-1/3 bg-magenta -z-10" />
             </SimpleEntrance>
           </div>
 
           {/* Right zone: title/glyph */}
-          <div className="flex-1 h-full relative">
+          <div className="flex-1 h-auto min-h-[33vh] md:h-full relative">
             <SimpleEntrance delayMs={heroDelay + 200}>
-              <div className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/6 text-[1280px] font-medium font-serif text-stroke -z-10 pointer-events-none select-none">
+              <div className="absolute left-0 top-0 -translate-x-1/4 md:-translate-x-1/2 -translate-y-1/6 text-[480px] md:text-[1280px] font-medium font-serif text-stroke -z-10 pointer-events-none select-none">
                 *
               </div>
             </SimpleEntrance>
             <SimpleEntrance delayMs={heroDelay + 1200}>
-              <div className="absolute bottom-1/3">
-                <h1 className="h1-hero w-fit relative" data-reader-hero-title>
+              <div className="absolute bottom-8 md:bottom-1/3">
+                <h1
+                  className="text-5xl md:text-8xl font-bold leading-[0.8] w-fit relative"
+                  data-reader-hero-title
+                >
                   {post.title}
-                  <div className="w-full h-screen bg-acid absolute bottom-full z-30" />
+                  <div className="w-full h-[50vh] md:h-screen bg-acid absolute bottom-full z-30" />
                 </h1>
               </div>
             </SimpleEntrance>
@@ -116,13 +128,26 @@ export default async function Post({
         </div>
       </section>
 
+      <section className="w-full" data-reader-transition>
+        <div className="w-full h-3 bg-magenta" />
+        <div className="w-full border-t-2 border-t-black" />
+        <div className="w-full border-t-2 border-t-black mt-2" />
+        <div className="flex flex-row items-center gap-4 px-6 py-4 border-b-2 border-b-black">
+          <span className="article-meta-label">ARTICLE</span>
+          <div className="flex-1 border-t-2 border-t-klein" />
+          <span className="text-xs font-mono tracking-wider">
+            BEGIN READING
+          </span>
+        </div>
+      </section>
+
       <section
-        className="bg-white flex-1 flex flex-col md:flex-row"
+        className="bg-white flex-1 flex flex-col md:flex-row relative"
         data-reader-shell
       >
         <div
           data-reader-rail
-          className="w-full md:w-48 border-b-2 md:border-b-0 md:border-r-2 border-black flex-shrink-0"
+          className="w-full md:w-48 border-b-2 md:border-b-0 md:border-r-2 border-black flex-shrink-0 relative"
         >
           <SimpleEntrance
             delayMs={railDelay}
@@ -147,12 +172,23 @@ export default async function Post({
               <p className="text-xs font-mono text-black/60">{slug}</p>
             </div>
           </SimpleEntrance>
+          <div className="hidden md:block absolute bottom-0 left-0 w-full border-t-2 border-t-black" />
+          <div className="hidden md:flex flex-col gap-1 absolute bottom-12 left-4 opacity-20 pointer-events-none">
+            {Array.from({ length: 3 }, (_, index) => (
+              <p key={index} className="font-mono text-xs">
+                {slug}
+              </p>
+            ))}
+          </div>
         </div>
 
-        <div data-reader-body className="flex-1 flex flex-col">
+        <div data-reader-body className="flex-1 flex flex-col relative">
+          <div className="absolute top-0 right-0 w-24 h-full border-l-2 border-l-black -z-10" />
+          <div className="absolute top-0 right-24 w-12 h-64 bg-magenta -z-20" />
+
           <SimpleEntrance
             delayMs={proseDelay}
-            className="py-8 md:py-16 px-6 md:px-12 max-w-2xl"
+            className="py-8 md:py-16 px-6 md:px-12 max-w-2xl relative"
           >
             <article>
               <div
