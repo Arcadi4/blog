@@ -47,7 +47,7 @@ export default function CustomCursor() {
   }, []);
 
   const scale = isInteractive ? 1.667 : 1;
-  const color = isInteractive ? "var(--color-magenta)" : "var(--color-klein)";
+  const color = isInteractive ? "var(--color-acid)" : "var(--color-magenta)";
 
   return (
     <div

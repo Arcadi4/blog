@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const PHONE_UA_REGEX =
   /Android.*Mobile|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Windows Phone/i;
@@ -96,7 +97,15 @@ function isDesktopLikeDevice(context: DeviceContext) {
   );
 }
 
-function shouldBlockMobileAccess() {
+function isArticleRoute(pathname: string) {
+  return pathname.startsWith("/posts/");
+}
+
+function shouldBlockMobileAccess(pathname: string) {
+  if (isArticleRoute(pathname)) {
+    return false;
+  }
+
   const context = getDeviceContext();
 
   if (isDesktopLikeDevice(context)) {
@@ -115,16 +124,18 @@ function shouldBlockMobileAccess() {
 }
 
 export default function MobileGate() {
+  const pathname = usePathname();
   const [shouldBlock, setShouldBlock] = useState(() => {
     if (typeof window === "undefined") {
       return false;
     }
 
-    return shouldBlockMobileAccess();
+    return shouldBlockMobileAccess(pathname);
   });
 
   useEffect(() => {
-    const updateShouldBlock = () => setShouldBlock(shouldBlockMobileAccess());
+    const updateShouldBlock = () =>
+      setShouldBlock(shouldBlockMobileAccess(pathname));
     const orientation = window.screen.orientation;
     const widthQuery = window.matchMedia(`(max-width: ${BLOCK_MAX_WIDTH}px)`);
 
@@ -144,7 +155,7 @@ export default function MobileGate() {
       orientation?.removeEventListener("change", updateShouldBlock);
       widthQuery.removeEventListener("change", updateShouldBlock);
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     if (!shouldBlock) {

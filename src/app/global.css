@@ -3,29 +3,31 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-    --background: #fafafa;
-    --foreground: #0f0f0f;
-    --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-title: "Bricolage Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    --font-mono: "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+  --background: #fafafa;
+  --foreground: #0f0f0f;
+  --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-title:
+    "Bricolage Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono:
+    "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
-    --font-serif: "Playfair Display", "Georgia", serif;
-    --color-acid: #c3ff00;
-    --color-klein: #0048ff;
-    --color-magenta: #ff00a6;
+  --font-serif: "Playfair Display", "Georgia", serif;
+  --color-acid: #c3ff00;
+  --color-klein: #0048ff;
+  --color-magenta: #ff00a6;
 }
 
 @theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-sans);
-    --font-display: var(--font-display);
-    --font-mono: var(--font-mono);
-    --font-title: var(--font-title);
-    --font-serif: var(--font-serif);
-    --color-acid: var(--color-acid);
-    --color-klein: var(--color-klein);
-    --color-magenta: var(--color-magenta);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+  --font-title: var(--font-title);
+  --font-serif: var(--font-serif);
+  --color-acid: var(--color-acid);
+  --color-klein: var(--color-klein);
+  --color-magenta: var(--color-magenta);
 }
 
 /* 
@@ -46,49 +48,168 @@ h4,
 h5,
 h6,
 .title {
-    font-family: var(--font-title), serif;
+  font-family: var(--font-title), serif;
 }
 
 @layer components {
-    .h1-hero {
-        @apply text-8xl font-bold leading-[0.8];
-    }
+  .h1-hero {
+    @apply text-8xl font-bold leading-[0.8];
+  }
 
-    .large-p {
-        @apply text-2xl leading-none;
-    }
+  .large-p {
+    @apply text-2xl leading-none;
+  }
 
-    .large-link {
-        @apply text-5xl leading-none;
+  .large-link {
+    @apply text-5xl leading-none;
+  }
+
+  .article-poster {
+    @apply h-[70dvh] w-full border-b-2 border-b-black flex flex-col justify-end;
+  }
+
+  @media (max-width: 768px) {
+    .article-poster {
+      @apply h-auto min-h-[50dvh] py-8;
     }
+  }
+
+  .article-rail {
+    @apply fixed left-0 top-0 h-full w-16 border-r-2 border-r-black flex flex-col gap-2 p-4;
+  }
+
+  @media (max-width: 768px) {
+    .article-rail {
+      @apply static w-full h-auto border-r-0 border-b-2 border-b-black flex-row gap-4 p-4 flex-wrap;
+    }
+  }
+
+  .article-meta-label {
+    @apply text-xs font-mono uppercase tracking-wider border border-black px-2 py-1;
+  }
+
+  .article-prose {
+    @apply font-serif text-lg leading-relaxed text-black/85;
+  }
+
+  @media (max-width: 768px) {
+    .article-prose {
+      @apply text-base;
+    }
+  }
+
+  .article-prose h2 {
+    @apply text-4xl font-bold font-title mt-16 mb-8 text-black border-t-2 border-t-black pt-8 leading-tight;
+  }
+
+  @media (max-width: 768px) {
+    .article-prose h2 {
+      @apply text-2xl mt-10 mb-5 pt-5;
+    }
+  }
+
+  .article-prose h3 {
+    @apply text-2xl font-bold font-title mt-10 mb-5 text-black border-l-4 border-l-black pl-4 leading-snug;
+  }
+
+  @media (max-width: 768px) {
+    .article-prose h3 {
+      @apply text-lg mt-6 mb-3;
+    }
+  }
+
+  .article-prose h4 {
+    @apply text-xl font-bold font-title mt-8 mb-4 text-black leading-snug;
+  }
+
+  .article-prose p {
+    @apply text-black/80 mb-6 leading-relaxed;
+  }
+
+  .article-prose ul,
+  .article-prose ol {
+    @apply ml-8 mb-6 space-y-2;
+  }
+
+  .article-prose li {
+    @apply text-black/80 leading-relaxed;
+  }
+
+  .article-prose blockquote {
+    @apply border-l-4 border-black pl-6 font-mono text-black bg-white my-8 py-6 px-6 border-2 border-l-4 text-sm leading-relaxed;
+  }
+
+  .article-prose code {
+    @apply bg-black text-acid px-2 py-1 font-mono text-sm rounded-sm;
+  }
+
+  .article-prose pre {
+    @apply bg-black text-acid p-6 overflow-x-auto my-8 border-2 border-black font-mono text-sm leading-relaxed;
+  }
+
+  .article-prose pre code {
+    @apply bg-transparent text-acid px-0 py-0;
+  }
+
+  .article-prose a {
+    @apply text-black underline decoration-black hover:opacity-70 transition-opacity;
+  }
+
+  .article-prose strong {
+    @apply text-black font-bold;
+  }
+
+  .article-prose em {
+    @apply italic text-black/80;
+  }
+
+  .article-exit-panel {
+    @apply border-t-4 border-t-black mt-20 pt-16 pb-12 px-8 bg-white flex flex-col gap-8;
+  }
+
+  .article-exit-panel .exit-marker {
+    @apply font-mono text-3xl font-bold text-black mb-6 tracking-tight;
+  }
+
+  .article-exit-panel .exit-label {
+    @apply text-xs font-mono uppercase tracking-widest border-2 border-black px-3 py-2 inline-block font-bold;
+  }
+
+  .article-exit-panel .exit-cta-section {
+    @apply border-b-2 border-b-black pb-8 mb-8;
+  }
+
+  .article-exit-panel .exit-license {
+    @apply flex flex-col gap-3 pb-8;
+  }
 }
 
 body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-sans), sans-serif;
-    isolation: isolate;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+  isolation: isolate;
 }
 
 .custom-cursor-enabled,
 .custom-cursor-enabled * {
-    cursor: none !important;
+  cursor: none !important;
 }
 
 @layer utilities {
-    .font-display {
-        font-family: var(--font-display), serif;
-    }
+  .font-display {
+    font-family: var(--font-display), serif;
+  }
 }
 
 .text-stroke {
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: black;
-    color: transparent;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: black;
+  color: transparent;
 }
 
 .text-stroke-white {
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: white;
-    color: transparent;
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: white;
+  color: transparent;
 }
