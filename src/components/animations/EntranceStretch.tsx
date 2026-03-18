@@ -38,6 +38,49 @@ type EntranceStretchProps = {
   step?: number;
 };
 
+function AnimatedChild({
+  child,
+  delayMs,
+  durationMs,
+  from,
+  fade,
+  disabled,
+}: {
+  child: React.ReactElement;
+  delayMs: number;
+  durationMs: number;
+  from: StretchFrom;
+  fade: boolean;
+  disabled: boolean;
+}) {
+  const { entered, reduceMotion } = useEntranceAnimation({ delayMs, disabled });
+
+  const style: React.CSSProperties = reduceMotion
+    ? {}
+    : { transitionDuration: `${durationMs}ms` };
+
+  const base = `will-change-transform transition ease-in-out ${originClass[from]}`;
+  const axisHidden =
+    from === "left" || from === "right" ? "scale-x-0" : "scale-y-0";
+  const axisShown =
+    from === "left" || from === "right" ? "scale-x-100" : "scale-y-100";
+
+  const opacityHidden = fade ? "opacity-0" : "";
+  const opacityShown = fade ? "opacity-100" : "";
+
+  const animationClasses = `${base} ${entered ? `${axisShown} ${opacityShown}` : `${axisHidden} ${opacityHidden}`}`;
+
+  const existingClassName = (child.props as { className?: string }).className;
+  const existingStyle = (child.props as { style?: React.CSSProperties }).style;
+
+  return React.cloneElement(child, {
+    className: existingClassName
+      ? `${existingClassName} ${animationClasses}`
+      : animationClasses,
+    style: { ...existingStyle, ...style },
+  } as Partial<typeof child.props>);
+}
+
 /**
  * 拉伸展开：X 方向用 scale-x，Y 方向用 scale-y
  * - from left/right => scale-x
@@ -56,14 +99,13 @@ export function StretchEntrance({
   const normalized = children ? normalizeChildren(children) : [];
   const hasChildren = normalized.length > 0;
 
+  const { entered, reduceMotion } = useEntranceAnimation({
+    delayMs,
+    disabled,
+  });
+
   // Empty-child mode: render host element (decorative usage)
   if (!hasChildren) {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { entered, reduceMotion } = useEntranceAnimation({
-      delayMs,
-      disabled,
-    });
-
     const style: React.CSSProperties = reduceMotion
       ? {}
       : { transitionDuration: `${durationMs}ms` };
@@ -92,39 +134,17 @@ export function StretchEntrance({
     <>
       {normalized.map((child, index) => {
         const childDelay = calculateStaggerDelay(delayMs, index, step);
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const { entered, reduceMotion } = useEntranceAnimation({
-          delayMs: childDelay,
-          disabled,
-        });
-
-        const style: React.CSSProperties = reduceMotion
-          ? {}
-          : { transitionDuration: `${durationMs}ms` };
-
-        const base = `will-change-transform transition ease-in-out ${originClass[from]}`;
-        const axisHidden =
-          from === "left" || from === "right" ? "scale-x-0" : "scale-y-0";
-        const axisShown =
-          from === "left" || from === "right" ? "scale-x-100" : "scale-y-100";
-
-        const opacityHidden = fade ? "opacity-0" : "";
-        const opacityShown = fade ? "opacity-100" : "";
-
-        const animationClasses = `${base} ${entered ? `${axisShown} ${opacityShown}` : `${axisHidden} ${opacityHidden}`}`;
-
-        const existingClassName = (child.props as { className?: string })
-          .className;
-        const existingStyle = (child.props as { style?: React.CSSProperties })
-          .style;
-
-        return React.cloneElement(child, {
-          key: child.key ?? index,
-          className: existingClassName
-            ? `${existingClassName} ${animationClasses}`
-            : animationClasses,
-          style: { ...existingStyle, ...style },
-        } as Partial<typeof child.props>);
+        return (
+          <AnimatedChild
+            key={child.key ?? index}
+            child={child}
+            delayMs={childDelay}
+            durationMs={durationMs}
+            from={from}
+            fade={fade}
+            disabled={disabled}
+          />
+        );
       })}
     </>
   );
