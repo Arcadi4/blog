@@ -10,17 +10,17 @@ import { menuItems } from "@/app/posts/menuItems";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ displayName?: string; }>;
+  searchParams: Promise<{ displayName?: string }>;
 }) {
   const params = await searchParams;
   const displayName = params.displayName || "";
   const hash = crypto.createHash("md5").update(displayName).digest("hex");
   const heroName =
     displayName &&
-      [
-        "441be6a1cc1cc50f35b95395f20f6b55",
-        "b38319dfed46aed62f00dca6d58e964a",
-      ].includes(hash)
+    [
+      "441be6a1cc1cc50f35b95395f20f6b55",
+      "b38319dfed46aed62f00dca6d58e964a",
+    ].includes(hash)
       ? displayName
       : "4rcadia";
 
@@ -163,14 +163,13 @@ export default async function Home({
                   delayMs={articlesBaseDelay + 200 + index * 100}
                   className="absolute h-full bottom-0 w-[calc(50%-64px)] translate-x-0 left-full bg-klein"
                 />
-                <SimpleEntrance
-                  delayMs={articlesBaseDelay + index * 100}
-                  className="w-96 pl-16"
-                >
-                  <Link href={`/posts/${post.slug}`} className="large-p">
-                    {post.title}
-                  </Link>
-                  <p className="large-p">{formatDate(post.date)}</p>
+                <SimpleEntrance delayMs={articlesBaseDelay + index * 100}>
+                  <div className="w-96 pl-16">
+                    <Link href={`/posts/${post.slug}`} className="large-p">
+                      {post.title}
+                    </Link>
+                    <p className="large-p">{formatDate(post.date)}</p>
+                  </div>
                 </SimpleEntrance>
                 {post.excerpt && (
                   <SimpleEntrance
