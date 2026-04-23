@@ -46,6 +46,9 @@ next-env.d.ts
 # agents
 .sisyphus
 AGENTS.md
+.claude
+.codex
+.agents
 
 # worktrees
 .worktrees
