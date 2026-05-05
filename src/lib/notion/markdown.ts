@@ -13,16 +13,16 @@ export async function convertMarkdownToHtml(
   pageId: string,
   context: { pageTitle?: string; propertyName?: string } = {}
 ): Promise<string> {
-  if (pageMarkdown.warnings.truncated) {
+  if (pageMarkdown.warnings?.truncated) {
     throw new NotionValidationError(
       `Page content was truncated (pageTitle=${context.pageTitle ?? pageId}, pageId=${pageId}, property=${context.propertyName ?? 'markdown'})`,
       { pageId, pageTitle: context.pageTitle, propertyName: context.propertyName }
     );
   }
 
-  if (pageMarkdown.warnings.unknown_block_ids?.length) {
+  if (pageMarkdown.warnings?.unknown_block_ids?.length) {
     throw new NotionValidationError(
-      `Unknown block types: ${pageMarkdown.warnings.unknown_block_ids.join(', ')} (pageTitle=${context.pageTitle ?? pageId}, pageId=${pageId}, property=${context.propertyName ?? 'markdown'})`,
+      `Unknown block types: ${pageMarkdown.warnings?.unknown_block_ids.join(', ')} (pageTitle=${context.pageTitle ?? pageId}, pageId=${pageId}, property=${context.propertyName ?? 'markdown'})`,
       { pageId, pageTitle: context.pageTitle, propertyName: context.propertyName }
     );
   }
