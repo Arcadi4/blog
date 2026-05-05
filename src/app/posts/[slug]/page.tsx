@@ -3,7 +3,7 @@ import { formatDate } from '@/lib/utils';
 import Link from '@/components/Link';
 
 export async function generateStaticParams() {
-  const posts = getAllPostSlugs();
+  const posts = await getAllPostSlugs();
   return posts.map((post) => ({
     slug: post.slug,
   }));
@@ -12,9 +12,23 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string; }>; }) {
   const { slug } = await params;
   const post = await getPostData(slug);
+
+  if (!post) {
+    return {
+      title: slug,
+    };
+  }
+
   return {
     title: post.title,
     description: post.excerpt,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+    },
+    alternates: {
+      canonical: `/posts/${slug}`,
+    },
   };
 }
 
