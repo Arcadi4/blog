@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "validate:notion": "node scripts/validate-notion.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^5.20.0",
