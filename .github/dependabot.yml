@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "cron"
+      cronjob: "0 7 * * 0,3"
+    versioning-strategy: increase
+    groups:
+      all:
+        patterns:
+          - "*"
