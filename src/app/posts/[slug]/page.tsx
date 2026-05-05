@@ -19,6 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
+  const alternates = await getArticleAlternates(slug);
+
   return {
     title: post.title,
     description: post.excerpt,
@@ -26,9 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: post.title,
       description: post.excerpt,
     },
-    alternates: {
-      canonical: `/posts/${slug}`,
-    },
+    alternates,
   };
 }
 

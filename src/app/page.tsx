@@ -1,5 +1,4 @@
 import Link from "@/components/Link";
-import crypto from "crypto";
 import { getSortedPostsData } from "@/lib/posts";
 import { formatDate } from "@/lib/utils";
 import ProximityLink from "@/components/ProximityLink";
@@ -7,22 +6,8 @@ import { SimpleEntrance } from "@/components/animations/EntranceSimple";
 import { StretchEntrance } from "@/components/animations/EntranceStretch";
 import { menuItems } from "@/app/posts/menuItems";
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ displayName?: string }>;
-}) {
-  const params = await searchParams;
-  const displayName = params.displayName || "";
-  const hash = crypto.createHash("md5").update(displayName).digest("hex");
-  const heroName =
-    displayName &&
-    [
-      "441be6a1cc1cc50f35b95395f20f6b55",
-      "b38319dfed46aed62f00dca6d58e964a",
-    ].includes(hash)
-      ? displayName
-      : "4rcadia";
+export default async function Home() {
+  const heroName = "4rcadia";
 
   const posts = await getSortedPostsData();
   const latestPosts = posts.slice(0, 3);

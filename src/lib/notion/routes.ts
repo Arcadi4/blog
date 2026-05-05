@@ -1,7 +1,7 @@
 import type { Locale } from './types';
 
 export function getLocaleSegment(locale: Locale): string {
-  return locale === 'zh-CN' ? '' : locale;
+  return locale;
 }
 
 export function buildOriginalUrl(slug: string): string {
@@ -23,12 +23,13 @@ export function buildAlternates(
     languages[locale] = buildTranslationUrl(locale, originalSlug);
   }
 
-  if (!languages['zh-CN']) {
-    languages['zh-CN'] = buildOriginalUrl(originalSlug);
-  }
+  const originalLocale = availableLocales[0];
+  const canonical = originalLocale
+    ? buildTranslationUrl(originalLocale, originalSlug)
+    : buildOriginalUrl(originalSlug);
 
   return {
-    canonical: languages['zh-CN'],
+    canonical,
     languages,
   };
 }
