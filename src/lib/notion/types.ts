@@ -26,7 +26,7 @@ export interface NotionTranslation {
   id: string;
   title: string;
   excerpt: string;
-  language: Locale;
+  locale: Locale;
   originalArticleId: string;
   originalSlug: string;
   content: string;
