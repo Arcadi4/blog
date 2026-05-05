@@ -24,7 +24,7 @@ export default async function Home({
       ? displayName
       : "4rcadia";
 
-  const posts = getSortedPostsData();
+  const posts = await getSortedPostsData();
   const latestPosts = posts.slice(0, 3);
 
   const socialMediaItems = [
