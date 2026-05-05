@@ -89,7 +89,7 @@ async function notionFetch<T>({ endpoint, method, body, context }: RequestContex
 
 export async function queryDataSource(dataSourceId: string): Promise<JsonValue[]> {
   return memo(`queryDataSource:${dataSourceId}`, async () => {
-    const endpoint = `/v1/databases/${dataSourceId}/query`;
+    const endpoint = `/v1/data_sources/${dataSourceId}/query`;
     const results: JsonValue[] = [];
     let startCursor: string | null | undefined;
 

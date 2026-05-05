@@ -9,6 +9,15 @@ import { convertMarkdownToHtml } from './markdown';
 import type { ArticleStatus, Locale, NotionArticle } from './types';
 import { NotionValidationError } from './types';
 
+const REQUIRED_ARTICLE_PROPERTIES = [
+  ARTICLE_PROPS.TITLE,
+  ARTICLE_PROPS.SLUG,
+  ARTICLE_PROPS.EXCERPT,
+  ARTICLE_PROPS.PUBLISH_DATE,
+  ARTICLE_PROPS.ORIGINAL_LANGUAGE,
+  ARTICLE_PROPS.STATUS,
+] as const;
+
 type NotionProperty = {
   title?: { plain_text?: string }[];
   rich_text?: { plain_text?: string }[];
@@ -38,6 +47,7 @@ type ArticleFields = {
 };
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const supportedArticleStatuses = Object.values(ARTICLE_STATUS) as string[];
 
 function plainText(items?: { plain_text?: string }[]) {
   return items?.map((item) => item.plain_text ?? '').join('').trim() ?? '';
@@ -61,6 +71,23 @@ function validationError(
     `${message} (pageTitle=${titleForError(fields, page)}, pageId=${page.id}, property=${propertyName})`,
     { pageId: page.id, pageTitle: titleForError(fields, page), propertyName }
   );
+}
+
+function schemaError(message: string, page: NotionPage, propertyName: string) {
+  const pageTitle = plainText(property(page, ARTICLE_PROPS.TITLE).title) || page.id;
+
+  return new NotionValidationError(
+    `${message} (pageTitle=${pageTitle}, pageId=${page.id}, property=${propertyName})`,
+    { pageId: page.id, pageTitle, propertyName }
+  );
+}
+
+function assertRequiredProperties(page: NotionPage) {
+  for (const propertyName of REQUIRED_ARTICLE_PROPERTIES) {
+    if (!page.properties || !(propertyName in page.properties)) {
+      throw schemaError('Article data source is missing a required property', page, propertyName);
+    }
+  }
 }
 
 function dateValue(value?: string | null) {
@@ -98,6 +125,15 @@ function validatePublicArticle(page: NotionPage, fields: ArticleFields) {
     throw validationError('Article title is required', page, fields, ARTICLE_PROPS.TITLE);
   }
 
+  if (!supportedArticleStatuses.includes(fields.status)) {
+    throw validationError(
+      `Article status must be one of: ${supportedArticleStatuses.join(', ')}`,
+      page,
+      fields,
+      ARTICLE_PROPS.STATUS
+    );
+  }
+
   if (!slugPattern.test(fields.slug)) {
     throw validationError(
       'Article slug must be lowercase and URL-safe',
@@ -131,7 +167,18 @@ export async function getAllArticles(): Promise<NotionArticle[]> {
   const slugs = new Map<string, NotionArticle>();
 
   for (const page of rows) {
+    assertRequiredProperties(page);
     const fields = normalizeArticle(page);
+
+    if (fields.status && !supportedArticleStatuses.includes(fields.status)) {
+      throw validationError(
+        `Article status must be one of: ${supportedArticleStatuses.join(', ')}`,
+        page,
+        fields,
+        ARTICLE_PROPS.STATUS
+      );
+    }
+
     if (fields.status !== ARTICLE_STATUS.PUBLIC) continue;
 
     validatePublicArticle(page, fields);
@@ -162,7 +209,15 @@ export async function getAllArticles(): Promise<NotionArticle[]> {
       );
     }
 
-    const content = await convertMarkdownToHtml(await getPageMarkdown(page.id), page.id);
+    const pageMarkdown = await getPageMarkdown(page.id);
+    if (!pageMarkdown.markdown.trim()) {
+      throw validationError('Article markdown body is required', page, fields, ARTICLE_PROPS.TITLE);
+    }
+
+    const content = await convertMarkdownToHtml(pageMarkdown, page.id, {
+      pageTitle: titleForError(fields, page),
+      propertyName: ARTICLE_PROPS.TITLE,
+    });
     const article: NotionArticle = {
       id: page.id,
       title: fields.title,

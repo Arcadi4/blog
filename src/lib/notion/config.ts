@@ -3,8 +3,23 @@ import 'server-only';
 export const NOTION_API_VERSION = '2026-03-11';
 export const NOTION_BASE_URL = 'https://api.notion.com';
 
-export const ARTICLES_DATA_SOURCE_ID = '357f5028-4ed3-8018-beef-000b360564a7';
-export const TRANSLATIONS_DATA_SOURCE_ID = '357f5028-4ed3-800a-abbf-000b01ac84cc';
+function requiredConfigValue(name: string, value: string | undefined) {
+  const normalized = value?.trim();
+  if (!normalized) {
+    throw new Error(`Missing ${name} configuration value.`);
+  }
+
+  return normalized;
+}
+
+export const ARTICLES_DATA_SOURCE_ID = requiredConfigValue(
+  'ARTICLES_DATA_SOURCE_ID',
+  process.env.NOTION_ARTICLES_DATA_SOURCE_ID ?? '357f5028-4ed3-8018-beef-000b360564a7'
+);
+export const TRANSLATIONS_DATA_SOURCE_ID = requiredConfigValue(
+  'TRANSLATIONS_DATA_SOURCE_ID',
+  process.env.NOTION_TRANSLATIONS_DATA_SOURCE_ID ?? '357f5028-4ed3-800a-abbf-000b01ac84cc'
+);
 
 export const ARTICLE_PROPS = {
   TITLE: '名称',

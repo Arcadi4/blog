@@ -11,6 +11,19 @@ import { convertMarkdownToHtml } from './markdown';
 import type { Locale, NotionTranslation } from './types';
 import { NotionValidationError } from './types';
 
+const REQUIRED_TRANSLATION_PROPERTIES = [
+  TRANSLATION_PROPS.TITLE,
+  TRANSLATION_PROPS.EXCERPT,
+  TRANSLATION_PROPS.LANGUAGE,
+  TRANSLATION_PROPS.PROGRESS,
+  TRANSLATION_PROPS.ORIGINAL,
+] as const;
+
+const REQUIRED_ORIGINAL_ARTICLE_PROPERTIES = [
+  ARTICLE_PROPS.ORIGINAL_LANGUAGE,
+  ARTICLE_PROPS.SLUG,
+] as const;
+
 type NotionProperty = {
   title?: { plain_text?: string }[];
   rich_text?: { plain_text?: string }[];
@@ -36,6 +49,9 @@ type OriginalArticleFields = {
   locale: string;
   slug: string;
 };
+
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const supportedTranslationProgress = Object.values(TRANSLATION_PROGRESS) as string[];
 
 function plainText(items?: { plain_text?: string }[]) {
   return items?.map((item) => item.plain_text ?? '').join('').trim() ?? '';
@@ -65,6 +81,30 @@ function validationError(
   );
 }
 
+function schemaError(message: string, page: NotionPage, propertyName: string) {
+  const pageTitle =
+    plainText(property(page, TRANSLATION_PROPS.TITLE).title) ||
+    plainText(property(page, ARTICLE_PROPS.TITLE).title) ||
+    page.id;
+
+  return new NotionValidationError(
+    `${message} (pageTitle=${pageTitle}, pageId=${page.id}, property=${propertyName})`,
+    { pageId: page.id, pageTitle, propertyName }
+  );
+}
+
+function assertRequiredProperties(
+  page: NotionPage,
+  propertyNames: readonly string[],
+  sourceName: string
+) {
+  for (const propertyName of propertyNames) {
+    if (!page.properties || !(propertyName in page.properties)) {
+      throw schemaError(`${sourceName} data source is missing a required property`, page, propertyName);
+    }
+  }
+}
+
 function normalizeTranslation(page: NotionPage): TranslationFields {
   return {
     title: plainText(property(page, TRANSLATION_PROPS.TITLE).title),
@@ -90,6 +130,7 @@ async function getOriginalArticleFields() {
   const originals = new Map<string, OriginalArticleFields>();
 
   for (const page of rows) {
+    assertRequiredProperties(page, REQUIRED_ORIGINAL_ARTICLE_PROPERTIES, 'Article');
     originals.set(page.id, normalizeOriginalArticle(page));
   }
 
@@ -138,7 +179,18 @@ export async function getAllTranslations(): Promise<NotionTranslation[]> {
   const completedByOriginalAndLocale = new Map<string, NotionPage>();
 
   for (const page of rows) {
+    assertRequiredProperties(page, REQUIRED_TRANSLATION_PROPERTIES, 'Translation');
     const fields = normalizeTranslation(page);
+
+    if (fields.progress && !supportedTranslationProgress.includes(fields.progress)) {
+      throw validationError(
+        `Translation progress must be one of: ${supportedTranslationProgress.join(', ')}`,
+        page,
+        fields,
+        TRANSLATION_PROPS.PROGRESS
+      );
+    }
+
     if (fields.progress !== TRANSLATION_PROGRESS.COMPLETED) continue;
 
     validateCompletedTranslation(page, fields);
@@ -158,6 +210,15 @@ export async function getAllTranslations(): Promise<NotionTranslation[]> {
     if (!isLocale(original.locale)) {
       throw validationError(
         `Original article has unsupported locale: originalArticleId=${originalArticleId}`,
+        page,
+        fields,
+        TRANSLATION_PROPS.ORIGINAL
+      );
+    }
+
+    if (!slugPattern.test(original.slug)) {
+      throw validationError(
+        `Original article relation must point to an article with a lowercase URL-safe slug: originalArticleId=${originalArticleId}`,
         page,
         fields,
         TRANSLATION_PROPS.ORIGINAL
@@ -194,7 +255,10 @@ export async function getAllTranslations(): Promise<NotionTranslation[]> {
       );
     }
 
-    const content = await convertMarkdownToHtml(pageMarkdown, page.id);
+    const content = await convertMarkdownToHtml(pageMarkdown, page.id, {
+      pageTitle: titleForError(fields, page),
+      propertyName: TRANSLATION_PROPS.TITLE,
+    });
     completedByOriginalAndLocale.set(duplicateKey, page);
     translations.push({
       id: page.id,

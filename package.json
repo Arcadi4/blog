@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "validate:notion": "node scripts/validate-notion.mjs"
+    "validate:notion": "NODE_ENV=production NODE_OPTIONS=--conditions=react-server tsx --env-file=.env scripts/validate-notion.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^5.20.0",
