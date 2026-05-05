@@ -17,6 +17,8 @@ export interface NotionArticle {
   originalLanguage: Locale;
   tags: string[];
   status: ArticleStatus;
+  translationIds: string[];
+  lastEditedTime: Date;
   content: string;
 }
 
