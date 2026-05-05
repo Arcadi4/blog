@@ -52,3 +52,6 @@ AGENTS.md
 
 # worktrees
 .worktrees
+
+# secrets
+.env
