@@ -14,7 +14,7 @@ try {
   execSync('yarn build', { stdio: 'inherit' });
   console.log('\n✅ Validation passed - build successful');
   process.exit(0);
-} catch (error) {
-  console.error('\n❌ Validation failed - build errors detected');
-  process.exit(1);
-}
+  } catch (err) {
+    console.error('Validation failed:', err.message);
+    process.exit(1);
+  }

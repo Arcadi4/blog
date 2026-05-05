@@ -13,7 +13,7 @@ export async function getSortedPostsData(): Promise<Post[]> {
   return index.articles.map(article => ({
     slug: article.slug,
     title: article.title,
-    date: article.publishedAt,
+    date: article.publishDate.toISOString(),
     excerpt: article.excerpt,
   }));
 }
@@ -34,7 +34,7 @@ export async function getPostData(slug: string): Promise<Post | null> {
   return {
     slug: article.slug,
     title: article.title,
-    date: article.publishedAt,
+    date: article.publishDate.toISOString(),
     excerpt: article.excerpt,
     content: article.content,
   };
