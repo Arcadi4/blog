@@ -1,6 +1,7 @@
 import { getPostData, getAllPostSlugs } from '@/lib/posts';
 import { formatDate } from '@/lib/utils';
 import Link from '@/components/Link';
+import { notFound } from 'next/navigation';
 
 export async function generateStaticParams() {
   const posts = await getAllPostSlugs();
@@ -32,6 +33,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function Post({ params }: { params: Promise<{ slug: string; }>; }) {
   const { slug } = await params;
   const post = await getPostData(slug);
+
+  if (!post) {
+    notFound();
+  }
 
   return (
     <main className="min-h-dvh flex flex-col">
