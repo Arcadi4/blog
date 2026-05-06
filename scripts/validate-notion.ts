@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-import { NotionValidationError } from '@/lib/notion/types';
-import { getContentIndex } from '../src/lib/notion/content';
+import { NotionValidationError } from './lib/validation-shared';
+import { getAllArticles } from './lib/validate-articles';
+import { getAllTranslations } from './lib/validate-translations';
 
 async function main() {
     try {
-        const { articles, translations } = await getContentIndex();
+        const articles = await getAllArticles();
+        const translations = await getAllTranslations();
         console.log('=== Notion Content Validation ===');
         console.log(`Publishable articles count: ${articles.length}`);
         console.log(`Completed translations count: ${translations.length}`);

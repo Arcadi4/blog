@@ -1,28 +1,15 @@
+// Validation moved to build-time: scripts/lib/validate-translations.ts
+
 import { getPageMarkdown, queryDataSource } from './client';
 import {
   ARTICLE_PROPS,
   ARTICLES_DATA_SOURCE_ID,
-  SUPPORTED_LOCALES,
   TRANSLATION_PROGRESS,
   TRANSLATION_PROPS,
   TRANSLATIONS_DATA_SOURCE_ID,
 } from './config';
 import { convertMarkdownToHtml } from './markdown';
 import type { Locale, NotionTranslation } from './types';
-import { NotionValidationError } from './types';
-
-const REQUIRED_TRANSLATION_PROPERTIES = [
-  TRANSLATION_PROPS.TITLE,
-  TRANSLATION_PROPS.EXCERPT,
-  TRANSLATION_PROPS.LANGUAGE,
-  TRANSLATION_PROPS.PROGRESS,
-  TRANSLATION_PROPS.ORIGINAL,
-] as const;
-
-const REQUIRED_ORIGINAL_ARTICLE_PROPERTIES = [
-  ARTICLE_PROPS.ORIGINAL_LANGUAGE,
-  ARTICLE_PROPS.SLUG,
-] as const;
 
 type NotionProperty = {
   title?: { plain_text?: string }[];
@@ -50,59 +37,12 @@ type OriginalArticleFields = {
   slug: string;
 };
 
-const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const supportedTranslationProgress = Object.values(TRANSLATION_PROGRESS) as string[];
-
 function plainText(items?: { plain_text?: string }[]) {
   return items?.map((item) => item.plain_text ?? '').join('').trim() ?? '';
 }
 
 function property(page: NotionPage, name: string) {
   return page.properties?.[name] ?? {};
-}
-
-function isLocale(value: string): value is Locale {
-  return SUPPORTED_LOCALES.includes(value as Locale);
-}
-
-function titleForError(fields: TranslationFields, page: NotionPage) {
-  return fields.title || page.id;
-}
-
-function validationError(
-  message: string,
-  page: NotionPage,
-  fields: TranslationFields,
-  propertyName: string
-) {
-  return new NotionValidationError(
-    `${message} (pageTitle=${titleForError(fields, page)}, pageId=${page.id}, property=${propertyName})`,
-    { pageId: page.id, pageTitle: titleForError(fields, page), propertyName }
-  );
-}
-
-function schemaError(message: string, page: NotionPage, propertyName: string) {
-  const pageTitle =
-    plainText(property(page, TRANSLATION_PROPS.TITLE).title) ||
-    plainText(property(page, ARTICLE_PROPS.TITLE).title) ||
-    page.id;
-
-  return new NotionValidationError(
-    `${message} (pageTitle=${pageTitle}, pageId=${page.id}, property=${propertyName})`,
-    { pageId: page.id, pageTitle, propertyName }
-  );
-}
-
-function assertRequiredProperties(
-  page: NotionPage,
-  propertyNames: readonly string[],
-  sourceName: string
-) {
-  for (const propertyName of propertyNames) {
-    if (!page.properties || !(propertyName in page.properties)) {
-      throw schemaError(`${sourceName} data source is missing a required property`, page, propertyName);
-    }
-  }
 }
 
 function normalizeTranslation(page: NotionPage): TranslationFields {
@@ -130,44 +70,10 @@ async function getOriginalArticleFields() {
   const originals = new Map<string, OriginalArticleFields>();
 
   for (const page of rows) {
-    assertRequiredProperties(page, REQUIRED_ORIGINAL_ARTICLE_PROPERTIES, 'Article');
     originals.set(page.id, normalizeOriginalArticle(page));
   }
 
   return originals;
-}
-
-function validateCompletedTranslation(page: NotionPage, fields: TranslationFields) {
-  if (fields.originalArticleIds.length !== 1) {
-    throw validationError(
-      'Completed translation must relate to exactly one original article',
-      page,
-      fields,
-      TRANSLATION_PROPS.ORIGINAL
-    );
-  }
-
-  if (!isLocale(fields.locale)) {
-    throw validationError(
-      'Completed translation language must be zh-CN or en-US',
-      page,
-      fields,
-      TRANSLATION_PROPS.LANGUAGE
-    );
-  }
-
-  if (!fields.title) {
-    throw validationError('Completed translation title is required', page, fields, TRANSLATION_PROPS.TITLE);
-  }
-
-  if (!fields.excerpt) {
-    throw validationError(
-      'Completed translation excerpt is required',
-      page,
-      fields,
-      TRANSLATION_PROPS.EXCERPT
-    );
-  }
 }
 
 export async function getAllTranslations(): Promise<NotionTranslation[]> {
@@ -176,90 +82,19 @@ export async function getAllTranslations(): Promise<NotionTranslation[]> {
   if (rows.length === 0) return translations;
 
   const originals = await getOriginalArticleFields();
-  const completedByOriginalAndLocale = new Map<string, NotionPage>();
 
   for (const page of rows) {
-    assertRequiredProperties(page, REQUIRED_TRANSLATION_PROPERTIES, 'Translation');
     const fields = normalizeTranslation(page);
-
-    if (fields.progress && !supportedTranslationProgress.includes(fields.progress)) {
-      throw validationError(
-        `Translation progress must be one of: ${supportedTranslationProgress.join(', ')}`,
-        page,
-        fields,
-        TRANSLATION_PROPS.PROGRESS
-      );
-    }
 
     if (fields.progress !== TRANSLATION_PROGRESS.COMPLETED) continue;
 
-    validateCompletedTranslation(page, fields);
-
     const locale = fields.locale as Locale;
-    const originalArticleId = fields.originalArticleIds[0];
-    const original = originals.get(originalArticleId);
-    if (!original) {
-      throw validationError(
-        `Original article relation was not found: originalArticleId=${originalArticleId}`,
-        page,
-        fields,
-        TRANSLATION_PROPS.ORIGINAL
-      );
-    }
-
-    if (!isLocale(original.locale)) {
-      throw validationError(
-        `Original article has unsupported locale: originalArticleId=${originalArticleId}`,
-        page,
-        fields,
-        TRANSLATION_PROPS.ORIGINAL
-      );
-    }
-
-    if (!slugPattern.test(original.slug)) {
-      throw validationError(
-        `Original article relation must point to an article with a lowercase URL-safe slug: originalArticleId=${originalArticleId}`,
-        page,
-        fields,
-        TRANSLATION_PROPS.ORIGINAL
-      );
-    }
-
-    if (locale === original.locale) {
-      throw validationError(
-        'Completed translation language must differ from original article language',
-        page,
-        fields,
-        TRANSLATION_PROPS.LANGUAGE
-      );
-    }
-
-    const duplicateKey = `${originalArticleId}:${locale}`;
-    const duplicate = completedByOriginalAndLocale.get(duplicateKey);
-    if (duplicate) {
-      throw validationError(
-        `Duplicate completed translation for originalArticleId=${originalArticleId} locale=${locale} also used by pageId=${duplicate.id}`,
-        page,
-        fields,
-        TRANSLATION_PROPS.LANGUAGE
-      );
-    }
+    const originalArticleId = fields.originalArticleIds[0]!;
+    const original = originals.get(originalArticleId)!;
 
     const pageMarkdown = await getPageMarkdown(page.id);
-    if (!pageMarkdown.markdown.trim()) {
-      throw validationError(
-        'Completed translation markdown body is required',
-        page,
-        fields,
-        TRANSLATION_PROPS.TITLE
-      );
-    }
+    const content = await convertMarkdownToHtml(pageMarkdown);
 
-    const content = await convertMarkdownToHtml(pageMarkdown, page.id, {
-      pageTitle: titleForError(fields, page),
-      propertyName: TRANSLATION_PROPS.TITLE,
-    });
-    completedByOriginalAndLocale.set(duplicateKey, page);
     translations.push({
       id: page.id,
       title: fields.title,

@@ -1,6 +1,8 @@
-// Validation policy:
-// Invalid public articles (状态=公开) and completed translations (翻译进度=完成) must fail.
-// Invalid draft/private/archive articles can be skipped.
+// Validation architecture:
+// - Build-time: All Notion metadata validation runs in scripts/lib/validate-*.ts
+// - Runtime: Pure data transformation only (articles.ts, translations.ts, markdown.ts)
+// - Policy: Invalid public articles (状态=公开) and completed translations (翻译进度=完成) must fail at build time
+// - Invalid draft/private/archive articles are skipped (not validated)
 
 export type Locale = 'zh-CN' | 'en-US';
 
