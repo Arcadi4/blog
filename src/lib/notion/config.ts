@@ -1,5 +1,3 @@
-import 'server-only';
-
 export const NOTION_API_VERSION = '2026-03-11';
 export const NOTION_BASE_URL = 'https://api.notion.com';
 

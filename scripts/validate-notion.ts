@@ -1,9 +1,17 @@
 #!/usr/bin/env node
-import { NotionValidationError } from './lib/validation-shared';
-import { getAllArticles } from './lib/validate-articles';
-import { getAllTranslations } from './lib/validate-translations';
+import { loadEnvFile } from 'node:process';
+
+if (!process.env.VERCEL_ENV) {
+    loadEnvFile('.env');
+}
 
 async function main() {
+    const [{ NotionValidationError }, { getAllArticles }, { getAllTranslations }] = await Promise.all([
+        import('./lib/validation-shared'),
+        import('./lib/validate-articles'),
+        import('./lib/validate-translations'),
+    ]);
+
     try {
         const articles = await getAllArticles();
         const translations = await getAllTranslations();
@@ -12,7 +20,7 @@ async function main() {
         console.log(`Completed translations count: ${translations.length}`);
         console.log('\n✅ Validation passed');
         process.exit(0);
-    } catch (error: NotionValidationError | unknown) {
+    } catch (error) {
         if (error instanceof NotionValidationError) {
             console.error('\n❌ Validation failed:');
             console.error(`  Error: ${error.message}`);

@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { NOTION_API_KEY, NOTION_API_VERSION, NOTION_BASE_URL } from './config';
 import { NotionValidationError } from './types';
 
