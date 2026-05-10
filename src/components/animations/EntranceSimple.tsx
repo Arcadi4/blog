@@ -8,15 +8,14 @@ import {
   warnMultiChildClassName,
 } from "./entranceChildAdapter";
 
-type TextFrom = "up" | "down" | "left" | "right";
 type TextFrom = "up" | "down" | "left" | "right" | "none";
 type Distance = "sm" | "md" | "lg";
 
 const distanceClass: Record<TextFrom, Record<Distance, string>> = {
-  up: { sm: "translate-y-2", md: "translate-y-4", lg: "translate-y-8" },
-  down: { sm: "-translate-y-2", md: "-translate-y-4", lg: "-translate-y-8" },
-  left: { sm: "translate-x-2", md: "translate-x-4", lg: "translate-x-8" },
-  right: { sm: "-translate-x-2", md: "-translate-x-4", lg: "-translate-x-8" },
+  up: { sm: "-translate-y-2", md: "-translate-y-4", lg: "-translate-y-8" },
+  down: { sm: "translate-y-2", md: "translate-y-4", lg: "translate-y-8" },
+  left: { sm: "-translate-x-2", md: "-translate-x-4", lg: "-translate-x-8" },
+  right: { sm: "translate-x-2", md: "translate-x-4", lg: "translate-x-8" },
   none: { sm: "translate-x-0", md: "translate-x-0", lg: "translate-x-0" },
 };
 
