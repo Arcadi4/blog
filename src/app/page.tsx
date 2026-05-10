@@ -3,8 +3,7 @@
 import ProximityLink from "@/components/ProximityLink";
 import { SimpleEntrance } from "@/components/animations/EntranceSimple";
 import { StretchEntrance } from "@/components/animations/EntranceStretch";
-import { menuItems } from "@/app/posts/menuItems";
-import { useSearchParams } from "next/navigation";
+import { LinkItem, menuItems, socialMediaItems } from "@/app/posts/menuItems";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -18,12 +17,6 @@ export default function Home() {
   const name = useRealName ? "Skylar" : "4rcadia";
   const heroSegments = useRealName ? ["Sky", "lr", "C."] : ["4rc", "ad", "ia"];
   const greeting = `Hello,\nhere’s\n${name}.`;
-
-  const socialMediaItems = [
-    { name: "GitHub", href: "https://github.com/arcadi4" },
-    { name: "Bilibili", href: "https://space.bilibili.com/499244418" },
-    { name: "Twitter", href: "https://x.com/_4rcadia" },
-  ];
 
   let menuAnimationIndex = 0;
   const delayPerMenuItem = 100;
@@ -64,22 +57,31 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="relative flex min-h-screen w-full max-w-full flex-col overflow-hidden overflow-x-clip">
-      {/* Grid for background elements, no y padding */}
-      <div className="absolute grid w-full grid-cols-12 gap-x-4 px-8">
+    <main className="relative">
+      {/* Grid for background elements, col only, no y padding */}
+      <div className="absolute grid h-full w-full grid-cols-12 gap-x-4 px-8">
         <StretchEntrance
           from="top"
           durationMs={1600}
           className="separator z-20 col-start-2 col-end-3 row-start-1 h-[200dvh] border-r"
         />
-        <StretchEntrance
-          from="top"
-          durationMs={1000}
-          className="bg-acid col-start-1 col-end-1 row-start-1 -ml-8 h-screen"
-        />
+        <div className="col-span-1 col-start-1 h-full py-8">
+          <div className="grid h-full grid-rows-9 gap-y-4">
+            <StretchEntrance
+              from="top"
+              durationMs={1000}
+              className="bg-acid -z-10 row-span-4 row-start-1 -mt-8 -ml-8"
+            />
+            <StretchEntrance
+              from="top"
+              durationMs={1000}
+              className="bg-klein -z-10 row-span-5 row-start-5 -mt-4 -ml-8 h-[105%]"
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Grid for background elements, no x padding */}
+      {/* Grid for background elements, row only, no x padding */}
       <div className="absolute grid h-[200dvh] w-full grid-rows-9 gap-y-4 py-8">
         <StretchEntrance
           from="left"
@@ -196,7 +198,7 @@ export default function Home() {
         {/* Menu; navigation and social media links */}
         <aside className="col-start-1 col-end-4 row-span-1 row-start-3">
           <div className="flex flex-col">
-            {menuItems.map((menuItem) => {
+            {menuItems.map((menuItem: LinkItem) => {
               menuAnimationIndex++;
               return (
                 <SimpleEntrance
@@ -219,7 +221,7 @@ export default function Home() {
         </aside>
         <aside className="col-start-1 col-end-4 row-span-1 row-start-4">
           <div className="flex flex-col">
-            {socialMediaItems.map((menuItem) => {
+            {socialMediaItems.map((menuItem: LinkItem) => {
               menuAnimationIndex++;
               return (
                 <SimpleEntrance
@@ -275,29 +277,29 @@ export default function Home() {
         <StretchEntrance
           from="top"
           delayMs={figureBaseDelay + 400}
-          className="separator col-span-1 col-start-4 row-span-3 row-start-2 -mt-4 border-r"
+          className="separator -z-10 col-span-1 col-start-4 row-span-3 row-start-2 -mt-4 border-r"
         />
         <StretchEntrance
           from="top"
           delayMs={figureBaseDelay + 600}
-          className="separator col-span-1 col-start-8 row-span-3 row-start-2 -mt-4 border-r"
+          className="separator -z-10 col-span-1 col-start-8 row-span-3 row-start-2 -mt-4 border-r"
         />
 
         {/* Figures */}
-        <div className="relative col-span-4 col-start-9 row-span-3 row-start-3">
+        <div className="relative col-span-4 col-start-5 row-span-3 row-start-3">
           <SimpleEntrance
-            delayMs={figureBaseDelay + 600}
+            delayMs={figureBaseDelay + 1000}
             from="none"
-            className="font-grotesque text-stroke-magenta pointer-events-none absolute bottom-0 left-0 z-10 text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
+            className="font-grotesque text-stroke-acid pointer-events-none absolute bottom-0 left-0 -z-20 text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
           >
             &
           </SimpleEntrance>
         </div>
-        <div className="relative col-span-4 col-start-4 row-span-3 row-start-3">
+        <div className="relative col-span-4 col-start-9 row-span-3 row-start-4">
           <SimpleEntrance
-            delayMs={figureBaseDelay + 1000}
+            delayMs={figureBaseDelay + 600}
             from="none"
-            className="font-grotesque text-stroke-acid pointer-events-none absolute bottom-0 left-0 -z-10 text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
+            className="font-grotesque text-stroke-magenta pointer-events-none absolute bottom-0 left-0 z-10 text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
           >
             &
           </SimpleEntrance>
