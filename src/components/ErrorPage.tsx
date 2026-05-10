@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { menuItemsErrorPage } from "@/app/posts/menuItems";
 import ProximityLink from "@/components/ProximityLink";
@@ -32,6 +33,33 @@ const DEFAULT_DESCRIPTION = (
   </>
 );
 
+type CurrentDateTime = {
+  currentDate: string;
+  currentTime: string;
+};
+
+const EMPTY_DATE_TIME: CurrentDateTime = {
+  currentDate: "",
+  currentTime: "",
+};
+
+function getCurrentDateTime(): CurrentDateTime {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  return {
+    currentDate:
+      year +
+      "-" +
+      String(month).padStart(2, "0") +
+      "-" +
+      String(day).padStart(2, "0"),
+    currentTime: date.toLocaleTimeString(),
+  };
+}
+
 function getErrorFamilyLabel(code: string) {
   const firstDigit = code.match(/\d/)?.[0];
   if (!firstDigit) {
@@ -55,22 +83,17 @@ export default function ErrorPage({
   links = menuItemsErrorPage,
 }: ErrorPageProps) {
   const pathname = usePathname();
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const currentDate =
-    year +
-    "-" +
-    String(month).padStart(2, "0") +
-    "-" +
-    String(day).padStart(2, "0");
-  const currentTime = date.toLocaleTimeString();
+  const [{ currentDate, currentTime }, setCurrentDateTime] =
+    useState(EMPTY_DATE_TIME);
   const normalizedCode = String(code);
   const resolvedCodeDisplay = codeDisplay ?? normalizedCode;
   const resolvedFamilyLabel =
     familyLabel ?? getErrorFamilyLabel(resolvedCodeDisplay);
   const resolvedTitleLines = titleLines ?? title.split(/\s+/).filter(Boolean);
+
+  useEffect(() => {
+    setCurrentDateTime(getCurrentDateTime());
+  }, []);
 
   return (
     <main className="overflow-hidden">
