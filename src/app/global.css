@@ -5,12 +5,11 @@
 @theme {
     --color-background: #fafafa;
     --color-foreground: #0f0f0f;
-    --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: Helvetica, -apple-system, sans-serif;
     --font-mono:
         "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas,
         "Liberation Mono", "Courier New", monospace;
-    --font-title:
-        "Bricolage Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-title: "Geist", Helvetica, Arial, sans-serif;
     --font-serif: "Playfair Display", "Georgia", serif;
     --color-acid: #c3ff00;
     --color-klein: #0048ff;
