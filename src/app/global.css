@@ -40,7 +40,7 @@ h6,
 
 @layer components {
   .separator {
-    @apply border-0 border-black/25;
+    @apply border-0 border-gray-400;
   }
 
   .h1-hero {
