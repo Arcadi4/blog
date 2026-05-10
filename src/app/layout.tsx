@@ -22,10 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="overflow-x-clip">
-      <body
-        className={`${bricolageGrotesque.variable} ${ibmPlexSans.variable} ${playfairDisplay.variable} antialiased`}
-      >
+    <html
+      lang="en"
+      className={`${bricolageGrotesque.variable} ${ibmPlexSans.variable} ${playfairDisplay.variable} overflow-x-clip antialiased`}
+    >
+      <body>
         <Analytics />
         <SpeedInsights />
         <CustomCursor />
