@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "pnpm validate:notion && next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "oxlint --fix",
     "validate:notion": "NODE_ENV=production NODE_OPTIONS=--conditions=react-server tsx scripts/validate-notion.ts"
   },
   "dependencies": {
@@ -30,9 +30,7 @@
     "@types/node": "^25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^10",
-    "eslint-config-next": "16.2.5",
-    "eslint-config-prettier": "^10.1.8",
+    "oxlint": "^1.63.0",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4",
