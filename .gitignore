@@ -49,6 +49,7 @@ AGENTS.md
 .claude
 .codex
 .agents
+.playwright-mcp
 
 # worktrees
 .worktrees
