@@ -1,7 +1,7 @@
 import {
+  ButtonHTMLAttributes,
   CSSProperties,
   forwardRef,
-  HTMLAttributes,
   MutableRefObject,
   useEffect,
   useMemo,
@@ -54,7 +54,7 @@ function useMousePositionRef(
   return positionRef;
 }
 
-interface VariableProximityProps extends HTMLAttributes<HTMLSpanElement> {
+interface VariableProximityProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   fromFontVariationSettings: string;
   toFontVariationSettings: string;
@@ -66,7 +66,7 @@ interface VariableProximityProps extends HTMLAttributes<HTMLSpanElement> {
   style?: CSSProperties;
 }
 
-const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>(
+const VariableProximity = forwardRef<HTMLButtonElement, VariableProximityProps>(
   (props, ref) => {
     const {
       label,
@@ -177,12 +177,17 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>(
     let letterIndex = 0;
 
     return (
-      <span
+      <button
         ref={ref}
         onClick={onClick}
+        type="button"
         style={{
           display: "inline",
           fontFamily: "inherit",
+          appearance: "none",
+          background: "none",
+          border: 0,
+          padding: 0,
           ...style,
         }}
         className={className}
@@ -215,7 +220,7 @@ const VariableProximity = forwardRef<HTMLSpanElement, VariableProximityProps>(
           </span>
         ))}
         <span className="sr-only">{label}</span>
-      </span>
+      </button>
     );
   },
 );

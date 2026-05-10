@@ -14,7 +14,7 @@ export default function Home() {
     setUseRealName(
       queryParams.has("name") && queryParams.get("name") === "skylar",
     );
-  });
+  }, []);
   const name = useRealName ? "Skylar" : "4rcadia";
   const heroSegments = useRealName ? ["Sky", "lr", "C."] : ["4rc", "ad", "ia"];
   const greeting = `Hello,\nhere’s\n${name}.`;
