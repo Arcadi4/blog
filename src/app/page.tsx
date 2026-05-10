@@ -8,10 +8,13 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const queryParams = useSearchParams();
-  const useRealName =
-    queryParams.has("name") && queryParams.get("name") === "skylar";
-
+  const [useRealName, setUseRealName] = useState(false);
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    setUseRealName(
+      queryParams.has("name") && queryParams.get("name") === "skylar",
+    );
+  });
   const name = useRealName ? "Skylar" : "4rcadia";
   const heroSegments = useRealName ? ["Sky", "lr", "C."] : ["4rc", "ad", "ia"];
   const greeting = `Hello,\nhere’s\n${name}.`;
