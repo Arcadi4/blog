@@ -164,10 +164,10 @@ export default function MobileGate() {
   }
 
   return (
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-klein px-8 text-center text-white">
-      <div className="fixed inset-x-8 -inset-y-1 border border-white pointer-events-none" />
-      <div className="fixed inset-y-10 -inset-x-1 border border-white pointer-events-none" />
-      <div className="space-y-4 m-8">
+    <div className="bg-klein fixed inset-0 z-9999 flex items-center justify-center px-8 text-center text-white">
+      <div className="pointer-events-none fixed inset-x-8 -inset-y-1 border border-white" />
+      <div className="pointer-events-none fixed -inset-x-1 inset-y-10 border border-white" />
+      <div className="m-8 space-y-4">
         <h1 className="text-6xl font-bold">Oooops!</h1>
         <p className="font-mono">
           The mobile version is under development. Please access through a

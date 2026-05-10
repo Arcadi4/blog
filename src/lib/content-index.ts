@@ -1,6 +1,6 @@
-import generatedContentIndex from '@/generated/content-index.json';
-import { buildAlternates } from './notion/routes';
-import type { Locale } from './notion/types';
+import generatedContentIndex from "@/generated/content-index.json";
+import { buildAlternates } from "./notion/routes";
+import type { Locale } from "./notion/types";
 
 export interface ContentArticle {
   id: string;
@@ -26,7 +26,10 @@ export interface ContentTranslation {
   content: string;
 }
 
-type GeneratedArticle = Omit<ContentArticle, 'publishDate' | 'lastEditedTime'> & {
+type GeneratedArticle = Omit<
+  ContentArticle,
+  "publishDate" | "lastEditedTime"
+> & {
   publishDate: string;
   lastEditedTime: string;
 };
@@ -58,30 +61,38 @@ export async function getPublicArticles(): Promise<ContentArticle[]> {
   return articles;
 }
 
-export async function getArticleBySlug(slug: string): Promise<ContentArticle | null> {
+export async function getArticleBySlug(
+  slug: string,
+): Promise<ContentArticle | null> {
   const { articles } = await getContentIndex();
   return articles.find((article) => article.slug === slug) ?? null;
 }
 
-export async function getTranslationParams(): Promise<Array<{ locale: Locale; slug: string }>> {
+export async function getTranslationParams(): Promise<
+  Array<{ locale: Locale; slug: string }>
+> {
   const { translations } = await getContentIndex();
-  return translations.map(({ locale, originalSlug }) => ({ locale, slug: originalSlug }));
+  return translations.map(({ locale, originalSlug }) => ({
+    locale,
+    slug: originalSlug,
+  }));
 }
 
 export async function getTranslation(
   locale: Locale,
-  slug: string
+  slug: string,
 ): Promise<ContentTranslation | null> {
   const { translations } = await getContentIndex();
   return (
     translations.find(
-      (translation) => translation.locale === locale && translation.originalSlug === slug
+      (translation) =>
+        translation.locale === locale && translation.originalSlug === slug,
     ) ?? null
   );
 }
 
 export async function getArticleAlternates(
-  slug: string
+  slug: string,
 ): Promise<{ canonical: string; languages: Record<string, string> }> {
   const { articles, translations } = await getContentIndex();
   const article = articles.find((item) => item.slug === slug);

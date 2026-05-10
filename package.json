@@ -8,6 +8,7 @@
     "build": "pnpm validate:notion && next build",
     "start": "next start",
     "lint": "oxlint --fix",
+    "format": "prettier --write .",
     "validate:notion": "NODE_ENV=production NODE_OPTIONS=--conditions=react-server tsx scripts/validate-notion.ts"
   },
   "dependencies": {

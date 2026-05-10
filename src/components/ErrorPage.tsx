@@ -97,41 +97,33 @@ export default function ErrorPage({
 
   return (
     <main className="overflow-hidden">
-      <div className="absolute w-full top-2/3 border-t-black border-t-2 z-10" />
-      <div className="absolute w-full h-12 top-2/3 bg-magenta" />
-      <div
-        className="
-        absolute bg-acid -z-10
-        md:h-dvh md:border-b-0 md:w-1/3 md:min-w-96"
-      />
-      <div
-        className="
-        absolute border-b-2 border-b-black z-10
-        md:h-dvh md:border-b-0 md:border-r-2 md:border-r-black md:w-1/3 md:min-w-96"
-      />
+      <div className="absolute top-2/3 z-10 w-full border-t-2 border-t-black" />
+      <div className="bg-magenta absolute top-2/3 h-12 w-full" />
+      <div className="bg-acid absolute -z-10 md:h-dvh md:w-1/3 md:min-w-96 md:border-b-0" />
+      <div className="absolute z-10 border-b-2 border-b-black md:h-dvh md:w-1/3 md:min-w-96 md:border-r-2 md:border-b-0 md:border-r-black" />
       <div className="absolute inset-0 -z-50 bg-white" />
-      <div className="flex flex-row h-screen w-full p-6 gap-6">
-        <div className="flex-1 h-full relative">
-          <div className="flex flex-col z-20 gap-1 absolute left-0 top-0">
+      <div className="flex h-screen w-full flex-row gap-6 p-6">
+        <div className="relative h-full flex-1">
+          <div className="absolute top-0 left-0 z-20 flex flex-col gap-1">
             {Array.from({ length: pathnameRepeats }, (_, index) => (
-              <p key={index} className="font-mono large-p">
+              <p key={index} className="large-p font-mono">
                 {pathname}
               </p>
             ))}
           </div>
-          <div className="flex flex-col z-20 gap-1 absolute left-0 bottom-[calc(1/3*100%+.5rem)]">
+          <div className="absolute bottom-[calc(1/3*100%+.5rem)] left-0 z-20 flex flex-col gap-1">
             {Array.from({ length: pathnameRepeats }, (_, index) => (
-              <p key={index} className="font-mono large-p">
+              <p key={index} className="large-p font-mono">
                 {pathname}
               </p>
             ))}
           </div>
-          <pre className="large-p absolute left-0 bottom-0">
+          <pre className="large-p absolute bottom-0 left-0">
             {resolvedFamilyLabel}
           </pre>
         </div>
-        <div className="flex-1 h-full relative">
-          <div className="flex flex-col items-end absolute right-0 top-[calc(2/3*100%-6*3rem+.5rem)]">
+        <div className="relative h-full flex-1">
+          <div className="absolute top-[calc(2/3*100%-6*3rem+.5rem)] right-0 flex flex-col items-end">
             {links.map((menuItem, index) => {
               return (
                 <ProximityLink
@@ -144,30 +136,28 @@ export default function ErrorPage({
               );
             })}
           </div>
-          <pre className="large-p absolute left-0 bottom-0">
+          <pre className="large-p absolute bottom-0 left-0">
             {caption ?? title.toLowerCase()}
           </pre>
-          <pre className="large-p absolute left-0 top-0">{description}</pre>
+          <pre className="large-p absolute top-0 left-0">{description}</pre>
         </div>
-        <div className="flex-1 h-full relative ">
+        <div className="relative h-full flex-1">
           {heroSymbol === "*" ? (
-            <div className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/6 text-[1280px] font-medium font-serif text-stroke -z-10 pointer-events-none select-none">
+            <div className="text-stroke pointer-events-none absolute top-0 left-0 -z-10 -translate-x-1/2 -translate-y-1/6 font-serif text-[1280px] font-medium select-none">
               *
             </div>
           ) : (
-            <div className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/6 text-[960px] font-bold font-serif text-stroke-white z-20 mix-blend-difference pointer-events-none select-none">
+            <div className="text-stroke-white pointer-events-none absolute top-0 left-0 z-20 -translate-x-1/2 -translate-y-1/6 font-serif text-[960px] font-bold mix-blend-difference select-none">
               {heroSymbol}
             </div>
           )}
           <div className="absolute bottom-1/3">
-            <h1 className="h1-hero w-fit relative">
+            <h1 className="h1-hero relative w-fit">
               {resolvedCodeDisplay}
-              <div className="w-full h-screen bg-klein absolute bottom-full z-30" />
+              <div className="bg-klein absolute bottom-full z-30 h-screen w-full" />
             </h1>
             <h1
-              className={
-                `h1-hero ${resolvedCodeDisplay === "503" ? " text-6xl" : ""}`
-              } // 503 service unavailable is too wide, so we reduce font size for it
+              className={`h1-hero ${resolvedCodeDisplay === "503" ? "text-6xl" : ""}`} // 503 service unavailable is too wide, so we reduce font size for it
             >
               {resolvedTitleLines.map((line, index) => {
                 return (
@@ -179,9 +169,9 @@ export default function ErrorPage({
               })}
             </h1>
           </div>
-          <pre className="large-p absolute left-0 bottom-0">{marker}</pre>
+          <pre className="large-p absolute bottom-0 left-0">{marker}</pre>
           <pre className="large-p absolute right-0 bottom-0">{marker}</pre>
-          <pre className="large-p absolute right-0 top-0 text-right">
+          <pre className="large-p absolute top-0 right-0 text-right">
             {currentDate}
             <br />
             {currentTime}

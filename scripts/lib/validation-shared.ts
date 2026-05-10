@@ -1,5 +1,5 @@
-import { SUPPORTED_LOCALES } from '../../src/lib/notion/config';
-import type { Locale } from '../../src/lib/notion/types';
+import { SUPPORTED_LOCALES } from "../../src/lib/notion/config";
+import type { Locale } from "../../src/lib/notion/types";
 
 export type NotionProperty = {
   title?: { plain_text?: string }[];
@@ -24,10 +24,10 @@ export class NotionValidationError extends Error {
 
   constructor(
     message: string,
-    context?: { pageId?: string; pageTitle?: string; propertyName?: string }
+    context?: { pageId?: string; pageTitle?: string; propertyName?: string },
   ) {
     super(message);
-    this.name = 'NotionValidationError';
+    this.name = "NotionValidationError";
     this.pageId = context?.pageId;
     this.pageTitle = context?.pageTitle;
     this.propertyName = context?.propertyName;
@@ -35,7 +35,12 @@ export class NotionValidationError extends Error {
 }
 
 export function plainText(items?: { plain_text?: string }[]) {
-  return items?.map((item) => item.plain_text ?? '').join('').trim() ?? '';
+  return (
+    items
+      ?.map((item) => item.plain_text ?? "")
+      .join("")
+      .trim() ?? ""
+  );
 }
 
 export function property(page: NotionPage, name: string) {

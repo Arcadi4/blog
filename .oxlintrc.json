@@ -12,7 +12,7 @@
     "unicorn",
     "oxc"
   ],
-    "ignorePatterns": [
+  "ignorePatterns": [
     ".next/**",
     "out/**",
     "dist/**",
@@ -20,5 +20,5 @@
     "coverage/**",
     "node_modules/**",
     "next-env.d.ts"
-  ],
+  ]
 }

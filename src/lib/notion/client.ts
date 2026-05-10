@@ -1,5 +1,5 @@
-import { NOTION_API_KEY, NOTION_API_VERSION, NOTION_BASE_URL } from './config';
-import { NotionValidationError } from './types';
+import { NOTION_API_KEY, NOTION_API_VERSION, NOTION_BASE_URL } from "./config";
+import { NotionValidationError } from "./types";
 
 type JsonValue =
   | string
@@ -11,7 +11,7 @@ type JsonValue =
 
 type RequestContext = {
   endpoint: string;
-  method: 'GET' | 'POST';
+  method: "GET" | "POST";
   body?: JsonValue;
   context: string;
 };
@@ -44,7 +44,7 @@ function memo<T>(key: string, load: () => Promise<T>): Promise<T> {
 }
 
 function retryDelay(response: Response, attempt: number) {
-  const retryAfter = response.headers.get('Retry-After');
+  const retryAfter = response.headers.get("Retry-After");
   if (retryAfter) {
     const seconds = Number(retryAfter);
     if (Number.isFinite(seconds)) return seconds * 1000;
@@ -56,14 +56,19 @@ function retryDelay(response: Response, attempt: number) {
   return 250 * 2 ** attempt;
 }
 
-async function notionFetch<T>({ endpoint, method, body, context }: RequestContext): Promise<T> {
+async function notionFetch<T>({
+  endpoint,
+  method,
+  body,
+  context,
+}: RequestContext): Promise<T> {
   for (let attempt = 0; attempt < 3; attempt++) {
     const response = await fetch(`${NOTION_BASE_URL}${endpoint}`, {
       method,
       headers: {
         Authorization: `Bearer ${NOTION_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Notion-Version': NOTION_API_VERSION,
+        "Content-Type": "application/json",
+        "Notion-Version": NOTION_API_VERSION,
       },
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -76,16 +81,18 @@ async function notionFetch<T>({ endpoint, method, body, context }: RequestContex
     }
 
     throw new NotionValidationError(
-      `Notion API request failed: endpoint=${endpoint} status=${response.status} context=${context}`
+      `Notion API request failed: endpoint=${endpoint} status=${response.status} context=${context}`,
     );
   }
 
   throw new NotionValidationError(
-    `Notion API request failed: endpoint=${endpoint} status=unknown context=${context}`
+    `Notion API request failed: endpoint=${endpoint} status=unknown context=${context}`,
   );
 }
 
-export async function queryDataSource(dataSourceId: string): Promise<JsonValue[]> {
+export async function queryDataSource(
+  dataSourceId: string,
+): Promise<JsonValue[]> {
   return memo(`queryDataSource:${dataSourceId}`, async () => {
     const endpoint = `/v1/data_sources/${dataSourceId}/query`;
     const results: JsonValue[] = [];
@@ -94,7 +101,7 @@ export async function queryDataSource(dataSourceId: string): Promise<JsonValue[]
     do {
       const response = await notionFetch<QueryResponse>({
         endpoint,
-        method: 'POST',
+        method: "POST",
         body: {
           page_size: 100,
           ...(startCursor ? { start_cursor: startCursor } : {}),
@@ -114,8 +121,8 @@ export async function getPageMarkdown(pageId: string): Promise<PageMarkdown> {
   return memo(`getPageMarkdown:${pageId}`, () =>
     notionFetch<PageMarkdown>({
       endpoint: `/v1/pages/${pageId}/markdown`,
-      method: 'GET',
+      method: "GET",
       context: `get page markdown ${pageId}`,
-    })
+    }),
   );
 }

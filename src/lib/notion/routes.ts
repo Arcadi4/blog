@@ -1,4 +1,4 @@
-import type { Locale } from './types';
+import type { Locale } from "./types";
 
 export function getLocaleSegment(locale: Locale): string {
   return locale;
@@ -15,7 +15,7 @@ export function buildTranslationUrl(locale: Locale, slug: string): string {
 
 export function buildAlternates(
   originalSlug: string,
-  availableLocales: Locale[]
+  availableLocales: Locale[],
 ): { canonical: string; languages: Record<string, string> } {
   const languages: Record<string, string> = {};
 

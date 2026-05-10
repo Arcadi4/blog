@@ -1,15 +1,15 @@
 // Validation moved to build-time: scripts/lib/validate-translations.ts
 
-import { getPageMarkdown, queryDataSource } from './client';
+import { getPageMarkdown, queryDataSource } from "./client";
 import {
   ARTICLE_PROPS,
   ARTICLES_DATA_SOURCE_ID,
   TRANSLATION_PROGRESS,
   TRANSLATION_PROPS,
   TRANSLATIONS_DATA_SOURCE_ID,
-} from './config';
-import { convertMarkdownToHtml } from './markdown';
-import type { Locale, NotionTranslation } from './types';
+} from "./config";
+import { convertMarkdownToHtml } from "./markdown";
+import type { Locale, NotionTranslation } from "./types";
 
 type NotionProperty = {
   title?: { plain_text?: string }[];
@@ -38,7 +38,12 @@ type OriginalArticleFields = {
 };
 
 function plainText(items?: { plain_text?: string }[]) {
-  return items?.map((item) => item.plain_text ?? '').join('').trim() ?? '';
+  return (
+    items
+      ?.map((item) => item.plain_text ?? "")
+      .join("")
+      .trim() ?? ""
+  );
 }
 
 function property(page: NotionPage, name: string) {
@@ -49,18 +54,18 @@ function normalizeTranslation(page: NotionPage): TranslationFields {
   return {
     title: plainText(property(page, TRANSLATION_PROPS.TITLE).title),
     excerpt: plainText(property(page, TRANSLATION_PROPS.EXCERPT).rich_text),
-    locale: property(page, TRANSLATION_PROPS.LANGUAGE).select?.name ?? '',
-    progress: property(page, TRANSLATION_PROPS.PROGRESS).status?.name ?? '',
+    locale: property(page, TRANSLATION_PROPS.LANGUAGE).select?.name ?? "",
+    progress: property(page, TRANSLATION_PROPS.PROGRESS).status?.name ?? "",
     originalArticleIds:
       property(page, TRANSLATION_PROPS.ORIGINAL)
-        .relation?.map((relation) => relation.id ?? '')
+        .relation?.map((relation) => relation.id ?? "")
         .filter(Boolean) ?? [],
   };
 }
 
 function normalizeOriginalArticle(page: NotionPage): OriginalArticleFields {
   return {
-    locale: property(page, ARTICLE_PROPS.ORIGINAL_LANGUAGE).select?.name ?? '',
+    locale: property(page, ARTICLE_PROPS.ORIGINAL_LANGUAGE).select?.name ?? "",
     slug: plainText(property(page, ARTICLE_PROPS.SLUG).rich_text),
   };
 }
@@ -77,7 +82,9 @@ async function getOriginalArticleFields() {
 }
 
 export async function getAllTranslations(): Promise<NotionTranslation[]> {
-  const rows = (await queryDataSource(TRANSLATIONS_DATA_SOURCE_ID)) as NotionPage[];
+  const rows = (await queryDataSource(
+    TRANSLATIONS_DATA_SOURCE_ID,
+  )) as NotionPage[];
   const translations: NotionTranslation[] = [];
   if (rows.length === 0) return translations;
 

@@ -1,13 +1,13 @@
 // Validation moved to build-time: scripts/lib/validate-articles.ts
 
-import { getPageMarkdown, queryDataSource } from './client';
+import { getPageMarkdown, queryDataSource } from "./client";
 import {
   ARTICLE_PROPS,
   ARTICLE_STATUS,
   ARTICLES_DATA_SOURCE_ID,
-} from './config';
-import { convertMarkdownToHtml } from './markdown';
-import type { ArticleStatus, Locale, NotionArticle } from './types';
+} from "./config";
+import { convertMarkdownToHtml } from "./markdown";
+import type { ArticleStatus, Locale, NotionArticle } from "./types";
 
 type NotionProperty = {
   title?: { plain_text?: string }[];
@@ -38,7 +38,12 @@ type ArticleFields = {
 };
 
 function plainText(items?: { plain_text?: string }[]) {
-  return items?.map((item) => item.plain_text ?? '').join('').trim() ?? '';
+  return (
+    items
+      ?.map((item) => item.plain_text ?? "")
+      .join("")
+      .trim() ?? ""
+  );
 }
 
 function property(page: NotionPage, name: string) {
@@ -56,18 +61,23 @@ function normalizeArticle(page: NotionPage): ArticleFields {
     title: plainText(property(page, ARTICLE_PROPS.TITLE).title),
     slug: plainText(property(page, ARTICLE_PROPS.SLUG).rich_text),
     excerpt: plainText(property(page, ARTICLE_PROPS.EXCERPT).rich_text),
-    publishDate: dateValue(property(page, ARTICLE_PROPS.PUBLISH_DATE).date?.start),
-    originalLanguage: property(page, ARTICLE_PROPS.ORIGINAL_LANGUAGE).select?.name ?? '',
+    publishDate: dateValue(
+      property(page, ARTICLE_PROPS.PUBLISH_DATE).date?.start,
+    ),
+    originalLanguage:
+      property(page, ARTICLE_PROPS.ORIGINAL_LANGUAGE).select?.name ?? "",
     tags:
       property(page, ARTICLE_PROPS.TAGS)
-        .multi_select?.map((tag) => tag.name ?? '')
+        .multi_select?.map((tag) => tag.name ?? "")
         .filter(Boolean) ?? [],
-    status: property(page, ARTICLE_PROPS.STATUS).status?.name ?? '',
+    status: property(page, ARTICLE_PROPS.STATUS).status?.name ?? "",
     translationIds:
       property(page, ARTICLE_PROPS.TRANSLATIONS)
-        .relation?.map((relation) => relation.id ?? '')
+        .relation?.map((relation) => relation.id ?? "")
         .filter(Boolean) ?? [],
-    lastEditedTime: dateValue(property(page, ARTICLE_PROPS.LAST_EDITED).last_edited_time),
+    lastEditedTime: dateValue(
+      property(page, ARTICLE_PROPS.LAST_EDITED).last_edited_time,
+    ),
   };
 }
 
@@ -99,5 +109,7 @@ export async function getAllArticles(): Promise<NotionArticle[]> {
     articles.push(article);
   }
 
-  return articles.sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
+  return articles.sort(
+    (a, b) => b.publishDate.getTime() - a.publishDate.getTime(),
+  );
 }

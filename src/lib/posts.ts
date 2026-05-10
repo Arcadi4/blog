@@ -1,4 +1,4 @@
-import { getContentIndex } from './content-index';
+import { getContentIndex } from "./content-index";
 
 export interface Post {
   slug: string;
@@ -10,7 +10,7 @@ export interface Post {
 
 export async function getSortedPostsData(): Promise<Post[]> {
   const index = await getContentIndex();
-  return index.articles.map(article => ({
+  return index.articles.map((article) => ({
     slug: article.slug,
     title: article.title,
     date: article.publishDate.toISOString(),
@@ -20,13 +20,13 @@ export async function getSortedPostsData(): Promise<Post[]> {
 
 export async function getAllPostSlugs(): Promise<{ slug: string }[]> {
   const index = await getContentIndex();
-  return index.articles.map(article => ({ slug: article.slug }));
+  return index.articles.map((article) => ({ slug: article.slug }));
 }
 
 export async function getPostData(slug: string): Promise<Post | null> {
   const index = await getContentIndex();
-  const article = index.articles.find(a => a.slug === slug);
-  
+  const article = index.articles.find((a) => a.slug === slug);
+
   if (!article) {
     return null;
   }
