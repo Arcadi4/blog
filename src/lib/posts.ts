@@ -1,4 +1,4 @@
-import { getContentIndex } from './notion/content';
+import { getContentIndex } from './content-index';
 
 export interface Post {
   slug: string;

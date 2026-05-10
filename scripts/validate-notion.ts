@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { loadEnvFile } from 'node:process';
 
 if (!process.env.VERCEL_ENV) {
@@ -15,9 +17,18 @@ async function main() {
     try {
         const articles = await getAllArticles();
         const translations = await getAllTranslations();
+        const generatedPath = join(process.cwd(), 'src/generated/content-index.json');
+
+        await mkdir(join(process.cwd(), 'src/generated'), { recursive: true });
+        await writeFile(
+            generatedPath,
+            `${JSON.stringify({ articles, translations }, null, 2)}\n`,
+        );
+
         console.log('=== Notion Content Validation ===');
         console.log(`Publishable articles count: ${articles.length}`);
         console.log(`Completed translations count: ${translations.length}`);
+        console.log(`Generated content index: ${generatedPath}`);
         console.log('\n✅ Validation passed');
         process.exit(0);
     } catch (error) {

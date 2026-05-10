@@ -56,3 +56,6 @@ AGENTS.md
 
 # secrets
 .env
+
+# ssg
+src/generated

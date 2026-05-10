@@ -1,4 +1,4 @@
-import { getContentIndex, getArticleBySlug } from '@/lib/notion/content';
+import { getArticleBySlug, getContentIndex } from '@/lib/content-index';
 import { formatDate } from '@/lib/utils';
 import Link from '@/components/Link';
 import { notFound } from 'next/navigation';

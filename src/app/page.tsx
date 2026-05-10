@@ -1,13 +1,24 @@
 import Link from "@/components/Link";
-import { getSortedPostsData } from "@/lib/posts";
 import { formatDate } from "@/lib/utils";
+"use client";
+
 import ProximityLink from "@/components/ProximityLink";
 import { SimpleEntrance } from "@/components/animations/EntranceSimple";
 import { StretchEntrance } from "@/components/animations/EntranceStretch";
 import { menuItems } from "@/app/posts/menuItems";
+import { Suspense } from "react";
+
+export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
+  );
+}
 
 export default async function Home() {
   const heroName = "4rcadia";
+function HomeContent() {
 
   const posts = await getSortedPostsData();
   const latestPosts = posts.slice(0, 3);
@@ -200,6 +211,7 @@ export default async function Home() {
           </div>
         </div>
       </section>
+        }
     </main>
   );
 }
