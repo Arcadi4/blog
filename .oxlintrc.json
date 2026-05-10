@@ -1,0 +1,24 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "options": {
+    "typeAware": true
+  },
+  "plugins": [
+    "typescript",
+    "react",
+    "jsx-a11y",
+    "nextjs",
+    "import",
+    "unicorn",
+    "oxc"
+  ],
+    "ignorePatterns": [
+    ".next/**",
+    "out/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "node_modules/**",
+    "next-env.d.ts"
+  ],
+}
