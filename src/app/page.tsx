@@ -1,27 +1,20 @@
-import Link from "@/components/Link";
-import { formatDate } from "@/lib/utils";
 "use client";
 
 import ProximityLink from "@/components/ProximityLink";
 import { SimpleEntrance } from "@/components/animations/EntranceSimple";
 import { StretchEntrance } from "@/components/animations/EntranceStretch";
 import { menuItems } from "@/app/posts/menuItems";
-import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  return (
-    <Suspense>
-      <HomeContent />
-    </Suspense>
-  );
-}
+  const queryParams = useSearchParams();
+  const useRealName =
+    queryParams.has("name") && queryParams.get("name") === "skylar";
 
-export default async function Home() {
-  const heroName = "4rcadia";
-function HomeContent() {
-
-  const posts = await getSortedPostsData();
-  const latestPosts = posts.slice(0, 3);
+  const name = useRealName ? "Skylar" : "4rcadia";
+  const heroSegments = useRealName ? ["Sky", "lr", "C."] : ["4rc", "ad", "ia"];
+  const greeting = `Hello,\nhere’s\n${name}.`;
 
   const socialMediaItems = [
     { name: "GitHub", href: "https://github.com/arcadi4" },
@@ -29,189 +22,339 @@ function HomeContent() {
     { name: "Twitter", href: "https://x.com/_4rcadia" },
   ];
 
-  const menuPartOne = menuItems.slice(1, 5);
-  const menuPartTwo = menuItems.slice(5);
-
   let menuAnimationIndex = 0;
   const delayPerMenuItem = 100;
 
   const backgroundBaseDelay = 0;
   const figureBaseDelay = 400;
   const menuBaseDelay = 800;
-  const articlesBaseDelay = 1400;
+  const contentBaseDelay = 1200;
+
+  const location = "cleveland, oh";
+  const timeZone = "America/New_York";
+  type CurrentDateTime = {
+    currentDate: string;
+    currentTime: string;
+  };
+  const EMPTY_DATE_TIME: CurrentDateTime = {
+    currentDate: "",
+    currentTime: "",
+  };
+  const [{ currentDate, currentTime }, setCurrentDateTime] =
+    useState(EMPTY_DATE_TIME);
+  const getCurrentDateTime = (): CurrentDateTime => {
+    return {
+      currentDate: new Date().toLocaleDateString("en-US", {
+        timeZone: timeZone,
+      }),
+      currentTime: new Date().toLocaleTimeString("en-US", {
+        timeZone: timeZone,
+      }),
+    };
+  };
+  useEffect(() => {
+    setCurrentDateTime(getCurrentDateTime());
+    const intervalId = setInterval(() => {
+      setCurrentDateTime(getCurrentDateTime());
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <main className="relative flex min-h-screen w-full max-w-full flex-col overflow-hidden overflow-x-clip">
-      <StretchEntrance
-        from="right"
-        delayMs={figureBaseDelay}
-        className="absolute bg-acid right-0 top-0 h-128 w-1/2 -z-50"
-      />
-      <StretchEntrance
-        from="bottom"
-        durationMs={1200}
-        className="absolute left-[calc(50%+64px)] top-0 h-full w-16 border-x separator z-20"
-      />
-      <StretchEntrance
-        from="bottom"
-        durationMs={1200}
-        className="absolute left-0 top-0 h-full w-12 border-r separator z-20"
-      />
-      <SimpleEntrance
-        durationMs={450}
-        delayMs={backgroundBaseDelay}
-        className="absolute -left-1/12 -top-1/3 text-[768pt] font-serif text-acid -z-10 pointer-events-none select-none"
-      >
-        *
-      </SimpleEntrance>
-      <section className="relative h-52">
+      {/* Grid for background elements, no y padding */}
+      <div className="absolute grid w-full grid-cols-12 gap-x-4 px-8">
         <StretchEntrance
-          from="left"
-          delayMs={figureBaseDelay + 200}
-          className="absolute w-full bottom-0 border-b separator"
+          from="top"
+          durationMs={1600}
+          className="separator z-20 col-start-2 col-end-3 row-start-1 h-[200dvh] border-r"
         />
-        <div className="flex flex-row">
-          <SimpleEntrance
-            delayMs={figureBaseDelay}
-            className="h1-hero min-w-3/4 pl-14 pt-4 select-none self-center"
-          >
-            <h1>
-              Hello, here&apos;s
-              <br />
-              {heroName}
-            </h1>
-          </SimpleEntrance>
-          <div className="relative h-full">
-            <StretchEntrance
-              from="top"
-              delayMs={figureBaseDelay}
-              className="absolute bg-magenta h-80 w-16 right-full -z-30"
-            />
-            <div className="flex flex-col pl-2 pt-2">
-              {socialMediaItems.map((link) => {
-                menuAnimationIndex++;
-                return (
-                  <SimpleEntrance
-                    key={link.name}
-                    delayMs={
-                      menuAnimationIndex * delayPerMenuItem + menuBaseDelay
-                    }
-                  >
-                    <ProximityLink href={link.href} className="large-link">
-                      {link.name}
-                    </ProximityLink>
-                  </SimpleEntrance>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-      <StretchEntrance
-        from="left"
-        delayMs={figureBaseDelay + 100}
-        className="h-16 w-full border-b separator"
-      />
-      <section className="relative">
+        <StretchEntrance
+          from="top"
+          durationMs={1000}
+          className="bg-acid col-start-1 col-end-1 row-start-1 -ml-8 h-screen"
+        />
+      </div>
+
+      {/* Grid for background elements, no x padding */}
+      <div className="absolute grid h-[200dvh] w-full grid-rows-9 gap-y-4 py-8">
         <StretchEntrance
           from="left"
           delayMs={figureBaseDelay}
-          className="absolute bottom-0 w-full border-b separator"
+          className="separator row-span-1 row-start-1 w-full border-b"
         />
-        <div className="flex flex-row">
-          <SimpleEntrance
-            delayMs={articlesBaseDelay - 200}
-            className="large-p pl-16 min-w-3/4"
-          >
-            LATEST ARTICLES
-          </SimpleEntrance>
-          <div className="flex flex-col pl-2">
-            {menuPartOne.map((menuItem) => {
-              menuAnimationIndex++;
-              return (
-                <SimpleEntrance
-                  key={menuItem.name}
-                  delayMs={
-                    menuAnimationIndex * delayPerMenuItem + menuBaseDelay
-                  }
-                >
-                  <ProximityLink href={menuItem.href} className="large-link">
-                    {menuItem.name}
-                  </ProximityLink>
-                </SimpleEntrance>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-      <section className="flex flex-row flex-1">
-        <div className="w-3/4">
-          <div className=" flex flex-col gap-8 max-w-2/3">
-            {latestPosts.map((post, index) => (
-              <article className="relative flex flex-row gap-4" key={post.slug}>
-                <StretchEntrance
-                  from="bottom"
-                  delayMs={articlesBaseDelay + index * 100}
-                  className="absolute h-full w-6 bg-klein "
-                />
-                <StretchEntrance
-                  from="right"
-                  delayMs={articlesBaseDelay + 200 + index * 100}
-                  className="absolute h-full bottom-0 w-[calc(50%-64px)] translate-x-0 left-full bg-klein"
-                />
-                <SimpleEntrance delayMs={articlesBaseDelay + index * 100}>
-                  <div className="w-96 pl-16">
-                    <Link href={`/posts/${post.slug}`} className="large-p">
-                      {post.title}
-                    </Link>
-                    <p className="large-p">{formatDate(post.date)}</p>
-                  </div>
-                </SimpleEntrance>
-                {post.excerpt && (
-                  <SimpleEntrance
-                    delayMs={articlesBaseDelay + 100 + index * 100}
-                    className="large-p w-96"
-                  >
-                    {post.excerpt}
-                  </SimpleEntrance>
-                )}
-              </article>
-            ))}
-          </div>
-        </div>
+        <StretchEntrance
+          from="left"
+          delayMs={figureBaseDelay + 200}
+          className="separator row-span-1 row-start-4 w-full border-b"
+        />
+      </div>
+
+      {/* Content grid, with x-y padding */}
+      <div className="relative mx-auto grid h-[200dvh] grid-cols-12 grid-rows-9 gap-x-4 gap-y-4 p-8">
+        {/* Blog URL */}
         <SimpleEntrance
-          durationMs={450}
-          delayMs={backgroundBaseDelay}
-          className="absolute font-title font-bold text-[640pt] text-stroke left-1/2 -top-32 select-none -z-10 pointer-events-none"
+          from="none"
+          className="col-start-1 row-start-1 text-base leading-none font-semibold whitespace-pre-line"
         >
-          &
+          {"https://\nblog.\narcadia\n.moe"}
         </SimpleEntrance>
-        <div className=" flex flex-col justify-between items-start">
-          <div className="relative flex flex-col pl-2">
-            {menuPartTwo.map((menuItem) => {
+
+        {/* Metadata; purely decorative */}
+        <SimpleEntrance
+          from="right"
+          delayMs={menuBaseDelay}
+          className="col-start-3 row-start-1 text-sm leading-none font-light whitespace-pre-line uppercase"
+        >
+          {"personal_blog\n© 2026"}
+        </SimpleEntrance>
+        <SimpleEntrance
+          from="right"
+          delayMs={menuBaseDelay + 200}
+          className="col-span-2 col-start-11 row-span-2 row-start-1 text-sm leading-none font-light whitespace-pre-line uppercase"
+        >
+          {`location
+          ${location}
+          
+          timezone
+          ${timeZone}
+          
+          time
+          ${currentTime}
+          
+          date
+          ${currentDate}`}
+        </SimpleEntrance>
+
+        {/* Hero text + greetings */}
+        <div className="col-span-12 col-start-1 row-span-4 row-start-1 grid grid-cols-subgrid grid-rows-3">
+          {/* Hero text */}
+          <SimpleEntrance
+            from="right"
+            delayMs={backgroundBaseDelay + 300}
+            className="relative col-start-4 col-end-13 row-start-1"
+          >
+            <span className="font-title absolute top-0 left-0 text-[352px] leading-none font-semibold tracking-[-0.06em] whitespace-nowrap uppercase [text-box:trim-both_cap_alphabetic]">
+              {heroSegments[0]}
+            </span>
+          </SimpleEntrance>
+          <SimpleEntrance
+            from="right"
+            delayMs={backgroundBaseDelay + 500}
+            className="relative col-start-7 col-end-13 row-start-2"
+          >
+            <span className="font-title absolute top-0 left-0 text-[352px] leading-none font-semibold tracking-[-0.06em] whitespace-nowrap uppercase [text-box:trim-both_cap_alphabetic]">
+              {heroSegments[1]}
+            </span>
+          </SimpleEntrance>
+          <SimpleEntrance
+            from="right"
+            delayMs={backgroundBaseDelay + 700}
+            className="relative col-start-10 col-end-13 row-start-3"
+          >
+            <span className="font-title absolute top-0 left-0 text-[352px] leading-none font-semibold tracking-[-0.06em] whitespace-nowrap uppercase [text-box:trim-both_cap_alphabetic]">
+              {heroSegments[2]}
+            </span>
+          </SimpleEntrance>
+
+          {/* Greeting text */}
+          <div className="col-start-3 col-end-13 row-start-2 mt-5 grid grid-cols-10 grid-rows-1 font-sans text-7xl font-light">
+            <SimpleEntrance
+              from="left"
+              delayMs={figureBaseDelay + 1000}
+              className="text-acid -z-10 col-start-1 whitespace-pre-line"
+            >
+              {greeting}
+            </SimpleEntrance>
+            <SimpleEntrance
+              from="right"
+              delayMs={figureBaseDelay + 200}
+              className="col-start-2 whitespace-pre-line"
+            >
+              {greeting}
+            </SimpleEntrance>
+            <SimpleEntrance
+              from="left"
+              delayMs={figureBaseDelay + 800}
+              className="text-magenta z-10 col-start-6 whitespace-pre-line"
+            >
+              {greeting}
+            </SimpleEntrance>
+            <SimpleEntrance
+              from="right"
+              delayMs={figureBaseDelay + 400}
+              className="col-start-10 whitespace-pre-line"
+            >
+              {greeting}
+            </SimpleEntrance>
+          </div>
+        </div>
+
+        {/* Menu; navigation and social media links */}
+        <aside className="col-start-1 col-end-4 row-span-1 row-start-3">
+          <div className="flex flex-col">
+            {menuItems.map((menuItem) => {
               menuAnimationIndex++;
               return (
                 <SimpleEntrance
                   key={menuItem.name}
+                  from="right"
                   delayMs={
                     menuAnimationIndex * delayPerMenuItem + menuBaseDelay
                   }
                 >
-                  <ProximityLink href={menuItem.href} className="large-link">
-                    {menuItem.name}
+                  <ProximityLink
+                    href={menuItem.href}
+                    className="font-title text-2xl leading-none font-normal"
+                  >
+                    {"/ " + menuItem.name}
                   </ProximityLink>
                 </SimpleEntrance>
               );
             })}
-            <StretchEntrance
-              from="top"
-              delayMs={figureBaseDelay}
-              className="absolute bg-magenta left-0 top-full h-screen w-16"
-            />
           </div>
+        </aside>
+        <aside className="col-start-1 col-end-4 row-span-1 row-start-4">
+          <div className="flex flex-col">
+            {socialMediaItems.map((menuItem) => {
+              menuAnimationIndex++;
+              return (
+                <SimpleEntrance
+                  key={menuItem.name}
+                  from="right"
+                  delayMs={
+                    menuAnimationIndex * delayPerMenuItem + menuBaseDelay
+                  }
+                >
+                  <ProximityLink
+                    href={menuItem.href}
+                    className="font-title text-2xl leading-none font-normal"
+                  >
+                    {"& " + menuItem.name}
+                  </ProximityLink>
+                </SimpleEntrance>
+              );
+            })}
+          </div>
+        </aside>
+
+        {/* Quote */}
+        <div className="font-title contents leading-none font-light">
+          <SimpleEntrance
+            from="right"
+            delayMs={contentBaseDelay}
+            className="col-span-1 col-start-3 row-span-1 row-start-4 text-black/25 uppercase"
+          >
+            quote_01
+          </SimpleEntrance>
+          <SimpleEntrance
+            from="right"
+            delayMs={contentBaseDelay + 200}
+            className="col-span-3 col-start-4 row-span-1 row-start-4"
+          >
+            <div className="flex flex-col gap-4">
+              <div>
+                {
+                  "A man who thinks he is a king is mad,\na king who thinks he is a king is no less so."
+                }
+              </div>
+              <div>
+                {
+                  "I le fou qui se croit roi est fou,\nle roi qui se croit roi ne l'est pas moins."
+                }
+              </div>
+              <div className="w-full pr-4 text-right">{"— Jacques Lacan"}</div>
+            </div>
+          </SimpleEntrance>
         </div>
-      </section>
-        }
+
+        {/* Grid lines */}
+        <StretchEntrance
+          from="top"
+          delayMs={figureBaseDelay + 400}
+          className="separator col-span-1 col-start-4 row-span-3 row-start-2 -mt-4 border-r"
+        />
+        <StretchEntrance
+          from="top"
+          delayMs={figureBaseDelay + 600}
+          className="separator col-span-1 col-start-8 row-span-3 row-start-2 -mt-4 border-r"
+        />
+
+        {/* Figures */}
+        <div className="relative col-span-4 col-start-9 row-span-3 row-start-3">
+          <SimpleEntrance
+            delayMs={figureBaseDelay + 600}
+            from="none"
+            className="font-grotesque text-stroke-magenta pointer-events-none absolute bottom-0 left-0 z-10 text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
+          >
+            &
+          </SimpleEntrance>
+        </div>
+        <div className="relative col-span-4 col-start-4 row-span-3 row-start-3">
+          <SimpleEntrance
+            delayMs={figureBaseDelay + 1000}
+            from="none"
+            className="font-grotesque text-stroke-acid pointer-events-none absolute bottom-0 left-0 -z-10 text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
+          >
+            &
+          </SimpleEntrance>
+        </div>
+
+        {/* <section className="relative">
+          <StretchEntrance
+            from="left"
+            delayMs={figureBaseDelay}
+            className="separator absolute bottom-0 w-full border-b"
+          />
+          <div className="flex flex-row">
+            <SimpleEntrance
+              delayMs={articlesBaseDelay - 200}
+              className="large-p min-w-3/4 pl-16"
+            >
+              LATEST ARTICLES
+            </SimpleEntrance>
+          </div>
+        </section>
+        <section className="flex flex-1 flex-row">
+          <div className="w-3/4">
+            <div className="flex max-w-2/3 flex-col gap-8">
+              {latestPosts.map((post, index) => (
+                <article
+                  className="relative flex flex-row gap-4"
+                  key={post.slug}
+                >
+                  <StretchEntrance
+                    from="bottom"
+                    delayMs={articlesBaseDelay + index * 100}
+                    className="bg-klein absolute h-full w-6"
+                  />
+                  <StretchEntrance
+                    from="right"
+                    delayMs={articlesBaseDelay + 200 + index * 100}
+                    className="bg-klein absolute bottom-0 left-full h-full w-[calc(50%-64px)] translate-x-0"
+                  />
+                  <SimpleEntrance delayMs={articlesBaseDelay + index * 100}>
+                    <div className="w-96 pl-16">
+                      <Link href={`/posts/${post.slug}`} className="large-p">
+                        {post.title}
+                      </Link>
+                      <p className="large-p">{formatDate(post.date)}</p>
+                    </div>
+                  </SimpleEntrance>
+                  {post.excerpt && (
+                    <SimpleEntrance
+                      delayMs={articlesBaseDelay + 100 + index * 100}
+                      className="large-p w-96"
+                    >
+                      {post.excerpt}
+                    </SimpleEntrance>
+                  )}
+                </article>
+              ))}
+            </div>
+          </div>
+        </section> */}
+      </div>
     </main>
   );
 }

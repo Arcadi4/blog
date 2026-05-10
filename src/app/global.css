@@ -3,17 +3,18 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-    --color-background: #fafafa;
-    --color-foreground: #0f0f0f;
-    --font-sans: Helvetica, -apple-system, sans-serif;
-    --font-mono:
-        "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas,
-        "Liberation Mono", "Courier New", monospace;
-    --font-title: "Geist", Helvetica, Arial, sans-serif;
-    --font-serif: "Playfair Display", "Georgia", serif;
-    --color-acid: #c3ff00;
-    --color-klein: #0048ff;
-    --color-magenta: #ff00a6;
+  --color-background: #fafafa;
+  --color-foreground: #0f0f0f;
+  --font-sans: Helvetica, -apple-system, sans-serif;
+  --font-mono:
+    "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --font-grotesque: "Bricolage Grotesque", Helvetica, Arial, sans-serif;
+  --font-title: "Geist", Helvetica, Arial, sans-serif;
+  --font-serif: "Playfair Display", "Georgia", serif;
+  --color-acid: #c3ff00;
+  --color-klein: #0048ff;
+  --color-magenta: #ff00a6;
 }
 
 /* 
@@ -34,47 +35,59 @@ h4,
 h5,
 h6,
 .title {
-    font-family: var(--font-title), serif;
+  font-family: var(--font-title), serif;
 }
 
 @layer components {
-    .separator {
-        @apply border-0 border-black/25;
-    }
+  .separator {
+    @apply border-0 border-black/25;
+  }
 
-    .h1-hero {
-        @apply text-8xl font-bold leading-[0.8];
-    }
+  .h1-hero {
+    @apply text-8xl leading-[0.8] font-bold;
+  }
 
-    .large-p {
-        @apply text-2xl leading-none;
-    }
+  .large-p {
+    @apply text-2xl leading-none;
+  }
 
-    .large-link {
-        @apply text-5xl leading-none;
-    }
+  .large-link {
+    @apply text-5xl leading-none;
+  }
 }
 
 body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-sans), sans-serif;
-    isolation: isolate;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+  isolation: isolate;
 }
 
 .custom-cursor-enabled,
 .custom-cursor-enabled * {
-    cursor: none !important;
+  cursor: none !important;
 }
 
 .text-stroke {
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: black;
-    color: transparent;
+  -webkit-text-stroke-width: 1.5px;
+  -webkit-text-stroke-color: black;
+  color: transparent;
 }
 
 .text-stroke-white {
-    -webkit-text-stroke-width: 1px;
-    -webkit-text-stroke-color: white;
-    color: transparent;
+  -webkit-text-stroke-width: 1.5px;
+  -webkit-text-stroke-color: white;
+  color: transparent;
+}
+
+.text-stroke-magenta {
+  -webkit-text-stroke-width: 1.5px;
+  -webkit-text-stroke-color: var(--color-magenta);
+  color: transparent;
+}
+
+.text-stroke-acid {
+  -webkit-text-stroke-width: 1.5px;
+  -webkit-text-stroke-color: var(--color-acid);
+  color: transparent;
 }
