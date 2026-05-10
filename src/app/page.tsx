@@ -39,12 +39,12 @@ export default async function Home() {
       <StretchEntrance
         from="bottom"
         durationMs={1200}
-        className="absolute left-[calc(50%+64px)] top-0 h-full w-16 border-x-2 border-x-black z-20"
+        className="absolute left-[calc(50%+64px)] top-0 h-full w-16 border-x separator z-20"
       />
       <StretchEntrance
         from="bottom"
         durationMs={1200}
-        className="absolute left-0 top-0 h-full w-12 border-r-2 border-r-black z-20"
+        className="absolute left-0 top-0 h-full w-12 border-r separator z-20"
       />
       <SimpleEntrance
         durationMs={450}
@@ -57,7 +57,7 @@ export default async function Home() {
         <StretchEntrance
           from="left"
           delayMs={figureBaseDelay + 200}
-          className="absolute w-full bottom-0 border-b-2 border-b-black"
+          className="absolute w-full bottom-0 border-b separator"
         />
         <div className="flex flex-row">
           <SimpleEntrance
@@ -99,13 +99,13 @@ export default async function Home() {
       <StretchEntrance
         from="left"
         delayMs={figureBaseDelay + 100}
-        className="h-16 w-full border-b-2 border-b-black"
+        className="h-16 w-full border-b separator"
       />
       <section className="relative">
         <StretchEntrance
           from="left"
           delayMs={figureBaseDelay}
-          className="absolute bottom-0 w-full border-b-2 border-b-black"
+          className="absolute bottom-0 w-full border-b separator"
         />
         <div className="flex flex-row">
           <SimpleEntrance

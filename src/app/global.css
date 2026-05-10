@@ -2,30 +2,19 @@
 
 @plugin "@tailwindcss/typography";
 
-:root {
-    --background: #fafafa;
-    --foreground: #0f0f0f;
+@theme {
+    --color-background: #fafafa;
+    --color-foreground: #0f0f0f;
     --font-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-title: "Bricolage Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    --font-mono: "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
+    --font-mono:
+        "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+    --font-title:
+        "Bricolage Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
     --font-serif: "Playfair Display", "Georgia", serif;
     --color-acid: #c3ff00;
     --color-klein: #0048ff;
     --color-magenta: #ff00a6;
-}
-
-@theme inline {
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --font-sans: var(--font-sans);
-    --font-display: var(--font-display);
-    --font-mono: var(--font-mono);
-    --font-title: var(--font-title);
-    --font-serif: var(--font-serif);
-    --color-acid: var(--color-acid);
-    --color-klein: var(--color-klein);
-    --color-magenta: var(--color-magenta);
 }
 
 /* 
@@ -50,6 +39,10 @@ h6,
 }
 
 @layer components {
+    .separator {
+        @apply border-0 border-black/25;
+    }
+
     .h1-hero {
         @apply text-8xl font-bold leading-[0.8];
     }
@@ -73,12 +66,6 @@ body {
 .custom-cursor-enabled,
 .custom-cursor-enabled * {
     cursor: none !important;
-}
-
-@layer utilities {
-    .font-display {
-        font-family: var(--font-display), serif;
-    }
 }
 
 .text-stroke {
