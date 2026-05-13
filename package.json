@@ -12,7 +12,7 @@
     "validate:notion": "NODE_ENV=production NODE_OPTIONS=--conditions=react-server tsx scripts/validate-notion.ts"
   },
   "dependencies": {
-    "@notionhq/client": "^5.20.0",
+    "@notionhq/client": "^5.21.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "geist": "^1.7.0",
@@ -31,7 +31,7 @@
     "@types/node": "^25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "oxlint": "^1.63.0",
+    "oxlint": "^1.64.0",
     "oxlint-tsgolint": "^0.22.1",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
