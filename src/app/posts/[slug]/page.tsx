@@ -48,7 +48,7 @@ export default async function Post({
 
   return (
     <main className="flex min-h-dvh flex-col">
-      <section className="bg-acid border-b-2 border-b-black">
+      <section className="border-b-2 border-b-black bg-acid">
         <div className="mx-auto max-w-3xl py-10">
           <Link href="/" className="large-p">
             ← Back to all posts
@@ -64,7 +64,7 @@ export default async function Post({
           </header>
 
           <div
-            className="prose prose-headings:font-(--font-title) prose-headings:text-black prose-p:text-black/80 prose-li:text-black/80 prose-strong:text-black prose-a:text-black prose-a:underline prose-a:decoration-black prose-code:text-white prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-600 prose-pre:text-white prose-blockquote:text-black/70 max-w-none"
+            className="prose max-w-none prose-headings:font-(--font-title) prose-headings:text-black prose-p:text-black/80 prose-a:text-black prose-a:underline prose-a:decoration-black prose-blockquote:text-black/70 prose-strong:text-black prose-code:rounded prose-code:px-1 prose-code:py-0.5 prose-code:text-white prose-pre:bg-gray-600 prose-pre:text-white prose-li:text-black/80"
             dangerouslySetInnerHTML={{ __html: post.content || "" }}
           />
         </article>

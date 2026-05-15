@@ -98,8 +98,8 @@ export default function ErrorPage({
   return (
     <main className="overflow-hidden">
       <div className="absolute top-2/3 z-10 w-full border-t-2 border-t-black" />
-      <div className="bg-magenta absolute top-2/3 h-12 w-full" />
-      <div className="bg-acid absolute -z-10 md:h-dvh md:w-1/3 md:min-w-96 md:border-b-0" />
+      <div className="absolute top-2/3 h-12 w-full bg-magenta" />
+      <div className="absolute -z-10 bg-acid md:h-dvh md:w-1/3 md:min-w-96 md:border-b-0" />
       <div className="absolute z-10 border-b-2 border-b-black md:h-dvh md:w-1/3 md:min-w-96 md:border-r-2 md:border-b-0 md:border-r-black" />
       <div className="absolute inset-0 -z-50 bg-white" />
       <div className="flex h-screen w-full flex-row gap-6 p-6">
@@ -154,7 +154,7 @@ export default function ErrorPage({
           <div className="absolute bottom-1/3">
             <h1 className="h1-hero relative w-fit">
               {resolvedCodeDisplay}
-              <div className="bg-klein absolute bottom-full z-30 h-screen w-full" />
+              <div className="absolute bottom-full z-30 h-screen w-full bg-klein" />
             </h1>
             <h1
               className={`h1-hero ${resolvedCodeDisplay === "503" ? "text-6xl" : ""}`} // 503 service unavailable is too wide, so we reduce font size for it

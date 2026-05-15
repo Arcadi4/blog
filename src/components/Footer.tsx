@@ -4,7 +4,7 @@ import Link from "@/components/Link";
 
 export default function Footer() {
   return (
-    <footer className="bg-klein relative grid h-32 w-dvw grid-cols-12 gap-x-4 px-8">
+    <footer className="relative grid h-32 w-dvw grid-cols-12 gap-x-4 bg-klein px-8">
       <div className="absolute bottom-8 col-span-full col-start-4 row-start-1 font-mono text-sm text-white">
         &copy; {new Date().getFullYear()} 4rcadia.
         <br />

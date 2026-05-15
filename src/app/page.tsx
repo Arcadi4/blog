@@ -59,7 +59,7 @@ export default function Home() {
   return (
     <main className="relative">
       {/* Grid for background elements, col only, no y padding */}
-      <div className="absolute grid h-full w-full grid-cols-12 gap-x-4 px-8">
+      <div className="absolute grid h-dvh w-dvw grid-cols-12 gap-x-4 px-8">
         <StretchEntrance
           from="top"
           durationMs={1600}
@@ -70,12 +70,12 @@ export default function Home() {
             <StretchEntrance
               from="top"
               durationMs={1000}
-              className="bg-acid -z-10 row-span-4 row-start-1 -mt-8 -ml-8"
+              className="-z-10 row-span-4 row-start-1 -mt-8 -ml-8 bg-acid"
             />
             <StretchEntrance
               from="top"
               durationMs={1000}
-              className="bg-klein -z-10 row-span-5 row-start-5 -mt-4 -ml-8 h-[105%]"
+              className="-z-10 row-span-5 row-start-5 -mt-4 -ml-8 h-[105%] bg-klein"
             />
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function Home() {
             delayMs={backgroundBaseDelay + 300}
             className="relative col-start-4 col-end-13 row-start-1"
           >
-            <span className="font-title absolute top-0 left-0 text-[352px] leading-none font-semibold tracking-[-0.06em] whitespace-nowrap uppercase [text-box:trim-both_cap_alphabetic]">
+            <span className="absolute top-0 left-0 font-title text-[352px] leading-none font-semibold tracking-[-0.06em] whitespace-nowrap uppercase [text-box:trim-both_cap_alphabetic]">
               {heroSegments[0]}
             </span>
           </SimpleEntrance>
@@ -148,7 +148,7 @@ export default function Home() {
             delayMs={backgroundBaseDelay + 500}
             className="relative col-start-7 col-end-13 row-start-2"
           >
-            <span className="font-title absolute top-0 left-0 text-[352px] leading-none font-semibold tracking-[-0.06em] whitespace-nowrap uppercase [text-box:trim-both_cap_alphabetic]">
+            <span className="absolute top-0 left-0 font-title text-[352px] leading-none font-semibold tracking-[-0.06em] whitespace-nowrap uppercase [text-box:trim-both_cap_alphabetic]">
               {heroSegments[1]}
             </span>
           </SimpleEntrance>
@@ -157,7 +157,7 @@ export default function Home() {
             delayMs={backgroundBaseDelay + 700}
             className="relative col-start-10 col-end-13 row-start-3"
           >
-            <span className="font-title absolute top-0 left-0 text-[352px] leading-none font-semibold tracking-[-0.06em] whitespace-nowrap uppercase [text-box:trim-both_cap_alphabetic]">
+            <span className="absolute top-0 left-0 font-title text-[352px] leading-none font-semibold tracking-[-0.06em] whitespace-nowrap uppercase [text-box:trim-both_cap_alphabetic]">
               {heroSegments[2]}
             </span>
           </SimpleEntrance>
@@ -167,7 +167,7 @@ export default function Home() {
             <SimpleEntrance
               from="left"
               delayMs={figureBaseDelay + 1000}
-              className="text-acid -z-10 col-start-1 whitespace-pre-line"
+              className="-z-10 col-start-1 whitespace-pre-line text-acid"
             >
               {greeting}
             </SimpleEntrance>
@@ -181,7 +181,7 @@ export default function Home() {
             <SimpleEntrance
               from="left"
               delayMs={figureBaseDelay + 800}
-              className="text-magenta z-10 col-start-6 whitespace-pre-line"
+              className="z-10 col-start-6 whitespace-pre-line text-magenta"
             >
               {greeting}
             </SimpleEntrance>
@@ -244,7 +244,7 @@ export default function Home() {
         </aside>
 
         {/* Quote */}
-        <div className="font-title contents leading-none font-light">
+        <div className="contents font-title leading-none font-light">
           <SimpleEntrance
             from="right"
             delayMs={contentBaseDelay}
@@ -255,17 +255,17 @@ export default function Home() {
           <SimpleEntrance
             from="right"
             delayMs={contentBaseDelay + 200}
-            className="col-span-3 col-start-4 row-span-1 row-start-4"
+            className="col-span-2 col-start-4 row-span-1 row-start-4"
           >
             <div className="flex flex-col gap-4">
               <div>
                 {
-                  "A man who thinks he is a king is mad,\na king who thinks he is a king is no less so."
+                  "A man who thinks he is a king is mad, a king who thinks he is a king is no less so."
                 }
               </div>
               <div>
                 {
-                  "I le fou qui se croit roi est fou,\nle roi qui se croit roi ne l'est pas moins."
+                  "I le fou qui se croit roi est fou, le roi qui se croit roi ne l'est pas moins."
                 }
               </div>
               <div className="w-full pr-4 text-right">{"— Jacques Lacan"}</div>
@@ -290,7 +290,7 @@ export default function Home() {
           <SimpleEntrance
             delayMs={figureBaseDelay + 1000}
             from="none"
-            className="font-grotesque text-stroke-acid pointer-events-none absolute bottom-0 left-0 -z-20 text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
+            className="text-stroke-acid pointer-events-none absolute bottom-0 left-0 -z-20 font-grotesque text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
           >
             &
           </SimpleEntrance>
@@ -299,7 +299,7 @@ export default function Home() {
           <SimpleEntrance
             delayMs={figureBaseDelay + 600}
             from="none"
-            className="font-grotesque text-stroke-magenta pointer-events-none absolute bottom-0 left-0 z-10 text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
+            className="text-stroke-magenta pointer-events-none absolute bottom-0 left-0 z-10 font-grotesque text-[512pt] leading-none font-bold select-none [text-box:trim-both_cap_alphabetic]"
           >
             &
           </SimpleEntrance>
