@@ -1,30 +1,32 @@
-import {
-  Bricolage_Grotesque,
-  IBM_Plex_Sans,
-  Playfair_Display,
-  Geist,
-} from "next/font/google";
+import { Bricolage_Grotesque, Geist, IBM_Plex_Mono, IBM_Plex_Sans, Playfair_Display } from "next/font/google";
 
 export const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-bricolage-grotesque",
   weight: "variable",
-});
-
-export const ibmPlexSans = IBM_Plex_Sans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  weight: "variable",
-});
-
-export const playfairDisplay = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-title",
+  variable: "--font-geist",
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+});
+
+export const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-ibm-plex-mono",
+  weight: ["200", "300", "400", "500", "600", "700"],
+});
+
+export const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  variable: "--font-ibm-plex-sans",
+  weight: "variable",
+  axes: ["wdth"],
+});
+
+export const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair-display",
   weight: "variable",
 });

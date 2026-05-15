@@ -8,7 +8,13 @@ import MobileGate from "@/components/MobileGate";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { bricolageGrotesque, ibmPlexSans, playfairDisplay } from "@/app/fonts";
+import {
+  bricolageGrotesque,
+  geist,
+  ibmPlexMono,
+  ibmPlexSans,
+  playfairDisplay,
+} from "@/app/fonts";
 
 export const metadata: Metadata = {
   title: "Next.js", //TODO: This is a placeholder
@@ -24,7 +30,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bricolageGrotesque.variable} ${ibmPlexSans.variable} ${playfairDisplay.variable} overflow-x-clip antialiased`}
+      className={`${bricolageGrotesque.variable} ${geist.variable} ${ibmPlexMono.variable} ${ibmPlexSans.variable} ${playfairDisplay.variable} overflow-x-clip antialiased`}
     >
       <body>
         <Analytics />

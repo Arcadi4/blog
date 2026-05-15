@@ -5,13 +5,13 @@
 @theme {
   --color-background: #fafafa;
   --color-foreground: #0f0f0f;
-  --font-sans: Helvetica, -apple-system, sans-serif;
+  --font-sans: var(--font-ibm-plex-sans), Helvetica, -apple-system, sans-serif;
   --font-mono:
-    "IBM Plex Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    var(--font-ibm-plex-mono), SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
-  --font-grotesque: "Bricolage Grotesque", Helvetica, Arial, sans-serif;
-  --font-title: "Geist", Helvetica, Arial, sans-serif;
-  --font-serif: "Playfair Display", "Georgia", serif;
+  --font-grotesque: var(--font-bricolage-grotesque), Helvetica, Arial, sans-serif;
+  --font-title: var(--font-geist), Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-playfair-display), "Georgia", serif;
   --color-acid: #c3ff00;
   --color-klein: #0048ff;
   --color-magenta: #ff00a6;
