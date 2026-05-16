@@ -14,8 +14,8 @@ export default function Footer() {
         Source code distributed with MIT License at{" "}
         <Link href="https://github.com/Arcadi4/blog" />
       </div>
-      <div className="col-span-1 col-start-1 -ml-8 h-full bg-black" />
-      <div className="absolute bottom-8 left-8 font-mono leading-none font-bold text-white">
+      <div className="col-span-1 col-start-1 row-start-1 -mr-4 -ml-8 bg-black" />
+      <div className="col-span-1 col-start-1 row-start-1 mb-8 self-end font-mono leading-none text-white">
         blog*
         <br />
         arcadia
