@@ -100,7 +100,7 @@ export default function Home() {
         {/* Blog URL */}
         <SimpleEntrance
           from="none"
-          className="col-start-1 row-start-1 text-base leading-none font-semibold whitespace-pre-line"
+          className="col-start-1 row-start-1 leading-none whitespace-pre-line"
         >
           {"https://\nblog.\narcadia\n.moe"}
         </SimpleEntrance>
@@ -196,7 +196,7 @@ export default function Home() {
         </div>
 
         {/* Menu; navigation and social media links */}
-        <aside className="col-start-1 col-end-4 row-span-1 row-start-3">
+        <aside className="z-50 col-start-1 col-end-4 row-span-1 row-start-3">
           <div className="flex flex-col">
             {menuItems.map((menuItem: LinkItem) => {
               menuAnimationIndex++;
@@ -219,7 +219,7 @@ export default function Home() {
             })}
           </div>
         </aside>
-        <aside className="col-start-1 col-end-4 row-span-1 row-start-4">
+        <aside className="z-50 col-start-1 col-end-4 row-span-1 row-start-4">
           <div className="flex flex-col">
             {socialMediaItems.map((menuItem: LinkItem) => {
               menuAnimationIndex++;
