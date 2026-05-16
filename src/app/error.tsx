@@ -71,16 +71,7 @@ function getStatusCode(error: Error & { status?: unknown; cause?: unknown }) {
 export default function Error({ error, reset }: ErrorProps) {
   const statusCode = getStatusCode(error);
   const title = ERROR_TITLES[statusCode] ?? "Unexpected Error";
-  const isServerError = statusCode >= 500;
-
   void reset;
 
-  return (
-    <ErrorPage
-      code={statusCode}
-      title={title}
-      heroSymbol={isServerError ? "!!" : "*"}
-      marker={isServerError ? "!!!" : ">>>"}
-    />
-  );
+  return <ErrorPage code={statusCode} title={title} />;
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { menuItemsErrorPage } from "@/app/posts/menuItems";
+import { LinkItem, menuItems } from "@/app/posts/menuItems";
 import ProximityLink from "@/components/ProximityLink";
+import { SimpleEntrance } from "@/components/animations/EntranceSimple";
+import { StretchEntrance } from "@/components/animations/EntranceStretch";
 
 type ErrorPageLink = {
   name: string;
@@ -24,42 +25,10 @@ type ErrorPageProps = {
   pathnameRepeats?: number;
   links?: ErrorPageLink[];
 };
-
-const DEFAULT_DESCRIPTION = (
-  <>
-    Server returned
-    <br />
-    an error :(
-  </>
-);
-
 type CurrentDateTime = {
   currentDate: string;
   currentTime: string;
 };
-
-const EMPTY_DATE_TIME: CurrentDateTime = {
-  currentDate: "",
-  currentTime: "",
-};
-
-function getCurrentDateTime(): CurrentDateTime {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-
-  return {
-    currentDate:
-      year +
-      "-" +
-      String(month).padStart(2, "0") +
-      "-" +
-      String(day).padStart(2, "0"),
-    currentTime: date.toLocaleTimeString(),
-  };
-}
-
 function getErrorFamilyLabel(code: string) {
   const firstDigit = code.match(/\d/)?.[0];
   if (!firstDigit) {
@@ -70,112 +39,159 @@ function getErrorFamilyLabel(code: string) {
 }
 
 export default function ErrorPage({
-  code,
-  title,
+  code = 500,
+  title = "Internal Server Error",
   codeDisplay,
   familyLabel,
-  caption,
-  description = DEFAULT_DESCRIPTION,
   titleLines,
-  heroSymbol = "*",
-  marker = ">>>",
-  pathnameRepeats = 5,
-  links = menuItemsErrorPage,
 }: ErrorPageProps) {
   const pathname = usePathname();
-  const [{ currentDate, currentTime }, setCurrentDateTime] =
-    useState(EMPTY_DATE_TIME);
   const normalizedCode = String(code);
   const resolvedCodeDisplay = codeDisplay ?? normalizedCode;
-  const resolvedFamilyLabel =
-    familyLabel ?? getErrorFamilyLabel(resolvedCodeDisplay);
-  const resolvedTitleLines = titleLines ?? title.split(/\s+/).filter(Boolean);
+  familyLabel ?? getErrorFamilyLabel(resolvedCodeDisplay);
+  titleLines ?? title.split(/\s+/).filter(Boolean);
 
-  useEffect(() => {
-    setCurrentDateTime(getCurrentDateTime());
-  }, []);
+  let menuAnimationIndex = 0;
+  const delayPerMenuItem = 100;
+  const baseUrl = "https://blog.arcadia.moe";
 
   return (
-    <main className="overflow-hidden">
-      <div className="absolute top-2/3 z-10 w-full border-t-2 border-t-black" />
-      <div className="absolute top-2/3 h-12 w-full bg-magenta" />
-      <div className="absolute -z-10 bg-acid md:h-dvh md:w-1/3 md:min-w-96 md:border-b-0" />
-      <div className="absolute z-10 border-b-2 border-b-black md:h-dvh md:w-1/3 md:min-w-96 md:border-r-2 md:border-b-0 md:border-r-black" />
-      <div className="absolute inset-0 -z-50 bg-white" />
-      <div className="flex h-screen w-full flex-row gap-6 p-6">
-        <div className="relative h-full flex-1">
-          <div className="absolute top-0 left-0 z-20 flex flex-col gap-1">
-            {Array.from({ length: pathnameRepeats }, (_, index) => (
-              <p key={index} className="large-p font-mono">
-                {pathname}
-              </p>
-            ))}
-          </div>
-          <div className="absolute bottom-[calc(1/3*100%+.5rem)] left-0 z-20 flex flex-col gap-1">
-            {Array.from({ length: pathnameRepeats }, (_, index) => (
-              <p key={index} className="large-p font-mono">
-                {pathname}
-              </p>
-            ))}
-          </div>
-          <pre className="large-p absolute bottom-0 left-0">
-            {resolvedFamilyLabel}
-          </pre>
-        </div>
-        <div className="relative h-full flex-1">
-          <div className="absolute top-[calc(2/3*100%-6*3rem+.5rem)] right-0 flex flex-col items-end">
-            {links.map((menuItem, index) => {
+    <main className="relative overflow-hidden">
+      {/* Deco grid, col only, no y padding */}
+      <div className="absolute grid h-dvh w-dvw grid-cols-12 gap-x-4 px-8">
+        <StretchEntrance
+          from="bottom"
+          className="-z-10 col-span-2 col-start-1 -ml-8 bg-acid"
+        />
+        <StretchEntrance
+          from="top"
+          className="separator z-10 col-span-1 col-start-12 border-r"
+        />
+      </div>
+
+      {/* Deco grid, row only, no x padding */}
+      <div className="absolute grid h-dvh w-dvw grid-rows-5 gap-y-4 py-8">
+        <StretchEntrance
+          from="right"
+          className="separator col-start-1 row-span-1 row-start-4 border-t"
+        />
+        <StretchEntrance
+          from="left"
+          delayMs={300}
+          className="col-start-1 row-start-3 h-2/3 self-end bg-magenta"
+        />
+      </div>
+
+      <div className="relative grid h-dvh w-dvw grid-cols-12 grid-rows-5 gap-x-4 gap-y-4 p-8">
+        {/* BG and guidelines */}
+        <StretchEntrance
+          from="top"
+          className="h-ful -z-10 col-span-3 col-start-6 row-span-4 row-start-1 -mt-8 bg-klein"
+        />
+
+        <StretchEntrance
+          from="top"
+          className="separator col-span-1 col-start-9 row-span-3 row-start-1 -mt-8 -mb-4 border-r"
+        />
+        <StretchEntrance
+          from="top"
+          className="separator -z-10 col-span-1 col-start-3 row-span-3 row-start-1 -mt-8 -mb-4 border-r"
+        />
+        <StretchEntrance
+          from="bottom"
+          className="separator -z-10 col-span-1 col-start-4 row-span-full row-start-4 -mb-8 border-r"
+        />
+        <StretchEntrance
+          from="top"
+          className="separator -z-10 col-span-1 col-start-6 row-span-full row-start-1 -my-8 border-r"
+        />
+
+        <StretchEntrance
+          from="right"
+          className="separator col-span-full col-start-7 row-span-1 row-start-2 -mr-8 -ml-4 border-b"
+        />
+
+        {/* Menu */}
+        <aside className="z-50 col-span-full col-start-10 row-start-1">
+          <div className="flex flex-col">
+            {menuItems.map((menuItem: LinkItem) => {
+              menuAnimationIndex++;
               return (
-                <ProximityLink
-                  href={menuItem.href}
-                  className="large-link select-none"
-                  key={index}
+                <SimpleEntrance
+                  key={menuItem.name}
+                  from="right"
+                  delayMs={menuAnimationIndex * delayPerMenuItem}
                 >
-                  {menuItem.name}
-                </ProximityLink>
+                  <ProximityLink
+                    href={menuItem.href}
+                    className="font-title text-4xl leading-none"
+                  >
+                    {"→ " + menuItem.name}
+                  </ProximityLink>
+                </SimpleEntrance>
               );
             })}
           </div>
-          <pre className="large-p absolute bottom-0 left-0">
-            {caption ?? title.toLowerCase()}
-          </pre>
-          <pre className="large-p absolute top-0 left-0">{description}</pre>
+        </aside>
+
+        {/* Corner text */}
+        <div className="col-start-1 row-start-5 self-end">ERROR_PAGE</div>
+        <div className="col-start-1 row-start-1 leading-none whitespace-pre-line">
+          {"https://\nblog.\narcadia\n.moe"}
         </div>
-        <div className="relative h-full flex-1">
-          {heroSymbol === "*" ? (
-            <div className="text-stroke pointer-events-none absolute top-0 left-0 -z-10 -translate-x-1/2 -translate-y-1/6 font-serif text-[1280px] font-medium select-none">
-              *
-            </div>
-          ) : (
-            <div className="text-stroke-white pointer-events-none absolute top-0 left-0 z-20 -translate-x-1/2 -translate-y-1/6 font-serif text-[960px] font-bold mix-blend-difference select-none">
-              {heroSymbol}
-            </div>
-          )}
-          <div className="absolute bottom-1/3">
-            <h1 className="h1-hero relative w-fit">
-              {resolvedCodeDisplay}
-              <div className="absolute bottom-full z-30 h-screen w-full bg-klein" />
-            </h1>
-            <h1
-              className={`h1-hero ${resolvedCodeDisplay === "503" ? "text-6xl" : ""}`} // 503 service unavailable is too wide, so we reduce font size for it
+
+        {/* Current route / body */}
+        <div className="col-span-full col-start-7 row-start-5 self-end">
+          <p>You are trying to visit</p>
+        </div>
+        <div className="col-span-full col-start-9 row-start-5 self-end">
+          {baseUrl}
+          <span className="font-semibold">{pathname}</span>
+        </div>
+        <div className="col-span-3 col-start-5 row-start-5 leading-tight">
+          Nothing found here. This page does not exist or have not been created.
+          Try return to the previous page or go to home.
+        </div>
+
+        {/* Error code */}
+        {Array.from({ length: 5 }, (_, index) => {
+          const row = index + 1;
+          const delay = 100 * index;
+          const weight = 300 + 100 * index;
+
+          return (
+            <SimpleEntrance
+              from="up"
+              key={index}
+              delayMs={delay}
+              className={`z-20 col-start-3 text-2xl select-none font-[${weight}] row-start-${row} row-span-1 self-start leading-none tracking-[-0.06em] [text-box:trim-both_cap_alphabetic]`}
             >
-              {resolvedTitleLines.map((line, index) => {
-                return (
-                  <span key={`${line}-${index}`}>
-                    {line}
-                    {index < resolvedTitleLines.length - 1 ? <br /> : null}
-                  </span>
-                );
-              })}
-            </h1>
-          </div>
-          <pre className="large-p absolute bottom-0 left-0">{marker}</pre>
-          <pre className="large-p absolute right-0 bottom-0">{marker}</pre>
-          <pre className="large-p absolute top-0 right-0 text-right">
-            {currentDate}
-            <br />
-            {currentTime}
-          </pre>
+              {resolvedCodeDisplay}
+            </SimpleEntrance>
+          );
+        })}
+        {Array.from({ length: 5 }, (_, index) => {
+          const col = 5 + index * 2;
+          const delay = 100 * index;
+          const weight = 300 + 100 * index;
+
+          return (
+            <SimpleEntrance
+              from="left"
+              delayMs={delay}
+              key={index}
+              className={`z-20 text-2xl select-none col-start-${col} font-[${weight}] row-span-1 row-start-3 self-start leading-none tracking-[-0.06em] [text-box:trim-both_cap_alphabetic]`}
+            >
+              {resolvedCodeDisplay}
+            </SimpleEntrance>
+          );
+        })}
+        {/* Hero */}
+        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[320px] leading-[0.9] font-light tracking-[-0.06em] text-nowrap text-magenta mix-blend-difference select-none [text-box:trim-both_cap_alphabetic]">
+          {title}.
+        </div>
+        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[128px] leading-none font-normal tracking-[-0.06em] whitespace-nowrap select-none [text-box:trim-both_cap_alphabetic]">
+          {title}.
         </div>
       </div>
     </main>
