@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "frontend-debugging": {
+      "source": "arcadi4/skills",
+      "sourceType": "github",
+      "skillPath": "frontend-debugging/SKILL.md",
+      "computedHash": "3ed121903110f616761ff002291011e0d04346abcf46edeafe489c10dcb94b0a"
+    },
     "frontend-design": {
       "source": "anthropics/skills",
       "sourceType": "github",
