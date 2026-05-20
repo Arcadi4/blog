@@ -12,12 +12,12 @@
     "validate:notion": "NODE_ENV=production NODE_OPTIONS=--conditions=react-server tsx scripts/validate-notion.ts"
   },
   "dependencies": {
-    "@notionhq/client": "^5.20.0",
+    "@notionhq/client": "^5.22.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "geist": "^1.7.0",
     "gray-matter": "^4.0.3",
-    "motion": "^12.38.0",
+    "motion": "^12.39.0",
     "next": "16.2.6",
     "react": "19.2.6",
     "react-dom": "19.2.6",
@@ -31,12 +31,12 @@
     "@types/node": "^25",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "oxlint": "^1.63.0",
-    "oxlint-tsgolint": "^0.22.1",
+    "oxlint": "^1.66.0",
+    "oxlint-tsgolint": "^0.23.0",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.3",
     "typescript": "^6"
   }
 }
