@@ -1,4 +1,10 @@
-import { Bricolage_Grotesque, Geist, IBM_Plex_Mono, IBM_Plex_Sans, Playfair_Display } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Geist,
+  IBM_Plex_Mono,
+  IBM_Plex_Sans,
+  Playfair_Display,
+} from "next/font/google";
 
 export const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],

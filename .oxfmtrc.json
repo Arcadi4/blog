@@ -4,7 +4,5 @@
   },
   "printWidth": 80,
   "sortPackageJson": false,
-  "ignorePatterns": [
-    "pnpm-lock.yaml"
-  ]
+  "ignorePatterns": ["pnpm-lock.yaml"]
 }
