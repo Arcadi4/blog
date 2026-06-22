@@ -1,0 +1,10 @@
+{
+  "sortTailwindcss": {
+    "stylesheet": "./src/app/global.css"
+  },
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "pnpm-lock.yaml"
+  ]
+}
