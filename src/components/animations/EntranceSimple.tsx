@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { useEntranceAnimation } from "./useEntranceAnimation";
 import {
-  normalizeChildren,
   calculateStaggerDelay,
+  normalizeChildren,
   warnMultiChildClassName,
 } from "./entranceChildAdapter";
 
@@ -26,9 +26,11 @@ const distanceClass: Record<TextFrom, Record<Distance, string>> = {
  * Multi-child mode: Returns Fragment with independently animated children (wrapperless).
  *
  * @property step - Per-child delay increment (ms) for stagger effect in multi-child mode
+ * @property minAbsY - Minimum absolute window scrollY before the animation delay starts
+ * @property minScreenY - Minimum bounded viewport y-coordinate before the animation delay starts
  * @property className - Applied only in single-child mode; multi-child + className emits dev warning (wrap children in explicit container div)
  */
-type SimpleEntranceProps = {
+type SimpleEntranceBaseProps = {
   children: React.ReactNode;
   from?: TextFrom;
   distance?: Distance;
@@ -39,6 +41,24 @@ type SimpleEntranceProps = {
   step?: number;
 };
 
+type EntranceTriggerProps =
+  | { minAbsY?: number; minScreenY?: never }
+  | { minAbsY?: never; minScreenY?: number };
+
+type SimpleEntranceProps = SimpleEntranceBaseProps & EntranceTriggerProps;
+
+function setElementRef(
+  ref: React.Ref<HTMLElement> | undefined,
+  node: HTMLElement | null,
+) {
+  if (!ref) return;
+  if (typeof ref === "function") {
+    ref(node);
+    return;
+  }
+  (ref as React.MutableRefObject<HTMLElement | null>).current = node;
+}
+
 function AnimatedChild({
   child,
   delayMs,
@@ -46,6 +66,8 @@ function AnimatedChild({
   from,
   distance,
   disabled,
+  minAbsY,
+  minScreenY,
 }: {
   child: React.ReactElement;
   delayMs: number;
@@ -53,8 +75,26 @@ function AnimatedChild({
   from: TextFrom;
   distance: Distance;
   disabled: boolean;
+  minAbsY?: number;
+  minScreenY?: number;
 }) {
-  const { entered, reduceMotion } = useEntranceAnimation({ delayMs, disabled });
+  const targetRef = useRef<HTMLElement | null>(null);
+  const childRef = (child.props as { ref?: React.Ref<HTMLElement> }).ref;
+  const ref = useCallback(
+    (node: HTMLElement | null) => {
+      targetRef.current = node;
+      setElementRef(childRef, node);
+    },
+    [childRef],
+  );
+
+  const { entered, reduceMotion } = useEntranceAnimation({
+    delayMs,
+    disabled,
+    minAbsY,
+    minScreenY,
+    targetRef,
+  });
 
   const style: React.CSSProperties = reduceMotion
     ? {}
@@ -77,6 +117,7 @@ function AnimatedChild({
 
   return React.cloneElement(child, {
     className: mergedClassName,
+    ref: minScreenY === undefined ? childRef : ref,
     style: mergedStyle,
   } as React.HTMLAttributes<HTMLElement>);
 }
@@ -90,12 +131,18 @@ export function SimpleEntrance({
   className = "",
   disabled = false,
   step = 0,
+  minAbsY,
+  minScreenY,
 }: SimpleEntranceProps) {
   const normalizedChildren = normalizeChildren(children);
+  const targetRef = useRef<HTMLElement | null>(null);
 
   const { entered, reduceMotion } = useEntranceAnimation({
     delayMs,
     disabled,
+    minAbsY,
+    minScreenY,
+    targetRef,
   });
 
   warnMultiChildClassName(!!className, normalizedChildren.length);
@@ -114,7 +161,12 @@ export function SimpleEntrance({
 
     const childProps = child.props as {
       className?: string;
+      ref?: React.Ref<HTMLElement>;
       style?: React.CSSProperties;
+    };
+    const ref = (node: HTMLElement | null) => {
+      targetRef.current = node;
+      setElementRef(childProps.ref, node);
     };
     const childClassName =
       typeof childProps.className === "string" ? childProps.className : "";
@@ -124,6 +176,7 @@ export function SimpleEntrance({
 
     return React.cloneElement(child, {
       className: mergedClassName,
+      ref: minScreenY === undefined ? childProps.ref : ref,
       style: mergedStyle,
     } as React.HTMLAttributes<HTMLElement>);
   }
@@ -141,6 +194,8 @@ export function SimpleEntrance({
             from={from}
             distance={distance}
             disabled={disabled}
+            minAbsY={minAbsY}
+            minScreenY={minScreenY}
           />
         );
       })}
