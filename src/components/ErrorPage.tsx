@@ -25,31 +25,15 @@ type ErrorPageProps = {
   pathnameRepeats?: number;
   links?: ErrorPageLink[];
 };
-type CurrentDateTime = {
-  currentDate: string;
-  currentTime: string;
-};
-function getErrorFamilyLabel(code: string) {
-  const firstDigit = code.match(/\d/)?.[0];
-  if (!firstDigit) {
-    return `error|${code}`;
-  }
-
-  return `${firstDigit}xx|${code}`;
-}
 
 export default function ErrorPage({
-  code = 500,
-  title = "Internal Server Error",
+  code,
+  title,
   codeDisplay,
-  familyLabel,
-  titleLines,
 }: ErrorPageProps) {
   const pathname = usePathname();
   const normalizedCode = String(code);
   const resolvedCodeDisplay = codeDisplay ?? normalizedCode;
-  familyLabel ?? getErrorFamilyLabel(resolvedCodeDisplay);
-  titleLines ?? title.split(/\s+/).filter(Boolean);
 
   let menuAnimationIndex = 0;
   const delayPerMenuItem = 100;
@@ -164,7 +148,7 @@ export default function ErrorPage({
               from="up"
               key={index}
               delayMs={delay}
-              className={`z-20 col-start-3 text-2xl select-none font-[${weight}] row-start-${row} row-span-1 self-start leading-none tracking-[-0.06em] [text-box:trim-both_cap_alphabetic]`}
+              className={`z-20 col-start-3 text-2xl select-none font-[${weight}] row-start-${row} row-span-1 self-start leading-none tracking-[-0.06em] text-trim-cap`}
             >
               {resolvedCodeDisplay}
             </FadeIn>
@@ -180,17 +164,17 @@ export default function ErrorPage({
               from="left"
               delayMs={delay}
               key={index}
-              className={`z-20 text-2xl select-none col-start-${col} font-[${weight}] row-span-1 row-start-3 self-start leading-none tracking-[-0.06em] [text-box:trim-both_cap_alphabetic]`}
+              className={`z-20 text-2xl select-none col-start-${col} font-[${weight}] row-span-1 row-start-3 self-start leading-none tracking-[-0.06em] text-trim-cap`}
             >
               {resolvedCodeDisplay}
             </FadeIn>
           );
         })}
         {/* Hero */}
-        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[320px] leading-[0.9] font-light tracking-[-0.06em] text-nowrap text-magenta mix-blend-difference select-none [text-box:trim-both_cap_alphabetic]">
+        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[320px] leading-[0.9] font-light tracking-[-0.06em] text-nowrap text-magenta mix-blend-difference select-none text-trim-cap">
           {title}.
         </div>
-        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[128px] leading-none font-normal tracking-[-0.06em] whitespace-nowrap select-none [text-box:trim-both_cap_alphabetic]">
+        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[128px] leading-none font-normal tracking-[-0.06em] whitespace-nowrap select-none text-trim-cap">
           {title}.
         </div>
       </div>

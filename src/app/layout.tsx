@@ -9,7 +9,7 @@ import type {Metadata} from "next";
 import {Analytics} from "@vercel/analytics/next";
 import {SpeedInsights} from "@vercel/speed-insights/next";
 import {bricolageGrotesque, funnelDisplay, geist, ibmPlexMono, ibmPlexSans, playfairDisplay,} from "@/app/fonts";
-import {cn} from "@/lib/fn";
+import {cn} from "@/lib/utils";
 import React from "react";
 
 export const metadata: Metadata = {
