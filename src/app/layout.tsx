@@ -17,9 +17,8 @@ import {
 } from "@/app/fonts";
 
 export const metadata: Metadata = {
-  title: "Next.js", //TODO: This is a placeholder
-  description:
-    "A personal blog built with Next.js, TypeScript, and Tailwind CSS",
+  title: "@4rcadia",
+  description: "My personal blog.",
 };
 
 export default function RootLayout({
