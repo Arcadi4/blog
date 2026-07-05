@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, {useCallback, useRef} from "react";
+import type {EntranceSeenOptions} from "./useEntranceAnimation";
 import {useEntranceAnimation} from "./useEntranceAnimation";
-import {calculateStaggerDelay, normalizeChildren, warnMultiChildClassName,} from "./entranceChildAdapter";
+import {calculateStaggerDelay, normalizeChildren, setElementRef, warnMultiChildClassName,} from "./entranceChildAdapter";
 
 type Origin = "left" | "right" | "top" | "bottom" | "center";
 
@@ -23,8 +24,10 @@ const originClass: Record<Origin, string> = {
  * @property step - Per-child delay increment (ms) for stagger effect in multi-child mode
  * @property className - Applied to host div in empty-child mode; multi-child + className emits dev warning (wrap children in explicit container div)
  * @property fade - Adds opacity transition alongside scale animation
+ * @property onSeen - Waits until the child reaches minPosition before the animation delay starts
+ * @property minPosition - Trigger line percentage measured up from the viewport bottom (0 = entering screen, 50 = middle, negative = before entering)
  */
-type ScaleInProps = {
+type ScaleInProps = EntranceSeenOptions & {
   children?: React.ReactNode;
   from?: Origin;
   delayMs?: number;
@@ -35,27 +38,13 @@ type ScaleInProps = {
   step?: number;
 };
 
-function AnimatedChild({
-  child,
-  delayMs,
-  durationMs,
-  from,
-  fade,
-  disabled,
-}: {
-  child: React.ReactElement;
-  delayMs: number;
-  durationMs: number;
-  from: Origin;
-  fade: boolean;
-  disabled: boolean;
-}) {
-  const { entered, reduceMotion } = useEntranceAnimation({ delayMs, disabled });
+type ScaleClasses = {
+  readonly base: string;
+  readonly hidden: string;
+  readonly shown: string;
+};
 
-  const style: React.CSSProperties = reduceMotion
-    ? {}
-    : { transitionDuration: `${durationMs}ms` };
-
+function getScaleClasses(from: Origin, fade: boolean): ScaleClasses {
   const base = `will-change-transform transition ease-in-out ${originClass[from]}`;
   const axisHidden =
     from === "center"
@@ -73,7 +62,64 @@ function AnimatedChild({
   const opacityHidden = fade ? "opacity-0" : "";
   const opacityShown = fade ? "opacity-100" : "";
 
-  const animationClasses = `${base} ${entered ? `${axisShown} ${opacityShown}` : `${axisHidden} ${opacityHidden}`}`;
+  return {
+    base,
+    hidden: `${axisHidden} ${opacityHidden}`,
+    shown: `${axisShown} ${opacityShown}`,
+  };
+}
+
+function getAnimationClassName(
+  from: Origin,
+  fade: boolean,
+  entered: boolean,
+): string {
+  const classes = getScaleClasses(from, fade);
+  return `${classes.base} ${entered ? classes.shown : classes.hidden}`;
+}
+
+function AnimatedChild({
+  child,
+  delayMs,
+  durationMs,
+  from,
+  fade,
+  disabled,
+  minPosition,
+  onSeen,
+}: {
+  child: React.ReactElement;
+  delayMs: number;
+  durationMs: number;
+  from: Origin;
+  fade: boolean;
+  disabled: boolean;
+  minPosition: number;
+  onSeen: boolean;
+}) {
+  const targetRef = useRef<HTMLElement | null>(null);
+  const childRef = (child.props as { ref?: React.Ref<HTMLElement> }).ref;
+  const ref = useCallback(
+    (node: HTMLElement | null) => {
+      targetRef.current = node;
+      setElementRef(childRef, node);
+    },
+    [childRef],
+  );
+
+  const { entered, reduceMotion } = useEntranceAnimation({
+    delayMs,
+    disabled,
+    minPosition,
+    onSeen,
+    targetRef,
+  });
+
+  const style: React.CSSProperties = reduceMotion
+    ? {}
+    : { transitionDuration: `${durationMs}ms` };
+
+  const animationClasses = getAnimationClassName(from, fade, entered);
 
   const existingClassName = (child.props as { className?: string }).className;
   const existingStyle = (child.props as { style?: React.CSSProperties }).style;
@@ -82,6 +128,7 @@ function AnimatedChild({
     className: existingClassName
       ? `${existingClassName} ${animationClasses}`
       : animationClasses,
+    ref: onSeen ? ref : childRef,
     style: { ...existingStyle, ...style },
   } as Partial<typeof child.props>);
 }
@@ -100,44 +147,37 @@ export function ScaleIn({
   className = "",
   disabled = false,
   fade = false,
+  minPosition = 50,
+  onSeen = false,
   step = 0,
 }: ScaleInProps) {
   const normalized = children ? normalizeChildren(children) : [];
   const hasChildren = normalized.length > 0;
+  const rendersHost = !hasChildren || (!!className && normalized.length === 1);
+  const targetRef = useRef<HTMLDivElement | null>(null);
 
   const { entered, reduceMotion } = useEntranceAnimation({
     delayMs,
     disabled,
+    minPosition,
+    onSeen: onSeen && rendersHost,
+    targetRef,
   });
 
-  // Empty-child mode: render host element (decorative usage)
-  if (!hasChildren) {
+  if (rendersHost) {
     const style: React.CSSProperties = reduceMotion
       ? {}
       : { transitionDuration: `${durationMs}ms` };
-
-    const base = `will-change-transform transition ease-in-out ${originClass[from]}`;
-    const axisHidden =
-      from === "center"
-        ? "scale-0"
-        : from === "left" || from === "right"
-          ? "scale-x-0"
-          : "scale-y-0";
-    const axisShown =
-      from === "center"
-        ? "scale-100"
-        : from === "left" || from === "right"
-          ? "scale-x-100"
-          : "scale-y-100";
-
-    const opacityHidden = fade ? "opacity-0" : "";
-    const opacityShown = fade ? "opacity-100" : "";
+    const animationClasses = getAnimationClassName(from, fade, entered);
 
     return (
       <div
-        className={`${base} ${entered ? `${axisShown} ${opacityShown}` : `${axisHidden} ${opacityHidden}`} ${className}`}
+        className={`${animationClasses} ${className}`.trim()}
+        ref={onSeen ? targetRef : undefined}
         style={style}
-      />
+      >
+        {children}
+      </div>
     );
   }
 
@@ -157,6 +197,8 @@ export function ScaleIn({
             from={from}
             fade={fade}
             disabled={disabled}
+            minPosition={minPosition}
+            onSeen={onSeen}
           />
         );
       })}
