@@ -1,12 +1,8 @@
 "use client";
 
-import React, { useCallback, useRef } from "react";
-import { useEntranceAnimation } from "./useEntranceAnimation";
-import {
-  calculateStaggerDelay,
-  normalizeChildren,
-  warnMultiChildClassName,
-} from "./entranceChildAdapter";
+import React, {useCallback, useRef} from "react";
+import {useEntranceAnimation} from "./useEntranceAnimation";
+import {calculateStaggerDelay, normalizeChildren, warnMultiChildClassName,} from "./entranceChildAdapter";
 
 type TextFrom = "up" | "down" | "left" | "right" | "none";
 type Distance = "sm" | "md" | "lg";
@@ -20,7 +16,7 @@ const distanceClass: Record<TextFrom, Record<Distance, string>> = {
 };
 
 /**
- * SimpleEntrance props
+ * FadeIn props
  *
  * Single-child mode: Merges animation classes directly onto child (no wrapper).
  * Multi-child mode: Returns Fragment with independently animated children (wrapperless).
@@ -30,7 +26,7 @@ const distanceClass: Record<TextFrom, Record<Distance, string>> = {
  * @property minScreenY - Minimum bounded viewport y-coordinate before the animation delay starts
  * @property className - Applied only in single-child mode; multi-child + className emits dev warning (wrap children in explicit container div)
  */
-type SimpleEntranceBaseProps = {
+type FadeInBaseProps = {
   children: React.ReactNode;
   from?: TextFrom;
   distance?: Distance;
@@ -45,7 +41,7 @@ type EntranceTriggerProps =
   | { minAbsY?: number; minScreenY?: never }
   | { minAbsY?: never; minScreenY?: number };
 
-type SimpleEntranceProps = SimpleEntranceBaseProps & EntranceTriggerProps;
+type FadeInProps = FadeInBaseProps & EntranceTriggerProps;
 
 function setElementRef(
   ref: React.Ref<HTMLElement> | undefined,
@@ -122,7 +118,7 @@ function AnimatedChild({
   } as React.HTMLAttributes<HTMLElement>);
 }
 
-export function SimpleEntrance({
+export function FadeIn({
   children,
   from = "up",
   distance = "md",
@@ -133,7 +129,7 @@ export function SimpleEntrance({
   step = 0,
   minAbsY,
   minScreenY,
-}: SimpleEntranceProps) {
+}: FadeInProps) {
   const normalizedChildren = normalizeChildren(children);
   const targetRef = useRef<HTMLElement | null>(null);
 

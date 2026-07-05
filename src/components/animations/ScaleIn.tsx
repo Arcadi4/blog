@@ -1,16 +1,12 @@
 "use client";
 
 import React from "react";
-import { useEntranceAnimation } from "./useEntranceAnimation";
-import {
-  normalizeChildren,
-  calculateStaggerDelay,
-  warnMultiChildClassName,
-} from "./entranceChildAdapter";
+import {useEntranceAnimation} from "./useEntranceAnimation";
+import {calculateStaggerDelay, normalizeChildren, warnMultiChildClassName,} from "./entranceChildAdapter";
 
-type StretchFrom = "left" | "right" | "top" | "bottom" | "center";
+type Origin = "left" | "right" | "top" | "bottom" | "center";
 
-const originClass: Record<StretchFrom, string> = {
+const originClass: Record<Origin, string> = {
   left: "origin-left",
   right: "origin-right",
   top: "origin-top",
@@ -19,7 +15,7 @@ const originClass: Record<StretchFrom, string> = {
 };
 
 /**
- * StretchEntrance props
+ * ScaleIn props
  *
  * Empty-child mode: Renders host div for decorative usage (e.g., divider lines).
  * Child-present mode: Wrapperless child injection via Fragment (no implicit wrapper).
@@ -28,9 +24,9 @@ const originClass: Record<StretchFrom, string> = {
  * @property className - Applied to host div in empty-child mode; multi-child + className emits dev warning (wrap children in explicit container div)
  * @property fade - Adds opacity transition alongside scale animation
  */
-type EntranceStretchProps = {
+type ScaleInProps = {
   children?: React.ReactNode;
-  from?: StretchFrom;
+  from?: Origin;
   delayMs?: number;
   durationMs?: number;
   className?: string;
@@ -50,7 +46,7 @@ function AnimatedChild({
   child: React.ReactElement;
   delayMs: number;
   durationMs: number;
-  from: StretchFrom;
+  from: Origin;
   fade: boolean;
   disabled: boolean;
 }) {
@@ -96,7 +92,7 @@ function AnimatedChild({
  * - from top/bottom => scale-y
  * - from center => scale
  */
-export function StretchEntrance({
+export function ScaleIn({
   children,
   from = "left",
   delayMs = 0,
@@ -105,7 +101,7 @@ export function StretchEntrance({
   disabled = false,
   fade = false,
   step = 0,
-}: EntranceStretchProps) {
+}: ScaleInProps) {
   const normalized = children ? normalizeChildren(children) : [];
   const hasChildren = normalized.length > 0;
 

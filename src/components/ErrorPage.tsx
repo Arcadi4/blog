@@ -1,11 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
-import { LinkItem, menuItems } from "@/app/posts/menuItems";
+import {usePathname} from "next/navigation";
+import type {ReactNode} from "react";
+import {LinkItem, menuItems} from "@/app/posts/menuItems";
 import ProximityLink from "@/components/ProximityLink";
-import { SimpleEntrance } from "@/components/animations/EntranceSimple";
-import { StretchEntrance } from "@/components/animations/EntranceStretch";
+import {FadeIn} from "@/components/animations/FadeIn";
+import {ScaleIn} from "@/components/animations/ScaleIn";
 
 type ErrorPageLink = {
   name: string;
@@ -59,11 +59,11 @@ export default function ErrorPage({
     <main className="relative overflow-hidden">
       {/* Deco grid, col only, no y padding */}
       <div className="absolute grid h-dvh w-dvw grid-cols-12 gap-x-4 px-8">
-        <StretchEntrance
+        <ScaleIn
           from="bottom"
           className="-z-10 col-span-2 col-start-1 -ml-8 bg-acid"
         />
-        <StretchEntrance
+        <ScaleIn
           from="top"
           className="separator z-10 col-span-1 col-start-12 border-r"
         />
@@ -71,11 +71,11 @@ export default function ErrorPage({
 
       {/* Deco grid, row only, no x padding */}
       <div className="absolute grid h-dvh w-dvw grid-rows-5 gap-y-4 py-8">
-        <StretchEntrance
+        <ScaleIn
           from="right"
           className="separator col-start-1 row-span-1 row-start-4 border-t"
         />
-        <StretchEntrance
+        <ScaleIn
           from="left"
           delayMs={300}
           className="col-start-1 row-start-3 h-2/3 self-end bg-magenta"
@@ -84,29 +84,29 @@ export default function ErrorPage({
 
       <div className="relative grid h-dvh w-dvw grid-cols-12 grid-rows-5 gap-x-4 gap-y-4 p-8">
         {/* BG and guidelines */}
-        <StretchEntrance
+        <ScaleIn
           from="top"
           className="h-ful -z-10 col-span-3 col-start-6 row-span-4 row-start-1 -mt-8 bg-klein"
         />
 
-        <StretchEntrance
+        <ScaleIn
           from="top"
           className="separator col-span-1 col-start-9 row-span-3 row-start-1 -mt-8 -mb-4 border-r"
         />
-        <StretchEntrance
+        <ScaleIn
           from="top"
           className="separator -z-10 col-span-1 col-start-3 row-span-3 row-start-1 -mt-8 -mb-4 border-r"
         />
-        <StretchEntrance
+        <ScaleIn
           from="bottom"
           className="separator -z-10 col-span-1 col-start-4 row-span-full row-start-4 -mb-8 border-r"
         />
-        <StretchEntrance
+        <ScaleIn
           from="top"
           className="separator -z-10 col-span-1 col-start-6 row-span-full row-start-1 -my-8 border-r"
         />
 
-        <StretchEntrance
+        <ScaleIn
           from="right"
           className="separator col-span-full col-start-7 row-span-1 row-start-2 -mr-8 -ml-4 border-b"
         />
@@ -117,7 +117,7 @@ export default function ErrorPage({
             {menuItems.map((menuItem: LinkItem) => {
               menuAnimationIndex++;
               return (
-                <SimpleEntrance
+                <FadeIn
                   key={menuItem.name}
                   from="right"
                   delayMs={menuAnimationIndex * delayPerMenuItem}
@@ -128,7 +128,7 @@ export default function ErrorPage({
                   >
                     {"→ " + menuItem.name}
                   </ProximityLink>
-                </SimpleEntrance>
+                </FadeIn>
               );
             })}
           </div>
@@ -160,14 +160,14 @@ export default function ErrorPage({
           const weight = 300 + 100 * index;
 
           return (
-            <SimpleEntrance
+            <FadeIn
               from="up"
               key={index}
               delayMs={delay}
               className={`z-20 col-start-3 text-2xl select-none font-[${weight}] row-start-${row} row-span-1 self-start leading-none tracking-[-0.06em] [text-box:trim-both_cap_alphabetic]`}
             >
               {resolvedCodeDisplay}
-            </SimpleEntrance>
+            </FadeIn>
           );
         })}
         {Array.from({ length: 5 }, (_, index) => {
@@ -176,14 +176,14 @@ export default function ErrorPage({
           const weight = 300 + 100 * index;
 
           return (
-            <SimpleEntrance
+            <FadeIn
               from="left"
               delayMs={delay}
               key={index}
               className={`z-20 text-2xl select-none col-start-${col} font-[${weight}] row-span-1 row-start-3 self-start leading-none tracking-[-0.06em] [text-box:trim-both_cap_alphabetic]`}
             >
               {resolvedCodeDisplay}
-            </SimpleEntrance>
+            </FadeIn>
           );
         })}
         {/* Hero */}
