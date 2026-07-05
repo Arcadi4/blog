@@ -44,6 +44,24 @@ let frameId: number | null = null;
 let listenersAttached = false;
 let cleanupPointerListeners: (() => void) | null = null;
 
+interface GlyphAppliedStyle {
+  base: string;
+  shadow: string;
+  x: number;
+  y: number;
+  opacity: string;
+}
+
+function createEmptyAppliedStyle(): GlyphAppliedStyle {
+  return {
+    base: "",
+    shadow: "",
+    x: Number.NaN,
+    y: Number.NaN,
+    opacity: "",
+  };
+}
+
 function setPointerPosition(x: number, y: number) {
   pointerPosition.x = x;
   pointerPosition.y = y;
@@ -154,9 +172,7 @@ export default function ProximityShadowText({
     bottom: number;
   } | null>(null);
   const shadowOffsetRefs = useRef<{ x: number; y: number }[]>([]);
-  const appliedStyleRefs = useRef<
-    { base: string; shadow: string; x: number; y: number; opacity: string }[]
-  >([]);
+  const appliedStyleRefs = useRef<GlyphAppliedStyle[]>([]);
   const hoverProgressRef = useRef(0);
   const isRestedRef = useRef(true);
   const isHoveredRef = useRef(isHovered);
@@ -230,6 +246,9 @@ export default function ProximityShadowText({
         y: rect.top + rect.height / 2,
       };
     });
+
+    lastFrameRef.current.x = null;
+    lastFrameRef.current.y = null;
   }, [containerRef]);
 
   const hasResidualOffset = useCallback(() => {
@@ -258,20 +277,7 @@ export default function ProximityShadowText({
       }
 
       const applied =
-        appliedStyleRefs.current[index] ??
-        ({
-          base: "",
-          shadow: "",
-          x: Number.NaN,
-          y: Number.NaN,
-          opacity: "",
-        } as {
-          base: string;
-          shadow: string;
-          x: number;
-          y: number;
-          opacity: string;
-        });
+        appliedStyleRefs.current[index] ?? createEmptyAppliedStyle();
 
       if (applied.base !== fromSettings) {
         baseRef.style.fontVariationSettings = fromSettings;
@@ -312,7 +318,24 @@ export default function ProximityShadowText({
       }
 
       const currentShadowTuning = shadowTuningRef.current;
-      const targetHoverProgress = isHoveredRef.current ? 1 : 0;
+      const x = pointerPosition.x;
+      const y = pointerPosition.y;
+      const bounds = containerBoundsRef.current;
+      const currentRadius = radiusRef.current;
+      const nearContainer =
+        !bounds ||
+        (x >= bounds.left - currentRadius &&
+          x <= bounds.right + currentRadius &&
+          y >= bounds.top - currentRadius &&
+          y <= bounds.bottom + currentRadius);
+      const insideContainer =
+        !!bounds &&
+        x >= bounds.left &&
+        x <= bounds.right &&
+        y >= bounds.top &&
+        y <= bounds.bottom;
+      const isActive = isHoveredRef.current || insideContainer;
+      const targetHoverProgress = isActive ? 1 : 0;
       const hoverDelta = targetHoverProgress - hoverProgressRef.current;
 
       if (Math.abs(hoverDelta) > 0.001) {
@@ -327,8 +350,6 @@ export default function ProximityShadowText({
         }
       }
 
-      const x = pointerPosition.x;
-      const y = pointerPosition.y;
       const hoverChanged =
         Math.abs(
           lastFrameRef.current.hoverProgress - hoverProgressRef.current,
@@ -336,16 +357,7 @@ export default function ProximityShadowText({
       const pointerChanged =
         lastFrameRef.current.x !== x || lastFrameRef.current.y !== y;
       const residualOffset = hasResidualOffset();
-      const bounds = containerBoundsRef.current;
-      const currentRadius = radiusRef.current;
-      const nearContainer =
-        !bounds ||
-        (x >= bounds.left - currentRadius &&
-          x <= bounds.right + currentRadius &&
-          y >= bounds.top - currentRadius &&
-          y <= bounds.bottom + currentRadius);
-      const shouldAnimateExit =
-        hoverChanged || isHoveredRef.current || residualOffset;
+      const shouldAnimateExit = hoverChanged || isActive || residualOffset;
 
       if (!nearContainer && !shouldAnimateExit) {
         if (!isRestedRef.current) {
@@ -364,7 +376,7 @@ export default function ProximityShadowText({
       const shouldProcess =
         pointerChanged ||
         hoverChanged ||
-        isHoveredRef.current ||
+        isActive ||
         residualOffset;
 
       if (!shouldProcess) {
@@ -423,7 +435,7 @@ export default function ProximityShadowText({
           radius: currentRadius,
           shadowStrength,
           hoverProgress: hoverProgressRef.current,
-          isHovered: isHoveredRef.current,
+          isHovered: isActive,
           allowShadowYFollow: allowShadowYFollowRef.current,
           reverseDirection: reverseShadowDirectionRef.current,
           reverseNearStronger: reverseShadowNearStrongerRef.current,
@@ -434,20 +446,7 @@ export default function ProximityShadowText({
         shadowOffsetRefs.current[index] = { x: nextShadow.x, y: nextShadow.y };
 
         const applied =
-          appliedStyleRefs.current[index] ??
-          ({
-            base: "",
-            shadow: "",
-            x: Number.NaN,
-            y: Number.NaN,
-            opacity: "",
-          } as {
-            base: string;
-            shadow: string;
-            x: number;
-            y: number;
-            opacity: string;
-          });
+          appliedStyleRefs.current[index] ?? createEmptyAppliedStyle();
 
         if (applied.base !== baseSettings) {
           baseRef.style.fontVariationSettings = baseSettings;
@@ -554,10 +553,7 @@ export default function ProximityShadowText({
 
   return (
     <span
-      style={{
-        display: "inline",
-        fontFamily: "inherit",
-      }}
+      className="proximity-shadow-text"
     >
       {words.map((word, wordIndex) => (
         <span key={wordIndex} className="inline-block whitespace-nowrap">
@@ -569,24 +565,16 @@ export default function ProximityShadowText({
                 ref={(el) => {
                   glyphRefs.current[currentLetterIndex] = el;
                 }}
-                style={{
-                  display: "inline-block",
-                  position: "relative",
-                }}
+                className="proximity-shadow-text__glyph"
                 aria-hidden="true"
               >
                 <span
                   ref={(el) => {
                     shadowLetterRefs.current[currentLetterIndex] = el;
                   }}
+                  className="proximity-shadow-text__shadow"
                   style={{
-                    position: "absolute",
-                    inset: 0,
-                    zIndex: 0,
-                    pointerEvents: "none",
                     color: shadowColor,
-                    opacity: 0,
-                    transform: "translate3d(0, 0, 0)",
                     fontVariationSettings: fromFontVariationSettings,
                   }}
                   aria-hidden="true"
@@ -597,12 +585,8 @@ export default function ProximityShadowText({
                   ref={(el) => {
                     baseLetterRefs.current[currentLetterIndex] = el;
                   }}
-                  style={{
-                    display: "inline-block",
-                    position: "relative",
-                    zIndex: 1,
-                    fontVariationSettings: fromFontVariationSettings,
-                  }}
+                  className="proximity-shadow-text__base"
+                  style={{ fontVariationSettings: fromFontVariationSettings }}
                   aria-hidden="true"
                 >
                   {letter}

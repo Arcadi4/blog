@@ -4,3 +4,29 @@
   position: relative;
   text-decoration: none;
 }
+
+.proximity-shadow-text {
+  display: inline;
+  font-family: inherit;
+}
+
+.proximity-shadow-text__glyph {
+  display: inline-block;
+  position: relative;
+}
+
+.proximity-shadow-text__shadow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+
+.proximity-shadow-text__base {
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+}
