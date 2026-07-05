@@ -44,10 +44,6 @@ next-env.d.ts
 .idea
 
 # agents
-.sisyphus
-AGENTS.md
-.claude
-.codex
 .agents
 .playwright-mcp
 
