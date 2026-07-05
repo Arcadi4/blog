@@ -5,17 +5,21 @@
 @theme {
   --color-background: #fafafa;
   --color-foreground: #0f0f0f;
-  --font-sans: var(--font-ibm-plex-sans), Helvetica, -apple-system, sans-serif;
-  --font-mono:
-    var(--font-ibm-plex-mono), SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
-  --font-grotesque:
-    var(--font-bricolage-grotesque), Helvetica, Arial, sans-serif;
-  --font-title: var(--font-geist), Helvetica, Arial, sans-serif;
-  --font-serif: var(--font-playfair-display), "Georgia", serif;
   --color-acid: #c3ff00;
   --color-klein: #0048ff;
   --color-magenta: #ff00a6;
+
+  --font-funnel-display: var(--font-funnel-display), sans-serif;
+
+  --font-sans: var(--font-ibm-plex-sans), Helvetica, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), SFMono-Regular, monospace;
+  --font-grotesque: var(--font-bricolage-grotesque), sans-serif;
+  --font-title: var(--font-geist), Helvetica, sans-serif;
+  --font-serif: var(--font-playfair-display), "Georgia", serif;
+}
+
+@utility text-trim-cap {
+  text-box: trim-both cap alphabetic;
 }
 
 /* 

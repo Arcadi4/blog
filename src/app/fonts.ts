@@ -1,5 +1,6 @@
 import {
   Bricolage_Grotesque,
+  Funnel_Display,
   Geist,
   IBM_Plex_Mono,
   IBM_Plex_Sans,
@@ -15,13 +16,13 @@ export const bricolageGrotesque = Bricolage_Grotesque({
 export const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist",
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800"],
+  weight: ["100", "300", "500", "900"],
 });
 
 export const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   variable: "--font-ibm-plex-mono",
-  weight: ["200", "300", "400", "500", "600", "700"],
+  weight: ["200", "300", "500", "700"],
 });
 
 export const ibmPlexSans = IBM_Plex_Sans({
@@ -34,5 +35,13 @@ export const ibmPlexSans = IBM_Plex_Sans({
 export const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair-display",
+  weight: "variable",
+});
+
+export const funnelDisplay = Funnel_Display({
+  display: "swap",
+  preload: true,
+  subsets: ["latin"],
+  variable: "--font-funnel-display",
   weight: "variable",
 });

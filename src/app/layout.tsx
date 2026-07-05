@@ -5,16 +5,12 @@ import "./global.css";
 import CustomCursor from "@/components/CustomCursor";
 import Footer from "@/components/Footer";
 import MobileGate from "@/components/MobileGate";
-import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import {
-  bricolageGrotesque,
-  geist,
-  ibmPlexMono,
-  ibmPlexSans,
-  playfairDisplay,
-} from "@/app/fonts";
+import type {Metadata} from "next";
+import {Analytics} from "@vercel/analytics/next";
+import {SpeedInsights} from "@vercel/speed-insights/next";
+import {bricolageGrotesque, funnelDisplay, geist, ibmPlexMono, ibmPlexSans, playfairDisplay,} from "@/app/fonts";
+import {cn} from "@/lib/fn";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "@4rcadia",
@@ -29,7 +25,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bricolageGrotesque.variable} ${geist.variable} ${ibmPlexMono.variable} ${ibmPlexSans.variable} ${playfairDisplay.variable} overflow-x-clip antialiased`}
+      className={cn(
+        bricolageGrotesque.variable,
+        geist.variable,
+        ibmPlexMono.variable,
+        ibmPlexSans.variable,
+        playfairDisplay.variable,
+        funnelDisplay.variable,
+        "overflow-x-clip antialiased",
+      )}
     >
       <body>
         <Analytics />
