@@ -27,12 +27,13 @@ export default function RootLayout({
       lang="en"
       className={cn(
         bricolageGrotesque.variable,
-        geist.variable,
         ibmPlexMono.variable,
         ibmPlexSans.variable,
         playfairDisplay.variable,
         funnelDisplay.variable,
+        geist.variable,
         "overflow-x-clip antialiased",
+        "font-sans",
       )}
     >
       <body>
