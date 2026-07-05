@@ -8,13 +8,14 @@ import {
   warnMultiChildClassName,
 } from "./entranceChildAdapter";
 
-type StretchFrom = "left" | "right" | "top" | "bottom";
+type StretchFrom = "left" | "right" | "top" | "bottom" | "center";
 
 const originClass: Record<StretchFrom, string> = {
   left: "origin-left",
   right: "origin-right",
   top: "origin-top",
   bottom: "origin-bottom",
+  center: "origin-center",
 };
 
 /**
@@ -61,9 +62,17 @@ function AnimatedChild({
 
   const base = `will-change-transform transition ease-in-out ${originClass[from]}`;
   const axisHidden =
-    from === "left" || from === "right" ? "scale-x-0" : "scale-y-0";
+    from === "center"
+      ? "scale-0"
+      : from === "left" || from === "right"
+        ? "scale-x-0"
+        : "scale-y-0";
   const axisShown =
-    from === "left" || from === "right" ? "scale-x-100" : "scale-y-100";
+    from === "center"
+      ? "scale-100"
+      : from === "left" || from === "right"
+        ? "scale-x-100"
+        : "scale-y-100";
 
   const opacityHidden = fade ? "opacity-0" : "";
   const opacityShown = fade ? "opacity-100" : "";
@@ -85,6 +94,7 @@ function AnimatedChild({
  * 拉伸展开：X 方向用 scale-x，Y 方向用 scale-y
  * - from left/right => scale-x
  * - from top/bottom => scale-y
+ * - from center => scale
  */
 export function StretchEntrance({
   children,
@@ -112,9 +122,17 @@ export function StretchEntrance({
 
     const base = `will-change-transform transition ease-in-out ${originClass[from]}`;
     const axisHidden =
-      from === "left" || from === "right" ? "scale-x-0" : "scale-y-0";
+      from === "center"
+        ? "scale-0"
+        : from === "left" || from === "right"
+          ? "scale-x-0"
+          : "scale-y-0";
     const axisShown =
-      from === "left" || from === "right" ? "scale-x-100" : "scale-y-100";
+      from === "center"
+        ? "scale-100"
+        : from === "left" || from === "right"
+          ? "scale-x-100"
+          : "scale-y-100";
 
     const opacityHidden = fade ? "opacity-0" : "";
     const opacityShown = fade ? "opacity-100" : "";
