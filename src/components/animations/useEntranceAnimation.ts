@@ -2,12 +2,20 @@
 
 import { type RefObject, useEffect, useMemo, useState } from "react";
 
-type EnterOptions = {
+export type EntranceSeenOptions = {
+  /**
+   * Trigger line as a percentage measured upward from the viewport bottom.
+   * 0 fires at screen entry, 50 fires at mid-screen, and negative values fire
+   * before entry below the viewport bottom.
+   */
+  readonly minPosition?: number;
+  readonly onSeen?: boolean;
+};
+
+type EnterOptions = EntranceSeenOptions & {
   delayMs?: number;
   disabled?: boolean;
   targetRef?: RefObject<HTMLElement | null>;
-  minAbsY?: number;
-  minScreenY?: number;
 };
 
 function prefersReducedMotion(): boolean {
@@ -25,8 +33,8 @@ export function useEntranceAnimation(options: EnterOptions = {}) {
   const {
     delayMs = 0,
     disabled = false,
-    minAbsY,
-    minScreenY,
+    minPosition = 50,
+    onSeen = false,
     targetRef,
   } = options;
   const [entered, setEntered] = useState(false);
@@ -34,10 +42,6 @@ export function useEntranceAnimation(options: EnterOptions = {}) {
   const reduce = useMemo(() => prefersReducedMotion(), []);
 
   useEffect(() => {
-    if (minAbsY !== undefined && minScreenY !== undefined) {
-      throw new Error("minAbsY and minScreenY cannot coexist.");
-    }
-
     if (disabled || reduce) {
       const immediateId = window.setTimeout(() => setEntered(true), 0);
       return () => window.clearTimeout(immediateId);
@@ -50,18 +54,15 @@ export function useEntranceAnimation(options: EnterOptions = {}) {
     };
 
     const hasEnteredThreshold = () => {
-      if (minAbsY !== undefined) return window.scrollY >= minAbsY;
-      if (minScreenY === undefined) return true;
+      if (!onSeen) return true;
 
       const target = targetRef?.current;
       if (!target) return false;
 
-      const boundedY = Math.min(
-        Math.max(target.getBoundingClientRect().top, 0),
-        window.innerHeight,
-      );
+      const viewportTriggerY = window.innerHeight * (1 - minPosition / 100);
+      const targetY = target.getBoundingClientRect().top;
 
-      return boundedY <= minScreenY;
+      return targetY <= viewportTriggerY;
     };
 
     const onViewportChange = () => {
@@ -86,7 +87,7 @@ export function useEntranceAnimation(options: EnterOptions = {}) {
       window.removeEventListener("resize", onViewportChange);
       if (timeoutId !== undefined) window.clearTimeout(timeoutId);
     };
-  }, [delayMs, disabled, minAbsY, minScreenY, reduce, targetRef]);
+  }, [delayMs, disabled, minPosition, onSeen, reduce, targetRef]);
 
   return { entered, reduceMotion: reduce };
 }

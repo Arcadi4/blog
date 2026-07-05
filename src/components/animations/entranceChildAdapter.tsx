@@ -2,6 +2,18 @@
 
 import React from "react";
 
+export function setElementRef(
+  ref: React.Ref<HTMLElement> | undefined,
+  node: HTMLElement | null,
+) {
+  if (!ref) return;
+  if (typeof ref === "function") {
+    ref(node);
+    return;
+  }
+  (ref as React.MutableRefObject<HTMLElement | null>).current = node;
+}
+
 export function normalizeChildren(
   children: React.ReactNode,
 ): React.ReactElement[] {

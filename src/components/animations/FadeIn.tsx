@@ -1,8 +1,9 @@
 "use client";
 
 import React, {useCallback, useRef} from "react";
+import type {EntranceSeenOptions} from "./useEntranceAnimation";
 import {useEntranceAnimation} from "./useEntranceAnimation";
-import {calculateStaggerDelay, normalizeChildren, warnMultiChildClassName,} from "./entranceChildAdapter";
+import {calculateStaggerDelay, normalizeChildren, setElementRef, warnMultiChildClassName,} from "./entranceChildAdapter";
 
 type TextFrom = "up" | "down" | "left" | "right" | "none";
 type Distance = "sm" | "md" | "lg";
@@ -22,11 +23,11 @@ const distanceClass: Record<TextFrom, Record<Distance, string>> = {
  * Multi-child mode: Returns Fragment with independently animated children (wrapperless).
  *
  * @property step - Per-child delay increment (ms) for stagger effect in multi-child mode
- * @property minAbsY - Minimum absolute window scrollY before the animation delay starts
- * @property minScreenY - Minimum bounded viewport y-coordinate before the animation delay starts
+ * @property onSeen - Waits until the child reaches minPosition before the animation delay starts
+ * @property minPosition - Trigger line percentage measured up from the viewport bottom (0 = entering screen, 50 = middle, negative = before entering)
  * @property className - Applied only in single-child mode; multi-child + className emits dev warning (wrap children in explicit container div)
  */
-type FadeInBaseProps = {
+type FadeInProps = EntranceSeenOptions & {
   children: React.ReactNode;
   from?: TextFrom;
   distance?: Distance;
@@ -37,24 +38,6 @@ type FadeInBaseProps = {
   step?: number;
 };
 
-type EntranceTriggerProps =
-  | { minAbsY?: number; minScreenY?: never }
-  | { minAbsY?: never; minScreenY?: number };
-
-type FadeInProps = FadeInBaseProps & EntranceTriggerProps;
-
-function setElementRef(
-  ref: React.Ref<HTMLElement> | undefined,
-  node: HTMLElement | null,
-) {
-  if (!ref) return;
-  if (typeof ref === "function") {
-    ref(node);
-    return;
-  }
-  (ref as React.MutableRefObject<HTMLElement | null>).current = node;
-}
-
 function AnimatedChild({
   child,
   delayMs,
@@ -62,8 +45,8 @@ function AnimatedChild({
   from,
   distance,
   disabled,
-  minAbsY,
-  minScreenY,
+  minPosition,
+  onSeen,
 }: {
   child: React.ReactElement;
   delayMs: number;
@@ -71,8 +54,8 @@ function AnimatedChild({
   from: TextFrom;
   distance: Distance;
   disabled: boolean;
-  minAbsY?: number;
-  minScreenY?: number;
+  minPosition: number;
+  onSeen: boolean;
 }) {
   const targetRef = useRef<HTMLElement | null>(null);
   const childRef = (child.props as { ref?: React.Ref<HTMLElement> }).ref;
@@ -87,8 +70,8 @@ function AnimatedChild({
   const { entered, reduceMotion } = useEntranceAnimation({
     delayMs,
     disabled,
-    minAbsY,
-    minScreenY,
+    minPosition,
+    onSeen,
     targetRef,
   });
 
@@ -113,7 +96,7 @@ function AnimatedChild({
 
   return React.cloneElement(child, {
     className: mergedClassName,
-    ref: minScreenY === undefined ? childRef : ref,
+    ref: onSeen ? ref : childRef,
     style: mergedStyle,
   } as React.HTMLAttributes<HTMLElement>);
 }
@@ -126,9 +109,9 @@ export function FadeIn({
   durationMs = 1000,
   className = "",
   disabled = false,
+  minPosition = 50,
+  onSeen = false,
   step = 0,
-  minAbsY,
-  minScreenY,
 }: FadeInProps) {
   const normalizedChildren = normalizeChildren(children);
   const targetRef = useRef<HTMLElement | null>(null);
@@ -136,8 +119,8 @@ export function FadeIn({
   const { entered, reduceMotion } = useEntranceAnimation({
     delayMs,
     disabled,
-    minAbsY,
-    minScreenY,
+    minPosition,
+    onSeen: onSeen && normalizedChildren.length === 1,
     targetRef,
   });
 
@@ -172,7 +155,7 @@ export function FadeIn({
 
     return React.cloneElement(child, {
       className: mergedClassName,
-      ref: minScreenY === undefined ? childProps.ref : ref,
+      ref: onSeen ? ref : childProps.ref,
       style: mergedStyle,
     } as React.HTMLAttributes<HTMLElement>);
   }
@@ -190,8 +173,8 @@ export function FadeIn({
             from={from}
             distance={distance}
             disabled={disabled}
-            minAbsY={minAbsY}
-            minScreenY={minScreenY}
+            minPosition={minPosition}
+            onSeen={onSeen}
           />
         );
       })}
