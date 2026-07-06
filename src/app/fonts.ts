@@ -22,7 +22,7 @@ export const geist = Geist({
 export const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   variable: "--font-ibm-plex-mono",
-  weight: ["200", "300", "500", "700"],
+  weight: ["300", "500", "600", "700"],
 });
 
 export const ibmPlexSans = IBM_Plex_Sans({

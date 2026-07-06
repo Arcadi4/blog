@@ -1,0 +1,277 @@
+"use client";
+
+import ProximityLink from "@/components/ProximityLink";
+import {FadeIn} from "@/components/animations/FadeIn";
+import type {LinkItem} from "@/app/posts/menuItems";
+import {menuItems, socialMediaItems} from "@/app/posts/menuItems";
+import {useEffect, useRef, useState} from "react";
+import {cn, formatDate} from "@/lib/utils";
+import {colorKlein} from "@/lib/colors";
+import VerticalGrid from "@/components/VerticalGrid";
+import {ScaleIn} from "@/components/animations/ScaleIn";
+import type {ContentArticle} from "@/lib/content-index";
+import Dither from "@/components/Dither";
+
+type HomePageClientProps = {
+  readonly articles: readonly ContentArticle[];
+};
+
+const homepageHeight = "h-[500dvh]";
+
+export function HomePageClient({ articles }: HomePageClientProps) {
+  const menuAnimationIndex = useRef(0);
+
+  const [useRealName, setUseRealName] = useState(false);
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    setUseRealName(
+      queryParams.has("name") && queryParams.get("name") === "skylar",
+    );
+  }, []);
+  const name = useRealName ? "Skylar" : "4rcadia";
+
+  const variableBgRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let frameId: number | null = null;
+
+    const update = () => {
+      frameId = null;
+
+      const progress = Math.min(window.scrollY / 180, 1);
+
+      if (variableBgRef.current) {
+        variableBgRef.current.style.transform = `scaleX(${1 + progress * 11})`;
+      }
+    };
+
+    const handleScroll = () => {
+      if (frameId === null) {
+        frameId = requestAnimationFrame(update);
+      }
+    };
+
+    update();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId);
+      }
+    };
+  }, []);
+
+  return (
+    <main className="relative">
+      <figure
+        className="pointer-events-none absolute inset-0 z-100 opacity-20 mix-blend-screen filter-[url('#noise-bg-fx')_grayscale(100%)]"
+        aria-hidden="true"
+      >
+        <svg>
+          <filter id="noise-bg-fx">
+            <feTurbulence baseFrequency="0.8" />
+          </filter>
+        </svg>
+      </figure>
+
+      <VerticalGrid height={homepageHeight} />
+
+      <div
+        className={cn(
+          "relative mx-auto grid grid-cols-12 grid-rows-25 gap-x-4 gap-y-4 p-8 w-dvw",
+          homepageHeight,
+        )}
+      >
+        <div className="col-start-3 row-start-1 text-2xl leading-none font-semibold">
+          <span className="text-klein">©</span> 2026
+          <br />
+          <span className="text-klein">https://</span>blog.arcadia.moe
+        </div>
+
+        {/* Hero */}
+        <div
+          ref={variableBgRef}
+          className="col-start-1 row-span-4 row-start-1 -mt-8 -ml-8 origin-left bg-klein transition-transform duration-400 ease-out"
+        />
+        <span className="pointer-events-none z-10 col-start-3 row-start-2 font-funnel-display text-[10rem] text-trim-cap">
+          @{name}
+        </span>
+
+        <div className="z-30 col-span-full col-start-3 row-start-3 font-funnel-display text-5xl leading-none whitespace-pre-line text-klein">
+          {"studying "}
+          <span className="text-foreground capitalize">
+            applied mathematics;
+          </span>
+          <br />
+          {"i am a "}
+          <span className="text-foreground capitalize">full stack dev;</span>
+          <br />
+          {"hobbyist "}
+          <span className="text-foreground capitalize">
+            graphical designer;
+          </span>
+          <br />
+          {"i play "}
+          <span className="text-foreground capitalize">
+            Dark Souls, Rogue-likes,
+          </span>
+          <br />
+          <span className="opacity-0">{"i play "}</span>
+          <span className="text-foreground capitalize">
+            {"Minecraft, {and more};"}
+          </span>
+          <br />
+          {"fan of "}
+          <span className="text-foreground capitalize">
+            j-pop band ZUTOMAYO;
+          </span>
+          <br />
+        </div>
+
+        <span className="col-start-1 row-start-5 self-center font-mono text-5xl leading-none text-klein">
+          ↓↓
+        </span>
+        <span className="col-start-7 row-start-5 self-center font-mono text-5xl leading-none text-klein">
+          ↓↓
+        </span>
+
+        <ScaleIn
+          durationMs={1000}
+          from="top"
+          minPosition={0.5}
+          delayMs={0}
+          onSeen
+        >
+          <div className="relative z-10 col-span-8 col-start-3 row-span-4 row-start-6 overflow-clip bg-acid">
+            <div className="marquee-track absolute bottom-0 flex gap-2 font-mono text-lg whitespace-nowrap">
+              <p>navigation navigation navigation navigation navigation </p>
+              <p>navigation navigation navigation navigation navigation </p>
+              <p>navigation navigation navigation navigation navigation </p>
+            </div>
+          </div>
+        </ScaleIn>
+        <ScaleIn
+          durationMs={1000}
+          from="top"
+          delayMs={0}
+          onSeen
+          minPosition={0.2}
+        >
+          <div className="relative col-span-6 col-start-1 row-span-3 row-start-9 overflow-clip bg-magenta">
+            <div className="marquee-track absolute bottom-0 flex gap-2 font-mono text-lg whitespace-nowrap text-background">
+              <p>social media social media social media social media</p>
+              <p>social media social media social media social media</p>
+              <p>social media social media social media social media</p>
+            </div>
+          </div>
+        </ScaleIn>
+        <div className="separator absolute row-start-10 w-screen border-b" />
+        <div className="separator absolute z-50 row-start-12 w-screen border-b" />
+
+        <nav className="z-50 col-span-full col-start-3 row-start-6">
+          <div className="flex flex-col">
+            {menuItems.map((menuItem: LinkItem) => {
+              menuAnimationIndex.current++;
+              return (
+                <FadeIn
+                  key={menuItem.name}
+                  from="right"
+                  onSeen
+                  minPosition={0.3}
+                >
+                  <div className="font-funnel-display text-7xl leading-none">
+                    {"→ "}
+                    <ProximityLink
+                      shadowColor={colorKlein}
+                      label={menuItem.name}
+                      href={menuItem.href}
+                    />
+                  </div>
+                </FadeIn>
+              );
+            })}
+          </div>
+        </nav>
+
+        <nav className="z-50 col-span-full col-start-3 row-start-10">
+          <div className="flex flex-col">
+            {socialMediaItems.map((menuItem: LinkItem) => {
+              menuAnimationIndex.current++;
+              return (
+                <FadeIn
+                  key={menuItem.name}
+                  from="right"
+                  onSeen
+                  minPosition={0.3}
+                >
+                  <div className="font-funnel-display text-7xl leading-none text-background">
+                    {"↗ "}
+                    <ProximityLink
+                      shadowColor={colorKlein}
+                      label={menuItem.name}
+                      href={menuItem.href}
+                    />
+                  </div>
+                </FadeIn>
+              );
+            })}
+          </div>
+        </nav>
+
+        <div className="relative col-span-10 col-start-3 row-start-12">
+          <Dither
+            enableMouseInteraction={false}
+            disableAnimation={false}
+            waveSpeed={0.2}
+            waveColor={[0, 0.2, 1]}
+            waveAmplitude={0.2}
+            waveFrequency={3}
+          />
+        </div>
+        <div className="z-30 col-start-3 row-start-13 font-funnel-display text-[10rem] leading-none text-klein">
+          Articles
+        </div>
+        <div className="separator absolute row-start-14 w-screen border-t" />
+
+        <div className="col-span-full row-start-15 flex flex-col gap-8">
+          {articles
+            .toSorted(
+              (a, b) => b.publishDate.valueOf() - a.publishDate.valueOf(),
+            )
+            .slice(0, 3)
+            .map((article, index) => (
+              <div key={article.id} className="grid w-full grid-cols-12 gap-4">
+                <div className="col-span-8 col-start-3 row-start-1 bg-acid text-[10rem] text-magenta text-trim-cap">
+                  {`{${(index + 1).toString()}}`}
+                </div>
+                <div className="col-span-full col-start-7 row-start-1 self-center text-2xl font-semibold">
+                  {`Published ${formatDate(article.publishDate.toISOString())}`}
+                  <br />
+                  {`Last edited ${formatDate(article.lastEditedTime.toISOString())}`}
+                </div>
+                <span className="col-start-3 col-end-11 row-start-2 mt-8 text-7xl font-semibold">
+                  {article.title}
+                </span>
+                <div className="col-span-8 col-start-3 row-start-3 text-4xl">
+                  {article.excerpt}
+                </div>
+              </div>
+            ))}
+        </div>
+
+        <div className="z-30 col-span-6 col-start-1 row-start-25 self-end font-serif text-5xl font-semibold">
+          A man who thinks he is a king is mad, a king who thinks he is a king
+          is no less so.
+          <br />
+          I le fou qui se croit roi est fou, le roi qui se croit roi ne l'est
+          pas moins.
+          <br />
+          <div className="justify-self-end font-light">— Jacques Lacan</div>
+        </div>
+      </div>
+    </main>
+  );
+}
