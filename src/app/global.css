@@ -26,6 +26,11 @@
 
 @utility text-trim-cap {
   text-box: trim-both cap alphabetic;
+
+  @supports (-moz-appearance: none) {
+    text-box: normal;
+    line-height: 0.72;
+  }
 }
 
 /* 
