@@ -5,61 +5,92 @@ interface VerticalGridProps {
   height: string;
 }
 
+type GridLinePairProps = VerticalGridProps & {
+  delayMs?: number;
+  leftColumnClassName: string;
+  rightColumnClassName: string;
+  elevated?: boolean;
+};
+
+const animationDurationMs = 1600;
+
+function GridLinePair({
+  delayMs,
+  elevated = false,
+  height,
+  leftColumnClassName,
+  rightColumnClassName,
+}: GridLinePairProps) {
+  const zIndexClass = elevated ? "z-20" : undefined;
+
+  return (
+    <>
+      <ScaleIn
+        from="top"
+        delayMs={delayMs}
+        durationMs={animationDurationMs}
+        className={cn(
+          "separator col-span-1 row-start-1 border-r",
+          leftColumnClassName,
+          zIndexClass,
+          height,
+        )}
+      />
+      <ScaleIn
+        from="top"
+        delayMs={delayMs}
+        durationMs={animationDurationMs}
+        className={cn(
+          "separator col-span-1 row-start-1 border-l",
+          rightColumnClassName,
+          zIndexClass,
+          height,
+        )}
+      />
+    </>
+  );
+}
+
+export function VerticalGridL({ height }: VerticalGridProps) {
+  return (
+    <GridLinePair
+      height={height}
+      leftColumnClassName="col-start-2"
+      rightColumnClassName="col-start-3"
+      elevated
+    />
+  );
+}
+
+export function VerticalGridM({ height }: VerticalGridProps) {
+  return (
+    <GridLinePair
+      height={height}
+      leftColumnClassName="col-start-6"
+      rightColumnClassName="col-start-7"
+      delayMs={200}
+    />
+  );
+}
+
+export function VerticalGridR({ height }: VerticalGridProps) {
+  return (
+    <GridLinePair
+      height={height}
+      leftColumnClassName="col-start-10"
+      rightColumnClassName="col-start-11"
+      delayMs={400}
+      elevated
+    />
+  );
+}
+
 export default function VerticalGrid({ height }: VerticalGridProps) {
   return (
     <div className="absolute grid h-dvh w-dvw grid-cols-12 gap-x-4 px-8">
-      <ScaleIn
-        from="top"
-        durationMs={1600}
-        className={cn(
-          "separator z-20 col-start-2 col-span-1 row-start-1 border-r",
-          height,
-        )}
-      />
-      <ScaleIn
-        from="top"
-        durationMs={1600}
-        className={cn(
-          "separator z-20 col-start-3 col-span-1 row-start-1 border-l",
-          height,
-        )}
-      />
-      <ScaleIn
-        from="top"
-        delayMs={200}
-        durationMs={1600}
-        className={cn(
-          "separator col-start-6 col-span-1 row-start-1 border-r",
-          height,
-        )}
-      />
-      <ScaleIn
-        from="top"
-        delayMs={200}
-        durationMs={1600}
-        className={cn(
-          "separator col-start-7 col-span-1 row-start-1 border-l",
-          height,
-        )}
-      />
-      <ScaleIn
-        from="top"
-        delayMs={400}
-        durationMs={1600}
-        className={cn(
-          "separator z-20 col-start-10 col-span-1 row-start-1 border-r",
-          height,
-        )}
-      />
-      <ScaleIn
-        from="top"
-        delayMs={400}
-        durationMs={1600}
-        className={cn(
-          "separator z-20 col-start-11 col-span-1 row-start-1 border-l",
-          height,
-        )}
-      />
+      <VerticalGridL height={height} />
+      <VerticalGridM height={height} />
+      <VerticalGridR height={height} />
     </div>
   );
 }
