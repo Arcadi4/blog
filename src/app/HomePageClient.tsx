@@ -1,7 +1,7 @@
 "use client";
 
 import ProximityLink from "@/components/ProximityLink";
-import {FadeIn} from "@/components/animations/FadeIn";
+import {EaseIn} from "@/components/animations/EaseIn";
 import type {LinkItem} from "@/app/posts/menuItems";
 import {menuItems, socialMediaItems} from "@/app/posts/menuItems";
 import {useEffect, useRef, useState} from "react";
@@ -38,7 +38,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
     const update = () => {
       frameId = null;
 
-      const progress = Math.min(window.scrollY / 180, 1);
+      const progress = Math.min(window.scrollY / (window.innerHeight * 0.2), 1);
 
       if (variableBgRef.current) {
         variableBgRef.current.style.transform = `scaleX(${1 + progress * 11})`;
@@ -85,11 +85,11 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           homepageHeight,
         )}
       >
-        <div className="col-start-3 row-start-1 text-2xl leading-none font-semibold">
+        <p className="z-30 col-start-3 row-start-1 font-sans text-2xl leading-none font-semibold">
           <span className="text-klein">©</span> 2026
           <br />
           <span className="text-klein">https://</span>blog.arcadia.moe
-        </div>
+        </p>
 
         {/* Hero */}
         <div
@@ -141,7 +141,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
         <ScaleIn
           durationMs={1000}
           from="top"
-          minPosition={0.5}
+          minPosition={15}
           delayMs={0}
           onSeen
         >
@@ -158,7 +158,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           from="top"
           delayMs={0}
           onSeen
-          minPosition={0.2}
+          minPosition={15}
         >
           <div className="relative col-span-6 col-start-1 row-span-3 row-start-9 overflow-clip bg-magenta">
             <div className="marquee-track absolute bottom-0 flex gap-2 font-mono text-lg whitespace-nowrap text-background">
@@ -176,12 +176,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             {menuItems.map((menuItem: LinkItem) => {
               menuAnimationIndex.current++;
               return (
-                <FadeIn
-                  key={menuItem.name}
-                  from="right"
-                  onSeen
-                  minPosition={0.3}
-                >
+                <EaseIn key={menuItem.name} from="right" onSeen>
                   <div className="font-funnel-display text-7xl leading-none">
                     {"→ "}
                     <ProximityLink
@@ -190,7 +185,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
                       href={menuItem.href}
                     />
                   </div>
-                </FadeIn>
+                </EaseIn>
               );
             })}
           </div>
@@ -201,12 +196,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             {socialMediaItems.map((menuItem: LinkItem) => {
               menuAnimationIndex.current++;
               return (
-                <FadeIn
-                  key={menuItem.name}
-                  from="right"
-                  onSeen
-                  minPosition={0.3}
-                >
+                <EaseIn key={menuItem.name} from="right" onSeen>
                   <div className="font-funnel-display text-7xl leading-none text-background">
                     {"↗ "}
                     <ProximityLink
@@ -215,13 +205,13 @@ export function HomePageClient({ articles }: HomePageClientProps) {
                       href={menuItem.href}
                     />
                   </div>
-                </FadeIn>
+                </EaseIn>
               );
             })}
           </div>
         </nav>
 
-        <div className="relative col-span-10 col-start-3 row-start-12">
+        <div className="col-span-10 col-start-3 row-start-12">
           <Dither
             enableMouseInteraction={false}
             disableAnimation={false}
@@ -231,9 +221,13 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             waveFrequency={3}
           />
         </div>
-        <div className="z-30 col-start-3 row-start-13 font-funnel-display text-[10rem] leading-none text-klein">
+        <EaseIn
+          onSeen
+          from="right"
+          className="z-30 col-start-3 row-start-13 font-funnel-display text-[10rem] leading-none text-klein"
+        >
           Articles
-        </div>
+        </EaseIn>
         <div className="separator absolute row-start-14 w-screen border-t" />
 
         <div className="col-span-full row-start-15 flex flex-col gap-8">
@@ -244,32 +238,42 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             .slice(0, 3)
             .map((article, index) => (
               <div key={article.id} className="grid w-full grid-cols-12 gap-4">
-                <div className="col-span-8 col-start-3 row-start-1 bg-acid text-[10rem] text-magenta text-trim-cap">
-                  {`{${(index + 1).toString()}}`}
-                </div>
-                <div className="col-span-full col-start-7 row-start-1 self-center text-2xl font-semibold">
-                  {`Published ${formatDate(article.publishDate.toISOString())}`}
-                  <br />
-                  {`Last edited ${formatDate(article.lastEditedTime.toISOString())}`}
-                </div>
-                <span className="col-start-3 col-end-11 row-start-2 mt-8 text-7xl font-semibold">
-                  {article.title}
-                </span>
-                <div className="col-span-8 col-start-3 row-start-3 text-4xl">
-                  {article.excerpt}
-                </div>
+                <ScaleIn
+                  from="horizontal"
+                  durationMs={1000}
+                  onSeen
+                  className="relative col-span-8 col-start-3 row-start-1 bg-acid text-[10rem] text-trim-cap text-magenta"
+                >
+                  <div>
+                    {`{${(index + 1).toString()}}`}
+                    <p className="absolute right-0 bottom-0 text-end text-2xl text-foreground">
+                      {`Published ${formatDate(article.publishDate.toISOString())}`}
+                      <br />
+                      {`Last edited ${formatDate(article.lastEditedTime.toISOString())}`}
+                    </p>
+                  </div>
+                </ScaleIn>
+
+                <EaseIn onSeen>
+                  <h1 className="col-start-3 col-end-11 row-start-2 mt-8 text-7xl font-semibold">
+                    {article.title}
+                  </h1>
+                  <p className="col-span-8 col-start-3 row-start-3 text-4xl">
+                    {article.excerpt}
+                  </p>
+                </EaseIn>
               </div>
             ))}
         </div>
 
-        <div className="z-30 col-span-6 col-start-1 row-start-25 self-end font-serif text-5xl font-semibold">
+        <div className="z-30 col-span-6 col-start-1 row-start-25 self-end font-serif text-5xl font-semibold text-pretty">
           A man who thinks he is a king is mad, a king who thinks he is a king
           is no less so.
           <br />
           I le fou qui se croit roi est fou, le roi qui se croit roi ne l'est
           pas moins.
           <br />
-          <div className="justify-self-end font-light">— Jacques Lacan</div>
+          <p className="text-end font-light">— Jacques Lacan</p>
         </div>
       </div>
     </main>
