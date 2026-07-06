@@ -3,9 +3,21 @@
 import React, {useCallback, useRef} from "react";
 import type {EntranceSeenOptions} from "./useEntranceAnimation";
 import {useEntranceAnimation} from "./useEntranceAnimation";
-import {calculateStaggerDelay, normalizeChildren, setElementRef, warnMultiChildClassName,} from "./entranceChildAdapter";
+import {
+  calculateStaggerDelay,
+  normalizeChildren,
+  setElementRef,
+  warnMultiChildClassName,
+} from "./entranceChildAdapter";
 
-type Origin = "left" | "right" | "top" | "bottom" | "center";
+type Origin =
+  | "left"
+  | "right"
+  | "top"
+  | "bottom"
+  | "center"
+  | "horizontal"
+  | "vertical";
 
 const originClass: Record<Origin, string> = {
   left: "origin-left",
@@ -13,6 +25,8 @@ const originClass: Record<Origin, string> = {
   top: "origin-top",
   bottom: "origin-bottom",
   center: "origin-center",
+  horizontal: "origin-center",
+  vertical: "origin-center",
 };
 
 /**
@@ -49,13 +63,13 @@ function getScaleClasses(from: Origin, fade: boolean): ScaleClasses {
   const axisHidden =
     from === "center"
       ? "scale-0"
-      : from === "left" || from === "right"
+      : from === "left" || from === "right" || from === "horizontal"
         ? "scale-x-0"
         : "scale-y-0";
   const axisShown =
     from === "center"
       ? "scale-100"
-      : from === "left" || from === "right"
+      : from === "left" || from === "right" || from === "horizontal"
         ? "scale-x-100"
         : "scale-y-100";
 
@@ -138,6 +152,8 @@ function AnimatedChild({
  * - from left/right => scale-x
  * - from top/bottom => scale-y
  * - from center => scale
+ * - from horizontal => centered scale-x
+ * - from vertical => centered scale-y
  */
 export function ScaleIn({
   children,
@@ -147,7 +163,7 @@ export function ScaleIn({
   className = "",
   disabled = false,
   fade = false,
-  minPosition = 50,
+  minPosition = 30,
   onSeen = false,
   step = 0,
 }: ScaleInProps) {
