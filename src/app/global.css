@@ -20,7 +20,7 @@
   --font-sans: var(--font-ibm-plex-sans), Helvetica, sans-serif;
   --font-mono: var(--font-ibm-plex-mono), SFMono-Regular, monospace;
   --font-grotesque: var(--font-bricolage-grotesque), sans-serif;
-  --font-title: var(--font-geist), Helvetica, sans-serif;
+  --font-title: var(--font-funnel-display), Helvetica, sans-serif;
   --font-serif: var(--font-playfair-display), "Georgia", serif;
 }
 
@@ -104,20 +104,6 @@ body {
   -webkit-text-stroke-width: 1.5px;
   -webkit-text-stroke-color: var(--color-acid);
   color: transparent;
-}
-
-.marquee-track {
-  animation: marquee 20s linear infinite;
-}
-
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-50%);
-  }
 }
 
 /* 

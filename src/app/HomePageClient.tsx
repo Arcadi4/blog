@@ -11,6 +11,7 @@ import VerticalGrid from "@/components/VerticalGrid";
 import {ScaleIn} from "@/components/animations/ScaleIn";
 import type {ContentArticle} from "@/lib/content-index";
 import Dither from "@/components/Dither";
+import MarqueeCard from "@/components/MarqueeCard";
 
 type HomePageClientProps = {
   readonly articles: readonly ContentArticle[];
@@ -85,7 +86,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           homepageHeight,
         )}
       >
-        <p className="z-30 col-start-3 row-start-1 font-sans text-2xl leading-none font-semibold">
+        <p className="z-30 col-span-full col-start-3 row-start-1 font-sans text-2xl leading-none font-semibold">
           <span className="text-klein">©</span> 2026
           <br />
           <span className="text-klein">https://</span>blog.arcadia.moe
@@ -145,13 +146,9 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           delayMs={0}
           onSeen
         >
-          <div className="relative z-10 col-span-8 col-start-3 row-span-4 row-start-6 overflow-clip bg-acid">
-            <div className="marquee-track absolute bottom-0 flex gap-2 font-mono text-lg whitespace-nowrap">
-              <p>navigation navigation navigation navigation navigation </p>
-              <p>navigation navigation navigation navigation navigation </p>
-              <p>navigation navigation navigation navigation navigation </p>
-            </div>
-          </div>
+          <MarqueeCard className="z-10 col-span-8 col-start-3 row-span-4 row-start-6 bg-acid">
+            navigation navigation navigation navigation navigation
+          </MarqueeCard>
         </ScaleIn>
         <ScaleIn
           durationMs={1000}
@@ -160,13 +157,12 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           onSeen
           minPosition={15}
         >
-          <div className="relative col-span-6 col-start-1 row-span-3 row-start-9 overflow-clip bg-magenta">
-            <div className="marquee-track absolute bottom-0 flex gap-2 font-mono text-lg whitespace-nowrap text-background">
-              <p>social media social media social media social media</p>
-              <p>social media social media social media social media</p>
-              <p>social media social media social media social media</p>
-            </div>
-          </div>
+          <MarqueeCard
+            className="col-span-6 col-start-1 row-span-3 row-start-9 bg-magenta"
+            trackClassName="text-background"
+          >
+            social media social media social media social media
+          </MarqueeCard>
         </ScaleIn>
         <div className="separator absolute row-start-10 w-screen border-b" />
         <div className="separator absolute z-50 row-start-12 w-screen border-b" />
