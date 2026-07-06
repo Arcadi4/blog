@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  memo,
   MutableRefObject,
   useCallback,
   useEffect,
@@ -31,7 +32,7 @@ export interface ProximityShadowTextProps extends Required<
 > {
   label: string;
   containerRef: MutableRefObject<HTMLElement | null>;
-  isHovered: boolean;
+  hoverRef: MutableRefObject<boolean>;
   shadowTuning: ProximityShadowTuning;
 }
 
@@ -112,7 +113,7 @@ function stopGlobalLoop() {
 }
 
 function runGlobalLoop() {
-  for (const subscriber of Array.from(frameSubscribers)) {
+  for (const subscriber of frameSubscribers) {
     const keep = subscriber();
     if (!keep) {
       frameSubscribers.delete(subscriber);
@@ -147,14 +148,14 @@ function subscribeFrameLoop(subscriber: FrameSubscriber) {
   };
 }
 
-export default function ProximityShadowText({
+function ProximityShadowText({
   label,
   containerRef,
   fromFontVariationSettings,
   toFontVariationSettings,
   radius,
   falloff,
-  isHovered,
+  hoverRef,
   shadowColor,
   allowShadowYFollow,
   reverseShadowDirection,
@@ -174,8 +175,8 @@ export default function ProximityShadowText({
   const shadowOffsetRefs = useRef<{ x: number; y: number }[]>([]);
   const appliedStyleRefs = useRef<GlyphAppliedStyle[]>([]);
   const hoverProgressRef = useRef(0);
+  const wasHoveredRef = useRef(false);
   const isRestedRef = useRef(true);
-  const isHoveredRef = useRef(isHovered);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const lastFrameRef = useRef<{
     x: number | null;
@@ -186,8 +187,6 @@ export default function ProximityShadowText({
     y: null,
     hoverProgress: -1,
   });
-
-  isHoveredRef.current = isHovered;
 
   const parsedSettings = useMemo<AxisRange[]>(() => {
     const fromSettings = parseVariationSettings(fromFontVariationSettings);
@@ -320,6 +319,12 @@ export default function ProximityShadowText({
       const currentShadowTuning = shadowTuningRef.current;
       const x = pointerPosition.x;
       const y = pointerPosition.y;
+      const isHovered = hoverRef.current;
+      if (isHovered && !wasHoveredRef.current) {
+        measureGlyphCenters();
+      }
+      wasHoveredRef.current = isHovered;
+
       const bounds = containerBoundsRef.current;
       const currentRadius = radiusRef.current;
       const nearContainer =
@@ -334,7 +339,7 @@ export default function ProximityShadowText({
         x <= bounds.right &&
         y >= bounds.top &&
         y <= bounds.bottom;
-      const isActive = isHoveredRef.current || insideContainer;
+      const isActive = isHovered || insideContainer;
       const targetHoverProgress = isActive ? 1 : 0;
       const hoverDelta = targetHoverProgress - hoverProgressRef.current;
 
@@ -475,7 +480,13 @@ export default function ProximityShadowText({
 
       return true;
     });
-  }, [containerRef, hasResidualOffset, resetToRestState]);
+  }, [
+    containerRef,
+    hasResidualOffset,
+    hoverRef,
+    measureGlyphCenters,
+    resetToRestState,
+  ]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -521,12 +532,6 @@ export default function ProximityShadowText({
   }, [containerRef, label, measureGlyphCenters]);
 
   useEffect(() => {
-    if (isHovered) {
-      measureGlyphCenters();
-    }
-  }, [isHovered, measureGlyphCenters]);
-
-  useEffect(() => {
     startLoop();
 
     return () => {
@@ -538,6 +543,7 @@ export default function ProximityShadowText({
     shadowOffsetRefs.current = [];
     appliedStyleRefs.current = [];
     hoverProgressRef.current = 0;
+    wasHoveredRef.current = false;
     isRestedRef.current = true;
     lastFrameRef.current = { x: null, y: null, hoverProgress: -1 };
     measureGlyphCenters();
@@ -603,3 +609,5 @@ export default function ProximityShadowText({
     </span>
   );
 }
+
+export default memo(ProximityShadowText);

@@ -1,7 +1,7 @@
 "use client";
 
 import NextLink from "next/link";
-import { MutableRefObject, useMemo, useRef, useState } from "react";
+import { memo, MutableRefObject, useMemo, useRef } from "react";
 import ProximityShadowText, {
   setProximityShadowPointerPosition,
 } from "./ProximityShadowText";
@@ -22,7 +22,7 @@ const DEFAULT_PROXIMITY_LINK_PROPS = {
   reverseShadowNearStronger: true,
 };
 
-export default function ProximityLink({
+function ProximityLink({
   href,
   children,
   label,
@@ -46,7 +46,7 @@ export default function ProximityLink({
   }
 
   const containerRef = useRef<HTMLAnchorElement | null>(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const isHoveredRef = useRef(false);
   const resolvedShadowTuning = useMemo(
     () => ({ ...defaultShadowTuning, ...shadowTuning }),
     [shadowTuning],
@@ -62,7 +62,7 @@ export default function ProximityLink({
       toFontVariationSettings={toFontVariationSettings}
       radius={radius}
       falloff={falloff}
-      isHovered={isHovered}
+      hoverRef={isHoveredRef}
       shadowColor={shadowColor}
       allowShadowYFollow={allowShadowYFollow}
       reverseShadowDirection={reverseShadowDirection}
@@ -73,12 +73,13 @@ export default function ProximityLink({
 
   const handleMouseEnter: ProximityLinkProps["onMouseEnter"] = (event) => {
     setProximityShadowPointerPosition(event.clientX, event.clientY);
-    setIsHovered(true);
+    isHoveredRef.current = true;
     onMouseEnter?.(event);
   };
 
   const handleMouseLeave: ProximityLinkProps["onMouseLeave"] = (event) => {
-    setIsHovered(false);
+    setProximityShadowPointerPosition(event.clientX, event.clientY);
+    isHoveredRef.current = false;
     onMouseLeave?.(event);
   };
 
@@ -112,3 +113,5 @@ export default function ProximityLink({
     </NextLink>
   );
 }
+
+export default memo(ProximityLink);
