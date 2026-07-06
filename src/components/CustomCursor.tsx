@@ -36,12 +36,21 @@ function isInteractiveTarget(target: EventTarget | null) {
   );
 }
 
+function getElementAtCursor(position: CursorPosition | null) {
+  if (!position) {
+    return null;
+  }
+
+  return document.elementFromPoint(position.x, position.y);
+}
+
 function getCursorTransform({ x, y }: CursorPosition) {
   return `translate3d(${x - CURSOR_OFFSET}px, ${y - CURSOR_OFFSET}px, 0)`;
 }
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
+  const positionRef = useRef<CursorPosition | null>(null);
   const [isInteractive, setIsInteractive] = useState(false);
 
   useEffect(() => {
@@ -50,24 +59,39 @@ export default function CustomCursor() {
     }
 
     const handlePointerMove = (event: MouseEvent) => {
+      const position = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+
+      positionRef.current = position;
       document.body.classList.add("custom-cursor-enabled");
 
       if (cursorRef.current) {
-        cursorRef.current.style.transform = getCursorTransform({
-          x: event.clientX,
-          y: event.clientY,
-        });
+        cursorRef.current.style.transform = getCursorTransform(position);
       }
 
       setIsInteractive(isInteractiveTarget(event.target));
     };
 
+    const updateInteractiveTarget = () => {
+      setIsInteractive(isInteractiveTarget(getElementAtCursor(positionRef.current)));
+    };
+
     window.addEventListener("mousemove", handlePointerMove, {
+      passive: true,
+    });
+    window.addEventListener("scroll", updateInteractiveTarget, {
+      passive: true,
+    });
+    window.addEventListener("resize", updateInteractiveTarget, {
       passive: true,
     });
 
     return () => {
       window.removeEventListener("mousemove", handlePointerMove);
+      window.removeEventListener("scroll", updateInteractiveTarget);
+      window.removeEventListener("resize", updateInteractiveTarget);
       document.body.classList.remove("custom-cursor-enabled");
     };
   }, []);
