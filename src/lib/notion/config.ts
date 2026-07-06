@@ -56,7 +56,7 @@ export const TRANSLATION_PROGRESS = {
 
 export const SUPPORTED_LOCALES = ["zh-CN", "en-US"] as const;
 
-export const NOTION_API_KEY = (() => {
+export function getNotionApiKey() {
   const key = process.env.NOTION_API_KEY;
   if (!key) {
     throw new Error(
@@ -65,4 +65,4 @@ export const NOTION_API_KEY = (() => {
     );
   }
   return key;
-})();
+}

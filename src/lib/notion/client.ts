@@ -1,4 +1,6 @@
-import { NOTION_API_KEY, NOTION_API_VERSION, NOTION_BASE_URL } from "./config";
+import "server-only";
+
+import { getNotionApiKey, NOTION_API_VERSION, NOTION_BASE_URL } from "./config";
 import { NotionValidationError } from "./types";
 
 type JsonValue =
@@ -43,6 +45,8 @@ function memo<T>(key: string, load: () => Promise<T>): Promise<T> {
   return promise;
 }
 
+const notionApiKey = () => `Bearer ${getNotionApiKey()}`;
+
 function retryDelay(response: Response, attempt: number) {
   const retryAfter = response.headers.get("Retry-After");
   if (retryAfter) {
@@ -66,7 +70,7 @@ async function notionFetch<T>({
     const response = await fetch(`${NOTION_BASE_URL}${endpoint}`, {
       method,
       headers: {
-        Authorization: `Bearer ${NOTION_API_KEY}`,
+        Authorization: notionApiKey(),
         "Content-Type": "application/json",
         "Notion-Version": NOTION_API_VERSION,
       },
