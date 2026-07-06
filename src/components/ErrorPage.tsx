@@ -2,10 +2,10 @@
 
 import {usePathname} from "next/navigation";
 import type {ReactNode} from "react";
-import {LinkItem, menuItems} from "@/app/posts/menuItems";
-import ProximityLink from "@/components/ProximityLink";
+import {menuItems} from "@/app/posts/menuItems";
 import {EaseIn} from "@/components/animations/EaseIn";
 import {ScaleIn} from "@/components/animations/ScaleIn";
+import {Menu} from "@/components/Menu";
 
 type ErrorPageLink = {
   name: string;
@@ -35,7 +35,6 @@ export default function ErrorPage({
   const normalizedCode = String(code);
   const resolvedCodeDisplay = codeDisplay ?? normalizedCode;
 
-  let menuAnimationIndex = 0;
   const delayPerMenuItem = 100;
   const baseUrl = "https://blog.arcadia.moe";
 
@@ -97,25 +96,12 @@ export default function ErrorPage({
 
         {/* Menu */}
         <aside className="z-50 col-span-full col-start-10 row-start-1">
-          <div className="flex flex-col">
-            {menuItems.map((menuItem: LinkItem) => {
-              menuAnimationIndex++;
-              return (
-                <EaseIn
-                  key={menuItem.name}
-                  from="right"
-                  delayMs={menuAnimationIndex * delayPerMenuItem}
-                >
-                  <ProximityLink
-                    href={menuItem.href}
-                    className="font-title text-4xl leading-none"
-                  >
-                    {"→ " + menuItem.name}
-                  </ProximityLink>
-                </EaseIn>
-              );
-            })}
-          </div>
+          <Menu
+            items={menuItems}
+            linkClassName="font-title text-4xl leading-none"
+            delayMs={delayPerMenuItem}
+            delayStepMs={delayPerMenuItem}
+          />
         </aside>
 
         {/* Corner text */}
