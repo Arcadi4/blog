@@ -15,6 +15,10 @@ type Origin =
   | "right"
   | "top"
   | "bottom"
+  | "top-left"
+  | "bottom-left"
+  | "top-right"
+  | "bottom-right"
   | "center"
   | "horizontal"
   | "vertical";
@@ -24,10 +28,21 @@ const originClass: Record<Origin, string> = {
   right: "origin-right",
   top: "origin-top",
   bottom: "origin-bottom",
+  "top-left": "origin-top-left",
+  "bottom-left": "origin-bottom-left",
+  "top-right": "origin-top-right",
+  "bottom-right": "origin-bottom-right",
   center: "origin-center",
   horizontal: "origin-center",
   vertical: "origin-center",
 };
+
+const cornerOrigins: ReadonlySet<Origin> = new Set([
+  "top-left",
+  "bottom-left",
+  "top-right",
+  "bottom-right",
+]);
 
 /**
  * ScaleIn props
@@ -61,13 +76,13 @@ type ScaleClasses = {
 function getScaleClasses(from: Origin, fade: boolean): ScaleClasses {
   const base = `will-change-transform transition ease-in-out ${originClass[from]}`;
   const axisHidden =
-    from === "center"
+    from === "center" || cornerOrigins.has(from)
       ? "scale-0"
       : from === "left" || from === "right" || from === "horizontal"
         ? "scale-x-0"
         : "scale-y-0";
   const axisShown =
-    from === "center"
+    from === "center" || cornerOrigins.has(from)
       ? "scale-100"
       : from === "left" || from === "right" || from === "horizontal"
         ? "scale-x-100"
@@ -154,6 +169,7 @@ function AnimatedChild({
  * - from center => scale
  * - from horizontal => centered scale-x
  * - from vertical => centered scale-y
+ * - from top-left/bottom-right/etc. => corner-origin scale
  */
 export function ScaleIn({
   children,
