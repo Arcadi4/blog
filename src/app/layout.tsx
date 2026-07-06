@@ -4,6 +4,7 @@ import "./global.css";
 import CustomCursor from "@/components/CustomCursor";
 import Footer from "@/components/Footer";
 import MobileGate from "@/components/MobileGate";
+import {NoiseOverlay} from "@/components/NoiseOverlay";
 import type {Metadata} from "next";
 import {Analytics} from "@vercel/analytics/next";
 import {SpeedInsights} from "@vercel/speed-insights/next";
@@ -41,6 +42,7 @@ export default function RootLayout({
         <SpeedInsights />
         <CustomCursor />
         <MobileGate />
+        <NoiseOverlay />
         {children}
         <Footer />
       </body>
