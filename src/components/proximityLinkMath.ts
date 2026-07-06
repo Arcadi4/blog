@@ -60,10 +60,88 @@ export function parseVariationSettings(settingsStr: string) {
   );
 }
 
-export function formatVariationSettings(
-  settings: Array<{ axis: string; value: number }>,
-) {
-  return settings.map(({ axis, value }) => `'${axis}' ${value}`).join(", ");
+// Quantizing falloff/strength into discrete steps lets us cache the generated
+// font-variation-settings strings. A step is 1/200 of the axis range (e.g. 3
+// weight units for wght 300-900), far below the perceptible threshold, so the
+// output is visually identical to full-precision interpolation.
+const SETTINGS_STEPS = 200;
+
+export interface VariationSettingsCache {
+  baseFor(falloffValue: number): string;
+  shadowFor(falloffValue: number, shadowStrength: number): string;
+}
+
+function formatAxes(
+  parsedSettings: AxisRange[],
+  t: number,
+  wghtBoost: number,
+  axisMin: number,
+  axisMax: number,
+): string {
+  let result = "";
+  for (let i = 0; i < parsedSettings.length; i++) {
+    const { axis, fromValue, toValue } = parsedSettings[i];
+    let value = fromValue + (toValue - fromValue) * t;
+    if (wghtBoost !== 0 && axis === "wght") {
+      value = clamp(value + wghtBoost, axisMin, axisMax);
+    }
+    value = Math.round(value * 100) / 100;
+    result += `${i === 0 ? "" : ", "}'${axis}' ${value}`;
+  }
+  return result;
+}
+
+export function createVariationSettingsCache(
+  parsedSettings: AxisRange[],
+  wghtAxisRange: AxisRange | undefined,
+  allowShadowYFollow: boolean,
+  tuning: ProximityShadowTuning,
+): VariationSettingsCache {
+  const baseCache: (string | undefined)[] = Array.from({
+    length: SETTINGS_STEPS + 1,
+  });
+  const baseFor = (falloffValue: number): string => {
+    const step = Math.round(clamp(falloffValue, 0, 1) * SETTINGS_STEPS);
+    return (baseCache[step] ??= formatAxes(
+      parsedSettings,
+      step / SETTINGS_STEPS,
+      0,
+      0,
+      0,
+    ));
+  };
+
+  if (!allowShadowYFollow || !wghtAxisRange) {
+    // In X-only mode shadow and base axis settings are identical.
+    return { baseFor, shadowFor: baseFor };
+  }
+
+  const axisMin = Math.min(wghtAxisRange.fromValue, wghtAxisRange.toValue);
+  const axisMax =
+    Math.max(wghtAxisRange.fromValue, wghtAxisRange.toValue) +
+    tuning.wghtMaxExtra;
+  const shadowCache = new Map<number, string>();
+  const shadowFor = (falloffValue: number, shadowStrength: number): string => {
+    const falloffStep = Math.round(clamp(falloffValue, 0, 1) * SETTINGS_STEPS);
+    const strengthStep = Math.round(
+      clamp(shadowStrength, 0, 1) * SETTINGS_STEPS,
+    );
+    const key = falloffStep * (SETTINGS_STEPS + 1) + strengthStep;
+    let cached = shadowCache.get(key);
+    if (cached === undefined) {
+      cached = formatAxes(
+        parsedSettings,
+        falloffStep / SETTINGS_STEPS,
+        tuning.wghtBoost * (strengthStep / SETTINGS_STEPS),
+        axisMin,
+        axisMax,
+      );
+      shadowCache.set(key, cached);
+    }
+    return cached;
+  };
+
+  return { baseFor, shadowFor };
 }
 
 export function getFalloffValue(
@@ -88,78 +166,36 @@ export function getFalloffValue(
   }
 }
 
-export function buildLayerVariationSettings({
-  parsedSettings,
-  wghtAxisRange,
-  falloffValue,
-  allowShadowYFollow,
-  shadowStrength,
-  shadowTuning,
-}: {
-  parsedSettings: AxisRange[];
-  wghtAxisRange?: AxisRange;
-  falloffValue: number;
-  allowShadowYFollow: boolean;
-  shadowStrength: number;
-  shadowTuning: ProximityShadowTuning;
-}) {
-  // Interpolate every axis for the base glyph so shape follows proximity.
-  const interpolatedAxisValues = parsedSettings.map(
-    ({ axis, fromValue, toValue }) => ({
-      axis,
-      value: fromValue + (toValue - fromValue) * falloffValue,
-    }),
-  );
-  const baseSettings = formatVariationSettings(interpolatedAxisValues);
-
-  if (!allowShadowYFollow || !wghtAxisRange) {
-    // In X-only mode we keep shadow and base axis settings identical.
-    return { baseSettings, shadowSettings: baseSettings };
-  }
-
-  const axisMin = Math.min(wghtAxisRange.fromValue, wghtAxisRange.toValue);
-  const axisMax =
-    Math.max(wghtAxisRange.fromValue, wghtAxisRange.toValue) +
-    shadowTuning.wghtMaxExtra;
-  const shadowSettings = formatVariationSettings(
-    interpolatedAxisValues.map(({ axis, value }) => {
-      if (axis !== "wght") return { axis, value };
-      // Shadow gets extra weight to read as a denser layer under the text.
-      const boostedValue = value + shadowTuning.wghtBoost * shadowStrength;
-      return { axis, value: clamp(boostedValue, axisMin, axisMax) };
-    }),
-  );
-
-  return { baseSettings, shadowSettings };
+export interface ShadowOffsetResult {
+  x: number;
+  y: number;
+  visible: boolean;
 }
 
-export function getShadowOffset({
-  deltaX,
-  deltaY,
-  distance,
+export type ShadowOffsetComputer = (
+  deltaX: number,
+  deltaY: number,
+  distance: number,
+  shadowStrength: number,
+  hoverProgress: number,
+  isHovered: boolean,
+  previousOffset: ShadowOffset,
+  out: ShadowOffsetResult,
+) => void;
+
+export function createShadowOffsetComputer({
   radius,
-  shadowStrength,
-  hoverProgress,
-  isHovered,
   allowShadowYFollow,
   reverseDirection,
   reverseNearStronger,
-  previousOffset,
   shadowTuning,
 }: {
-  deltaX: number;
-  deltaY: number;
-  distance: number;
   radius: number;
-  shadowStrength: number;
-  hoverProgress: number;
-  isHovered: boolean;
   allowShadowYFollow: boolean;
   reverseDirection: boolean;
   reverseNearStronger: boolean;
-  previousOffset: ShadowOffset;
   shadowTuning: ProximityShadowTuning;
-}) {
+}): ShadowOffsetComputer {
   // Different interaction modes can have different perceived travel,
   // so each mode gets its own max offset control.
   const activeMaxOffset = reverseDirection
@@ -167,68 +203,81 @@ export function getShadowOffset({
     : allowShadowYFollow
       ? shadowTuning.maxOffset
       : shadowTuning.maxOffsetXOnly;
-
-  // shadowStrength already includes falloff + hover progress. Multiplying by
-  // max offset converts that normalized strength into screen-space pixels.
-  const shadowDistance = activeMaxOffset * shadowStrength;
-
-  // Dead zone keeps the center stable and avoids jitter when cursor sits
-  // exactly over a glyph.
-  const innerRadiusRange = Math.max(radius - shadowTuning.innerDeadZone, 1);
-  const distanceRamp = clamp(
-    (distance - shadowTuning.innerDeadZone) / innerRadiusRange,
-    0,
-    1,
-  );
-
-  // Fade in smoothly right after leaving the dead zone to prevent a hard jump.
-  const deadZoneExitRamp = clamp(
-    (distance - shadowTuning.innerDeadZone) /
-      Math.max(shadowTuning.innerDeadZone, 1),
-    0,
-    1,
-  );
-
+  const innerDeadZone = shadowTuning.innerDeadZone;
+  const innerRadiusRange = Math.max(radius - innerDeadZone, 1);
+  const deadZoneRange = Math.max(innerDeadZone, 1);
   // Reverse-near mode multiplies two curves, which can inflate magnitude.
   // This normalization keeps the perceived travel comparable to normal mode.
   const exponent = Math.max(shadowTuning.falloffExponent, 0.0001);
   const reverseNearNormalization =
     Math.pow(exponent, exponent) / Math.pow(exponent + 1, exponent + 1);
-  const offsetRamp = reverseDirection
-    ? distance <= shadowTuning.innerDeadZone
-      ? 0
-      : reverseNearStronger
-        ? (1 - distanceRamp) * deadZoneExitRamp * reverseNearNormalization
-        : distanceRamp
-    : distanceRamp;
-  const directionScale =
-    shadowDistance /
-    Math.sqrt(
-      deltaX * deltaX +
-        deltaY * deltaY +
-        shadowTuning.directionSoftness * shadowTuning.directionSoftness,
-    );
-
   // directionSoftness acts like a denominator floor, making close-range motion
   // less twitchy while preserving directionality.
+  const softnessSquared =
+    shadowTuning.directionSoftness * shadowTuning.directionSoftness;
   const directionMultiplier = reverseDirection ? -1 : 1;
+  const visibilityThresholdSquared =
+    shadowTuning.visibilityThreshold * shadowTuning.visibilityThreshold;
 
-  const targetOffsetX =
-    deltaX * directionScale * offsetRamp * directionMultiplier;
-  const targetOffsetY = allowShadowYFollow
-    ? deltaY * directionScale * offsetRamp * directionMultiplier
-    : 0;
-  const offsetLerp = isHovered
-    ? shadowTuning.offsetEnterLerp
-    : shadowTuning.offsetLeaveLerp;
+  return (
+    deltaX,
+    deltaY,
+    distance,
+    shadowStrength,
+    hoverProgress,
+    isHovered,
+    previousOffset,
+    out,
+  ) => {
+    // shadowStrength already includes falloff + hover progress. Multiplying by
+    // max offset converts that normalized strength into screen-space pixels.
+    const shadowDistance = activeMaxOffset * shadowStrength;
 
-  // Exponential smoothing gives motion inertia without needing spring physics.
-  const x = previousOffset.x + (targetOffsetX - previousOffset.x) * offsetLerp;
-  const y = previousOffset.y + (targetOffsetY - previousOffset.y) * offsetLerp;
+    // Dead zone keeps the center stable and avoids jitter when cursor sits
+    // exactly over a glyph.
+    const distanceRamp = clamp(
+      (distance - innerDeadZone) / innerRadiusRange,
+      0,
+      1,
+    );
 
-  // Keep invisible shadow updates cheap when offset is visually negligible.
-  const visible =
-    hoverProgress > 0.01 && Math.hypot(x, y) > shadowTuning.visibilityThreshold;
+    // Fade in smoothly right after leaving the dead zone to prevent a hard
+    // jump.
+    const deadZoneExitRamp = clamp(
+      (distance - innerDeadZone) / deadZoneRange,
+      0,
+      1,
+    );
 
-  return { x, y, visible };
+    const offsetRamp = reverseDirection
+      ? distance <= innerDeadZone
+        ? 0
+        : reverseNearStronger
+          ? (1 - distanceRamp) * deadZoneExitRamp * reverseNearNormalization
+          : distanceRamp
+      : distanceRamp;
+    const directionScale =
+      shadowDistance /
+      Math.sqrt(deltaX * deltaX + deltaY * deltaY + softnessSquared);
+
+    const targetOffsetX =
+      deltaX * directionScale * offsetRamp * directionMultiplier;
+    const targetOffsetY = allowShadowYFollow
+      ? deltaY * directionScale * offsetRamp * directionMultiplier
+      : 0;
+    const offsetLerp = isHovered
+      ? shadowTuning.offsetEnterLerp
+      : shadowTuning.offsetLeaveLerp;
+
+    // Exponential smoothing gives motion inertia without needing springs.
+    const x =
+      previousOffset.x + (targetOffsetX - previousOffset.x) * offsetLerp;
+    const y =
+      previousOffset.y + (targetOffsetY - previousOffset.y) * offsetLerp;
+
+    out.x = x;
+    out.y = y;
+    out.visible =
+      hoverProgress > 0.01 && x * x + y * y > visibilityThresholdSquared;
+  };
 }
