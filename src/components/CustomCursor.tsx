@@ -1,39 +1,65 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {useEffect, useRef, useState} from "react";
+import {cn} from "@/lib/utils";
 
 const CURSOR_SIZE = 28;
+const CURSOR_OFFSET = CURSOR_SIZE / 2;
+const INTERACTIVE_SELECTOR = [
+  "[data-cursor='interactive']",
+  "a",
+  "button",
+  "summary",
+  "[role='button']",
+  "input",
+  "select",
+  "textarea",
+  "label",
+].join(", ");
+
+type CursorPosition = {
+  x: number;
+  y: number;
+};
+
+function canUseCustomCursor() {
+  return (
+    window.matchMedia("(any-pointer: fine)").matches &&
+    window.matchMedia("(any-hover: hover)").matches &&
+    !window.matchMedia("(forced-colors: active)").matches
+  );
+}
+
+function isInteractiveTarget(target: EventTarget | null) {
+  return (
+    target instanceof Element && Boolean(target.closest(INTERACTIVE_SELECTOR))
+  );
+}
+
+function getCursorTransform({ x, y }: CursorPosition) {
+  return `translate3d(${x - CURSOR_OFFSET}px, ${y - CURSOR_OFFSET}px, 0)`;
+}
 
 export default function CustomCursor() {
-  const [position, setPosition] = useState({ x: -100, y: -100 });
+  const cursorRef = useRef<HTMLDivElement>(null);
   const [isInteractive, setIsInteractive] = useState(false);
 
   useEffect(() => {
-    const hasFinePointer = window.matchMedia("(any-pointer: fine)").matches;
-    const hasHover = window.matchMedia("(any-hover: hover)").matches;
-    const forcedColors = window.matchMedia("(forced-colors: active)").matches;
-
-    if (!hasFinePointer || !hasHover || forcedColors) {
+    if (!canUseCustomCursor()) {
       return;
     }
 
     const handlePointerMove = (event: MouseEvent) => {
-      if (!document.body.classList.contains("custom-cursor-enabled")) {
-        document.body.classList.add("custom-cursor-enabled");
+      document.body.classList.add("custom-cursor-enabled");
+
+      if (cursorRef.current) {
+        cursorRef.current.style.transform = getCursorTransform({
+          x: event.clientX,
+          y: event.clientY,
+        });
       }
 
-      setPosition({ x: event.clientX, y: event.clientY });
-      const target = event.target;
-      if (!(target instanceof Element)) {
-        return;
-      }
-
-      const interactive = Boolean(
-        target.closest(
-          "[data-cursor='interactive'], a, button, summary, [role='button'], input, select, textarea, label",
-        ),
-      );
-      setIsInteractive(interactive);
+      setIsInteractive(isInteractiveTarget(event.target));
     };
 
     window.addEventListener("mousemove", handlePointerMove, {
@@ -46,25 +72,21 @@ export default function CustomCursor() {
     };
   }, []);
 
-  const scale = isInteractive ? 1.667 : 1;
-  const color = isInteractive ? "var(--color-magenta)" : "var(--color-klein)";
-
   return (
     <div
+      ref={cursorRef}
       aria-hidden="true"
-      className="custom-cursor"
-      style={{
-        transform: `translate3d(${position.x - CURSOR_SIZE / 2}px, ${position.y - CURSOR_SIZE / 2}px, 0)`,
-      }}
+      className={cn(
+        "pointer-events-none fixed top-0 left-0 z-9999 will-change-transform",
+        isInteractive ? "mix-blend-exclusion" : "mix-blend-multiply",
+      )}
     >
       <div
-        className="custom-cursor-dot"
-        style={{
-          width: CURSOR_SIZE,
-          height: CURSOR_SIZE,
-          transform: `scale(${scale})`,
-          backgroundColor: color,
-        }}
+        className={cn(
+          " size-16 rounded-full transition-all duration-400 ease-in-out will-change-transform",
+          isInteractive && "scale-[0.375] bg-white outline-1",
+          !isInteractive && " bg-magenta",
+        )}
       />
     </div>
   );
