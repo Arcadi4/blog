@@ -4,7 +4,7 @@ import {usePathname} from "next/navigation";
 import type {ReactNode} from "react";
 import {LinkItem, menuItems} from "@/app/posts/menuItems";
 import ProximityLink from "@/components/ProximityLink";
-import {FadeIn} from "@/components/animations/FadeIn";
+import {EaseIn} from "@/components/animations/EaseIn";
 import {ScaleIn} from "@/components/animations/ScaleIn";
 
 type ErrorPageLink = {
@@ -101,7 +101,7 @@ export default function ErrorPage({
             {menuItems.map((menuItem: LinkItem) => {
               menuAnimationIndex++;
               return (
-                <FadeIn
+                <EaseIn
                   key={menuItem.name}
                   from="right"
                   delayMs={menuAnimationIndex * delayPerMenuItem}
@@ -112,7 +112,7 @@ export default function ErrorPage({
                   >
                     {"→ " + menuItem.name}
                   </ProximityLink>
-                </FadeIn>
+                </EaseIn>
               );
             })}
           </div>
@@ -144,14 +144,14 @@ export default function ErrorPage({
           const weight = 300 + 100 * index;
 
           return (
-            <FadeIn
+            <EaseIn
               from="up"
               key={index}
               delayMs={delay}
-              className={`z-20 col-start-3 text-2xl select-none font-[${weight}] row-start-${row} row-span-1 self-start leading-none tracking-[-0.06em] text-trim-cap`}
+              className={`z-20 col-start-3 text-2xl select-none font-[${weight}] row-start-${row} row-span-1 self-start text-trim-cap leading-none tracking-[-0.06em]`}
             >
               {resolvedCodeDisplay}
-            </FadeIn>
+            </EaseIn>
           );
         })}
         {Array.from({ length: 5 }, (_, index) => {
@@ -160,21 +160,21 @@ export default function ErrorPage({
           const weight = 300 + 100 * index;
 
           return (
-            <FadeIn
+            <EaseIn
               from="left"
               delayMs={delay}
               key={index}
-              className={`z-20 text-2xl select-none col-start-${col} font-[${weight}] row-span-1 row-start-3 self-start leading-none tracking-[-0.06em] text-trim-cap`}
+              className={`z-20 text-2xl select-none col-start-${col} font-[${weight}] row-span-1 row-start-3 self-start text-trim-cap leading-none tracking-[-0.06em]`}
             >
               {resolvedCodeDisplay}
-            </FadeIn>
+            </EaseIn>
           );
         })}
         {/* Hero */}
-        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[320px] leading-[0.9] font-light tracking-[-0.06em] text-nowrap text-magenta mix-blend-difference select-none text-trim-cap">
+        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[320px] text-trim-cap leading-[0.9] font-light tracking-[-0.06em] text-nowrap text-magenta mix-blend-difference select-none">
           {title}.
         </div>
-        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[128px] leading-none font-normal tracking-[-0.06em] whitespace-nowrap select-none text-trim-cap">
+        <div className="z-10 col-start-2 row-start-4 self-end font-title text-[128px] text-trim-cap leading-none font-normal tracking-[-0.06em] whitespace-nowrap select-none">
           {title}.
         </div>
       </div>

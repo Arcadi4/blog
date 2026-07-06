@@ -3,7 +3,12 @@
 import React, {useCallback, useRef} from "react";
 import type {EntranceSeenOptions} from "./useEntranceAnimation";
 import {useEntranceAnimation} from "./useEntranceAnimation";
-import {calculateStaggerDelay, normalizeChildren, setElementRef, warnMultiChildClassName,} from "./entranceChildAdapter";
+import {
+  calculateStaggerDelay,
+  normalizeChildren,
+  setElementRef,
+  warnMultiChildClassName,
+} from "./entranceChildAdapter";
 
 type TextFrom = "up" | "down" | "left" | "right" | "none";
 type Distance = "sm" | "md" | "lg";
@@ -17,7 +22,7 @@ const distanceClass: Record<TextFrom, Record<Distance, string>> = {
 };
 
 /**
- * FadeIn props
+ * EaseIn props
  *
  * Single-child mode: Merges animation classes directly onto child (no wrapper).
  * Multi-child mode: Returns Fragment with independently animated children (wrapperless).
@@ -27,7 +32,7 @@ const distanceClass: Record<TextFrom, Record<Distance, string>> = {
  * @property minPosition - Trigger line percentage measured up from the viewport bottom (0 = entering screen, 50 = middle, negative = before entering)
  * @property className - Applied only in single-child mode; multi-child + className emits dev warning (wrap children in explicit container div)
  */
-type FadeInProps = EntranceSeenOptions & {
+type EaseInProps = EntranceSeenOptions & {
   children: React.ReactNode;
   from?: TextFrom;
   distance?: Distance;
@@ -101,7 +106,7 @@ function AnimatedChild({
   } as React.HTMLAttributes<HTMLElement>);
 }
 
-export function FadeIn({
+export function EaseIn({
   children,
   from = "up",
   distance = "md",
@@ -109,10 +114,10 @@ export function FadeIn({
   durationMs = 1000,
   className = "",
   disabled = false,
-  minPosition = 50,
+  minPosition = 30,
   onSeen = false,
   step = 0,
-}: FadeInProps) {
+}: EaseInProps) {
   const normalizedChildren = normalizeChildren(children);
   const targetRef = useRef<HTMLElement | null>(null);
 
