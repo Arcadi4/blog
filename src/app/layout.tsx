@@ -34,6 +34,7 @@ export default function RootLayout({
         geist.variable,
         "overflow-x-clip antialiased",
         "font-sans",
+        "selection:bg-magenta selection:text-white",
       )}
     >
       <body>
