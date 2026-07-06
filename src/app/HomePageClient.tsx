@@ -1,8 +1,6 @@
 "use client";
 
-import ProximityLink from "@/components/ProximityLink";
 import {EaseIn} from "@/components/animations/EaseIn";
-import type {LinkItem} from "@/app/posts/menuItems";
 import {menuItems, socialMediaItems} from "@/app/posts/menuItems";
 import {useEffect, useRef, useState} from "react";
 import {cn, formatDate} from "@/lib/utils";
@@ -12,16 +10,15 @@ import {ScaleIn} from "@/components/animations/ScaleIn";
 import type {ContentArticle} from "@/lib/content-index";
 import Dither from "@/components/Dither";
 import MarqueeCard from "@/components/MarqueeCard";
+import {Menu} from "@/components/Menu";
 
 type HomePageClientProps = {
   readonly articles: readonly ContentArticle[];
 };
 
-const homepageHeight = "h-[500dvh]";
+const homepageHeight = "h-[320rem]";
 
 export function HomePageClient({ articles }: HomePageClientProps) {
-  const menuAnimationIndex = useRef(0);
-
   const [useRealName, setUseRealName] = useState(false);
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -67,22 +64,11 @@ export function HomePageClient({ articles }: HomePageClientProps) {
 
   return (
     <main className="relative">
-      <figure
-        className="pointer-events-none absolute inset-0 z-100 opacity-20 mix-blend-screen filter-[url('#noise-bg-fx')_grayscale(100%)]"
-        aria-hidden="true"
-      >
-        <svg>
-          <filter id="noise-bg-fx">
-            <feTurbulence baseFrequency="0.8" />
-          </filter>
-        </svg>
-      </figure>
-
       <VerticalGrid height={homepageHeight} />
 
       <div
         className={cn(
-          "relative mx-auto grid grid-cols-12 grid-rows-25 gap-x-4 gap-y-4 p-8 w-dvw",
+          "relative mx-auto grid grid-cols-12 grid-rows-25 gap-x-4 gap-y-4 p-8 w-dvw ",
           homepageHeight,
         )}
       >
@@ -97,7 +83,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           ref={variableBgRef}
           className="col-start-1 row-span-4 row-start-1 -mt-8 -ml-8 origin-left bg-klein transition-transform duration-400 ease-out"
         />
-        <span className="pointer-events-none z-10 col-start-3 row-start-2 font-funnel-display text-[10rem] text-trim-cap">
+        <span className="h- pointer-events-none z-10 col-start-3 row-start-2 font-funnel-display text-[10rem] text-trim-cap">
           @{name}
         </span>
 
@@ -132,10 +118,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           <br />
         </div>
 
-        <span className="col-start-1 row-start-5 self-center font-mono text-5xl leading-none text-klein">
-          ↓↓
-        </span>
-        <span className="col-start-7 row-start-5 self-center font-mono text-5xl leading-none text-klein">
+        <span className="col-start-12 row-start-4 self-end font-mono text-5xl leading-none text-klein">
           ↓↓
         </span>
 
@@ -146,7 +129,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           delayMs={0}
           onSeen
         >
-          <MarqueeCard className="z-10 col-span-8 col-start-3 row-span-4 row-start-6 bg-acid">
+          <MarqueeCard className="z-10 col-span-6 col-start-4 row-span-4 row-start-6 bg-acid">
             navigation navigation navigation navigation navigation
           </MarqueeCard>
         </ScaleIn>
@@ -158,56 +141,87 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           minPosition={15}
         >
           <MarqueeCard
-            className="col-span-6 col-start-1 row-span-3 row-start-9 bg-magenta"
+            className="col-span-4 col-start-7 row-span-3 row-start-9 bg-magenta"
             trackClassName="text-background"
           >
             social media social media social media social media
           </MarqueeCard>
         </ScaleIn>
+
+        {/*
+        <h1 className="col-span-8 col-start-3 row-span-6 row-start-6 overflow-clip text-6xl leading-none text-pretty">
+          {`生活の偽造 いつも通り 通り過ぎて
+            1回言った「わかった。」戻らない
+            確信犯でしょ？ 夕食中に泣いた後
+            君は笑ってた
+            「私もそうだよ。」って 偽りの気持ち合算して
+            吐いて 黙って ずっと溜まってく
+            何が何でも 面と向かって「さよなら」
+            する資格もないまま 僕は
+            灰に潜り 秒針を噛み
+            白昼夢の中で ガンガン砕いた
+            でも壊れない 止まってくれない
+            「本当」を知らないまま 進むのさ
+            このまま奪って 隠して 忘れたい
+            分かり合う○ 1つもなくても
+            会って「ごめん。」って返さないでね
+            形のない言葉は いらないから
+            消えない後遺症「なんでも受け止める。」と
+            言ったきり もう帰ることはない
+            デタラメでも 僕のためじゃなくても
+            君に守られた
+            目も口も 意味がないほどに
+            塞ぎ込んで 動けない僕を
+            みつけないで ほっといてくれないか
+            どこ見ても どこに居ても 開かない
+            肺に潜り 秒針を噛み
+            白昼夢の中で ガンガン砕いた
+            でも壊れない 止まってくれない
+            演じ続けるのなら
+            このまま奪って 隠して 忘れたい
+            分かり合う○ 1つもなくても
+            会って「ごめん。」って返さないでね
+            形のない言葉は いらないから
+            縋って 叫んで 朝はない
+            笑って 転んで 情けない
+            誰のせいでも ないこと
+            誰かのせいに したくて
+            「僕って いるのかな？」
+            本当は わかってるんだ
+            見放されても 信じてしまうよ
+            このまま 奪って 隠して 忘れたい
+            このまま 奪って 隠して 忘れたい
+            このまま 奪って 隠して 話したい
+            分かり合う○ 1つもなくても
+            会って「ごめん。」って返さないでね
+            「疑うだけの 僕をどうして？」
+            救いきれない 嘘はいらないから
+            ハレタ レイラ`}
+        </h1>*/}
+
         <div className="separator absolute row-start-10 w-screen border-b" />
         <div className="separator absolute z-50 row-start-12 w-screen border-b" />
 
-        <nav className="z-50 col-span-full col-start-3 row-start-6">
-          <div className="flex flex-col">
-            {menuItems.map((menuItem: LinkItem) => {
-              menuAnimationIndex.current++;
-              return (
-                <EaseIn key={menuItem.name} from="right" onSeen>
-                  <div className="font-funnel-display text-7xl leading-none">
-                    {"→ "}
-                    <ProximityLink
-                      shadowColor={colorKlein}
-                      label={menuItem.name}
-                      href={menuItem.href}
-                    />
-                  </div>
-                </EaseIn>
-              );
-            })}
-          </div>
+        <nav className="z-50 col-span-full col-start-4 row-start-6">
+          <Menu
+            items={menuItems}
+            itemClassName="font-funnel-display text-7xl leading-none"
+            shadowColor={colorKlein}
+            onSeen
+          />
         </nav>
 
-        <nav className="z-50 col-span-full col-start-3 row-start-10">
-          <div className="flex flex-col">
-            {socialMediaItems.map((menuItem: LinkItem) => {
-              menuAnimationIndex.current++;
-              return (
-                <EaseIn key={menuItem.name} from="right" onSeen>
-                  <div className="font-funnel-display text-7xl leading-none text-background">
-                    {"↗ "}
-                    <ProximityLink
-                      shadowColor={colorKlein}
-                      label={menuItem.name}
-                      href={menuItem.href}
-                    />
-                  </div>
-                </EaseIn>
-              );
-            })}
-          </div>
+        <nav className="z-50 col-span-full col-start-7 row-start-10">
+          <Menu
+            items={socialMediaItems}
+            itemClassName="font-funnel-display text-7xl leading-none text-background"
+            prefix="↗ "
+            shadowColor="#000"
+            onSeen
+          />
         </nav>
 
-        <div className="col-span-10 col-start-3 row-start-12">
+        <div className="z-30 col-span-6 col-start-1 row-span-2 row-start-12">
           <Dither
             enableMouseInteraction={false}
             disableAnimation={false}
@@ -217,10 +231,11 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             waveFrequency={3}
           />
         </div>
+
         <EaseIn
           onSeen
           from="right"
-          className="z-30 col-start-3 row-start-13 font-funnel-display text-[10rem] leading-none text-klein"
+          className="z-30 col-start-7 row-start-13 font-funnel-display text-[10rem] text-klein"
         >
           Articles
         </EaseIn>
@@ -235,13 +250,12 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             .map((article, index) => (
               <div key={article.id} className="grid w-full grid-cols-12 gap-4">
                 <ScaleIn
-                  from="horizontal"
-                  durationMs={1000}
+                  from="left"
                   onSeen
                   className="relative col-span-8 col-start-3 row-start-1 bg-acid text-[10rem] text-trim-cap text-magenta"
                 >
                   <div>
-                    {`{${(index + 1).toString()}}`}
+                    <h1>{`{${(index + 1).toString()}}`}</h1>
                     <p className="absolute right-0 bottom-0 text-end text-2xl text-foreground">
                       {`Published ${formatDate(article.publishDate.toISOString())}`}
                       <br />
@@ -262,15 +276,15 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             ))}
         </div>
 
-        <div className="z-30 col-span-6 col-start-1 row-start-25 self-end font-serif text-5xl font-semibold text-pretty">
-          A man who thinks he is a king is mad, a king who thinks he is a king
-          is no less so.
-          <br />
-          I le fou qui se croit roi est fou, le roi qui se croit roi ne l'est
-          pas moins.
-          <br />
-          <p className="text-end font-light">— Jacques Lacan</p>
-        </div>
+        {/*<div className="z-30 col-span-6 col-start-1 row-start-25 self-end font-serif text-5xl font-semibold text-pretty">*/}
+        {/*  A man who thinks he is a king is mad, a king who thinks he is a king*/}
+        {/*  is no less so.*/}
+        {/*  <br />*/}
+        {/*  I le fou qui se croit roi est fou, le roi qui se croit roi ne l'est*/}
+        {/*  pas moins.*/}
+        {/*  <br />*/}
+        {/*  <p className="text-end font-light">— Jacques Lacan</p>*/}
+        {/*</div>*/}
       </div>
     </main>
   );
