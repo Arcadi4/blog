@@ -55,3 +55,4 @@ next-env.d.ts
 
 # ssg
 src/generated
+public/banners

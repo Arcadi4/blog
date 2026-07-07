@@ -14,6 +14,7 @@ export interface ContentArticle {
   translationIds: string[];
   lastEditedTime: Date;
   content: string;
+  banner?: string;
 }
 
 export interface ContentTranslation {

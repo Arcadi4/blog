@@ -6,6 +6,7 @@ export interface Post {
   date: string;
   excerpt?: string;
   content?: string;
+  banner?: string;
 }
 
 export async function getSortedPostsData(): Promise<Post[]> {
@@ -15,6 +16,7 @@ export async function getSortedPostsData(): Promise<Post[]> {
     title: article.title,
     date: article.publishDate.toISOString(),
     excerpt: article.excerpt,
+    banner: article.banner,
   }));
 }
 
@@ -37,5 +39,6 @@ export async function getPostData(slug: string): Promise<Post | null> {
     date: article.publishDate.toISOString(),
     excerpt: article.excerpt,
     content: article.content,
+    banner: article.banner,
   };
 }

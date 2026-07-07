@@ -22,6 +22,7 @@ export interface NotionArticle {
   translationIds: string[];
   lastEditedTime: Date;
   content: string;
+  banner?: string;
 }
 
 export interface NotionTranslation {

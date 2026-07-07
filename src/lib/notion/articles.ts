@@ -104,6 +104,7 @@ export async function getAllArticles(): Promise<NotionArticle[]> {
       translationIds: fields.translationIds,
       lastEditedTime: fields.lastEditedTime ?? new Date(0),
       content,
+      banner: undefined,
     };
 
     articles.push(article);

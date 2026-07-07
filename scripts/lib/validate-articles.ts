@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { getPageMarkdown, queryDataSource } from "../../src/lib/notion/client";
 import {
   ARTICLE_PROPS,
@@ -8,6 +10,7 @@ import type { ArticleStatus, NotionArticle } from "../../src/lib/notion/types";
 import { convertMarkdownToHtml } from "./validate-markdown";
 import {
   dateValue,
+  getCoverUrl,
   isLocale,
   NotionValidationError,
   plainText,
@@ -38,6 +41,60 @@ type ArticleFields = {
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const supportedArticleStatuses = Object.values(ARTICLE_STATUS) as string[];
+
+const CONTENT_TYPE_TO_EXT: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif",
+  "image/avif": "avif",
+  "image/svg+xml": "svg",
+};
+
+function extensionFromContentType(contentType: string | null): string | null {
+  if (!contentType) return null;
+  const base = contentType.split(";")[0]?.trim().toLowerCase();
+  return base ? (CONTENT_TYPE_TO_EXT[base] ?? null) : null;
+}
+
+function extensionFromUrl(url: string): string | null {
+  try {
+    const pathname = new URL(url).pathname;
+    const match = pathname.match(/\.([a-zA-Z0-9]+)$/);
+    if (!match) return null;
+    const ext = match[1]!.toLowerCase();
+    return Object.values(CONTENT_TYPE_TO_EXT).includes(ext) ? ext : null;
+  } catch {
+    return null;
+  }
+}
+
+async function downloadBanner(
+  coverUrl: string,
+  slug: string,
+): Promise<string | undefined> {
+  const bannersDir = join(process.cwd(), "public/banners");
+  await mkdir(bannersDir, { recursive: true });
+
+  const response = await fetch(coverUrl);
+  if (!response.ok) {
+    console.warn(
+      `  ⚠ Failed to download banner for "${slug}": HTTP ${response.status}`,
+    );
+    return undefined;
+  }
+
+  const contentType = response.headers.get("content-type");
+  const ext =
+    extensionFromContentType(contentType) ?? extensionFromUrl(coverUrl) ?? "jpg";
+  const filename = `${slug}.${ext}`;
+  const filePath = join(bannersDir, filename);
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  await writeFile(filePath, buffer);
+
+  return `/banners/${filename}`;
+}
 
 function titleForError(fields: ArticleFields, page: NotionPage) {
   return fields.title || page.id;
@@ -225,6 +282,12 @@ export async function getAllArticles(): Promise<NotionArticle[]> {
       pageTitle: titleForError(fields, page),
       propertyName: ARTICLE_PROPS.TITLE,
     });
+
+    const coverUrl = getCoverUrl(page.cover);
+    const banner = coverUrl
+      ? await downloadBanner(coverUrl, fields.slug)
+      : undefined;
+
     const article: NotionArticle = {
       id: page.id,
       title: fields.title,
@@ -237,6 +300,7 @@ export async function getAllArticles(): Promise<NotionArticle[]> {
       translationIds: fields.translationIds,
       lastEditedTime: fields.lastEditedTime ?? new Date(0),
       content,
+      banner,
     };
 
     slugs.set(slugKey, article);

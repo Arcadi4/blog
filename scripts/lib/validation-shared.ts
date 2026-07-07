@@ -12,10 +12,23 @@ export type NotionProperty = {
   last_edited_time?: string;
 };
 
+export type NotionCover =
+  | { type: "file"; file: { url: string } }
+  | { type: "external"; external: { url: string } }
+  | null;
+
 export type NotionPage = {
   id: string;
+  cover?: NotionCover;
   properties?: Record<string, NotionProperty>;
 };
+
+export function getCoverUrl(cover?: NotionCover): string | null {
+  if (!cover) return null;
+  if (cover.type === "file") return cover.file.url;
+  if (cover.type === "external") return cover.external.url;
+  return null;
+}
 
 export class NotionValidationError extends Error {
   readonly pageId?: string;
