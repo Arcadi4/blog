@@ -11,12 +11,15 @@ import type {ContentArticle} from "@/lib/content-index";
 import Dither from "@/components/Dither";
 import MarqueeCard from "@/components/MarqueeCard";
 import {Menu} from "@/components/Menu";
+import NextLink from "next/link";
 
 type HomePageClientProps = {
   readonly articles: readonly ContentArticle[];
 };
 
-const homepageHeight = "h-[320rem]";
+// roughly 4.4 screens (64rem per screen)
+// the grid system is 5 rows per screen, so its 22 rows
+const homepageHeight = "h-[281.6rem]";
 
 export function HomePageClient({ articles }: HomePageClientProps) {
   const [useRealName, setUseRealName] = useState(false);
@@ -68,7 +71,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
 
       <div
         className={cn(
-          "relative mx-auto grid grid-cols-12 grid-rows-25 gap-x-4 gap-y-4 p-8 w-dvw ",
+          "relative grid grid-cols-12 grid-rows-22 gap-x-4 gap-y-4 p-8 w-dvw ",
           homepageHeight,
         )}
       >
@@ -122,24 +125,13 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           ↓↓
         </span>
 
-        <ScaleIn
-          durationMs={1000}
-          from="top"
-          minPosition={15}
-          delayMs={0}
-          onSeen
-        >
+        {/* Menu - cards */}
+        <ScaleIn from="top-left" minPosition={15} delayMs={0} onSeen>
           <MarqueeCard className="z-10 col-span-6 col-start-4 row-span-4 row-start-6 bg-acid">
             navigation navigation navigation navigation navigation
           </MarqueeCard>
         </ScaleIn>
-        <ScaleIn
-          durationMs={1000}
-          from="top"
-          delayMs={0}
-          onSeen
-          minPosition={15}
-        >
+        <ScaleIn from="top-right" delayMs={0} onSeen minPosition={15}>
           <MarqueeCard
             className="col-span-4 col-start-7 row-span-3 row-start-9 bg-magenta"
             trackClassName="text-background"
@@ -148,6 +140,12 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           </MarqueeCard>
         </ScaleIn>
 
+        {/*
+        Lyrics from "秒針を噛み". Reserved, plans:
+          - Uncomment if I found a good Japanese font.
+          - Replace this with some other prose.
+          - I implemented a player component
+        */}
         {/*
         <h1 className="col-span-8 col-start-3 row-span-6 row-start-6 overflow-clip text-6xl leading-none text-pretty">
           {`生活の偽造 いつも通り 通り過ぎて
@@ -197,11 +195,15 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             「疑うだけの 僕をどうして？」
             救いきれない 嘘はいらないから
             ハレタ レイラ`}
-        </h1>*/}
+        </h1>
+        */}
 
+        {/* Menu - grid lines */}
+        <div className="separator absolute row-span-1 row-start-5 h-full w-screen border-b" />
         <div className="separator absolute row-start-10 w-screen border-b" />
         <div className="separator absolute z-50 row-start-12 w-screen border-b" />
 
+        {/* Menu - links */}
         <nav className="z-50 col-span-full col-start-4 row-start-6">
           <Menu
             items={menuItems}
@@ -235,9 +237,13 @@ export function HomePageClient({ articles }: HomePageClientProps) {
         <EaseIn
           onSeen
           from="right"
-          className="z-30 col-start-7 row-start-13 font-funnel-display text-[10rem] text-klein"
+          className="z-30 col-start-7 row-start-13 self-end"
         >
-          Articles
+          <h1 className="font-funnel-display text-[10rem] text-trim-cap leading-none text-klein">
+            Latest
+            <br />
+            Articles
+          </h1>
         </EaseIn>
         <div className="separator absolute row-start-14 w-screen border-t" />
 
@@ -250,23 +256,32 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             .map((article, index) => (
               <div key={article.id} className="grid w-full grid-cols-12 gap-4">
                 <ScaleIn
-                  from="left"
+                  from="horizontal"
                   onSeen
-                  className="relative col-span-8 col-start-3 row-start-1 bg-acid text-[10rem] text-trim-cap text-magenta"
+                  className="group relative col-span-8 col-start-3 row-start-1 bg-acid text-[10rem] text-trim-cap transition-all hover:bg-klein"
                 >
-                  <div>
-                    <h1>{`{${(index + 1).toString()}}`}</h1>
-                    <p className="absolute right-0 bottom-0 text-end text-2xl text-foreground">
+                  <NextLink href={`/posts/${article.slug}`}>
+                    <div className="separator absolute ml-[-50dvw] h-full w-[150dvw] border-y" />
+                    <h1 className="text-magenta transition-all group-hover:text-acid">
+                      {" "}
+                      {`{${(index + 1).toString()}}`}
+                    </h1>
+                    <p className="absolute right-0 bottom-0 text-end text-2xl transition-all group-hover:text-background">
                       {`Published ${formatDate(article.publishDate.toISOString())}`}
                       <br />
                       {`Last edited ${formatDate(article.lastEditedTime.toISOString())}`}
                     </p>
-                  </div>
+                  </NextLink>
                 </ScaleIn>
 
                 <EaseIn onSeen>
                   <h1 className="col-start-3 col-end-11 row-start-2 mt-8 text-7xl font-semibold">
-                    {article.title}
+                    <NextLink
+                      className="text-black transition-all hover:text-magenta"
+                      href={`/posts/${article.slug}`}
+                    >
+                      {article.title}
+                    </NextLink>
                   </h1>
                   <p className="col-span-8 col-start-3 row-start-3 text-4xl">
                     {article.excerpt}
@@ -276,15 +291,12 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             ))}
         </div>
 
-        {/*<div className="z-30 col-span-6 col-start-1 row-start-25 self-end font-serif text-5xl font-semibold text-pretty">*/}
-        {/*  A man who thinks he is a king is mad, a king who thinks he is a king*/}
-        {/*  is no less so.*/}
-        {/*  <br />*/}
-        {/*  I le fou qui se croit roi est fou, le roi qui se croit roi ne l'est*/}
-        {/*  pas moins.*/}
-        {/*  <br />*/}
-        {/*  <p className="text-end font-light">— Jacques Lacan</p>*/}
-        {/*</div>*/}
+        <Menu
+          className="col-span-4 col-start-7 row-start-21 self-end justify-self-end text-right"
+          prefix="..."
+          itemClassName="font-funnel-display text-7xl leading-none"
+          items={[{ name: "View All", href: "/all" }]}
+        />
       </div>
     </main>
   );
