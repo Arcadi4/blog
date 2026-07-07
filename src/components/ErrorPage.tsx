@@ -119,8 +119,8 @@ export default function ErrorPage({
           <span className="font-semibold">{pathname}</span>
         </div>
         <div className="col-span-3 col-start-5 row-start-5 leading-tight">
-          Nothing found here. This page does not exist or have not been created.
-          Try return to the previous page or go to home.
+          Nothing found here. The site is still under construction. This page
+          might have not been created yet.
         </div>
 
         {/* Error code */}
