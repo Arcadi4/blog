@@ -81,11 +81,20 @@ export default function CustomCursor() {
       );
     };
 
+    let holdTimer: ReturnType<typeof setTimeout> | null = null;
+
     const handleMouseDown = () => {
-      setIsPressed(true);
+      holdTimer = setTimeout(() => {
+        setIsPressed(true);
+        holdTimer = null;
+      }, 150);
     };
 
     const handleMouseUp = () => {
+      if (holdTimer !== null) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
       setIsPressed(false);
     };
 
@@ -107,6 +116,9 @@ export default function CustomCursor() {
       window.removeEventListener("resize", updateInteractiveTarget);
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
+      if (holdTimer !== null) {
+        clearTimeout(holdTimer);
+      }
       document.body.classList.remove("custom-cursor-enabled");
     };
   }, []);
