@@ -1,5 +1,5 @@
 import {forwardRef} from "react";
-import type {ReactNode} from "react";
+import type {ComponentPropsWithoutRef, ReactNode} from "react";
 import {cn} from "@/lib/utils";
 
 type MarqueeTrackProps = {
@@ -22,7 +22,7 @@ function MarqueeTrack({ className, children }: MarqueeTrackProps) {
   );
 }
 
-type MarqueeCardProps = {
+type MarqueeCardProps = ComponentPropsWithoutRef<"div"> & {
   readonly className?: string;
   readonly trackClassName?: string;
   readonly children: ReactNode;
@@ -30,11 +30,11 @@ type MarqueeCardProps = {
 
 const MarqueeCard = forwardRef<HTMLDivElement, MarqueeCardProps>(
   function MarqueeCard(
-    {className, trackClassName, children},
+    { className, trackClassName, children, ...props },
     ref,
   ) {
     return (
-      <div ref={ref} className={cn("relative overflow-clip", className)}>
+      <div {...props} ref={ref} className={cn("relative overflow-clip", className)}>
         <MarqueeTrack className={trackClassName}>{children}</MarqueeTrack>
       </div>
     );
