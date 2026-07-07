@@ -52,6 +52,7 @@ export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const positionRef = useRef<CursorPosition | null>(null);
   const [isInteractive, setIsInteractive] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
 
   useEffect(() => {
     if (!canUseCustomCursor()) {
@@ -75,7 +76,17 @@ export default function CustomCursor() {
     };
 
     const updateInteractiveTarget = () => {
-      setIsInteractive(isInteractiveTarget(getElementAtCursor(positionRef.current)));
+      setIsInteractive(
+        isInteractiveTarget(getElementAtCursor(positionRef.current)),
+      );
+    };
+
+    const handleMouseDown = () => {
+      setIsPressed(true);
+    };
+
+    const handleMouseUp = () => {
+      setIsPressed(false);
     };
 
     window.addEventListener("mousemove", handlePointerMove, {
@@ -87,11 +98,15 @@ export default function CustomCursor() {
     window.addEventListener("resize", updateInteractiveTarget, {
       passive: true,
     });
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mouseup", handleMouseUp);
 
     return () => {
       window.removeEventListener("mousemove", handlePointerMove);
       window.removeEventListener("scroll", updateInteractiveTarget);
       window.removeEventListener("resize", updateInteractiveTarget);
+      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mouseup", handleMouseUp);
       document.body.classList.remove("custom-cursor-enabled");
     };
   }, []);
@@ -107,9 +122,12 @@ export default function CustomCursor() {
     >
       <div
         className={cn(
-          " size-16 rounded-full transition-all duration-400 ease-in-out will-change-transform",
-          isInteractive && "scale-[0.375] bg-white outline-1",
-          !isInteractive && " bg-magenta",
+          "size-16 transition-all ease-in-out will-change-transform",
+          isPressed
+            ? "scale-x-25 bg-klein transition-colors duration-1250"
+            : "rounded-full",
+          isInteractive && "scale-[0.375] bg-white outline-2 duration-400",
+          !isInteractive && !isPressed && "bg-magenta",
         )}
       />
     </div>
