@@ -1,4 +1,5 @@
 .proximity-link {
+  user-select: none;
   display: inline-block;
   width: fit-content;
   position: relative;
