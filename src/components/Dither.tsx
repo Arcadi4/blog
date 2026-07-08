@@ -1,8 +1,10 @@
-import { useRef, useState, useEffect, forwardRef } from 'react';
-import { Canvas, useFrame, useThree, ThreeEvent } from '@react-three/fiber';
-import { EffectComposer, wrapEffect } from '@react-three/postprocessing';
-import { Effect } from 'postprocessing';
-import * as THREE from 'three';
+"use client";
+
+import {forwardRef, useEffect, useRef} from "react";
+import {Canvas, ThreeEvent, useFrame, useThree} from "@react-three/fiber";
+import {EffectComposer, wrapEffect} from "@react-three/postprocessing";
+import {Effect} from "postprocessing";
+import * as THREE from "three";
 
 const waveVertexShader = `
 precision highp float;
