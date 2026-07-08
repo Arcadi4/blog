@@ -83,7 +83,17 @@ export default function CustomCursor() {
 
     let holdTimer: ReturnType<typeof setTimeout> | null = null;
 
-    const handleMouseDown = () => {
+    const clearHold = () => {
+      if (holdTimer !== null) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      setIsPressed(false);
+    };
+
+    const handleMouseDown = (event: MouseEvent) => {
+      // Only track primary button (left click)
+      if (event.button !== 0) return;
       holdTimer = setTimeout(() => {
         setIsPressed(true);
         holdTimer = null;
@@ -91,11 +101,7 @@ export default function CustomCursor() {
     };
 
     const handleMouseUp = () => {
-      if (holdTimer !== null) {
-        clearTimeout(holdTimer);
-        holdTimer = null;
-      }
-      setIsPressed(false);
+      clearHold();
     };
 
     window.addEventListener("mousemove", handlePointerMove, {
@@ -109,6 +115,12 @@ export default function CustomCursor() {
     });
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mouseup", handleMouseUp);
+    // Reset hold when focus is lost (tab away, alt-tab, etc.)
+    window.addEventListener("blur", clearHold);
+    // Reset hold when pointer leaves the document (drag outside window)
+    document.addEventListener("mouseleave", clearHold);
+    // Reset hold on context menu (right-click during hold)
+    window.addEventListener("contextmenu", clearHold);
 
     return () => {
       window.removeEventListener("mousemove", handlePointerMove);
@@ -116,6 +128,9 @@ export default function CustomCursor() {
       window.removeEventListener("resize", updateInteractiveTarget);
       window.removeEventListener("mousedown", handleMouseDown);
       window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("blur", clearHold);
+      document.removeEventListener("mouseleave", clearHold);
+      window.removeEventListener("contextmenu", clearHold);
       if (holdTimer !== null) {
         clearTimeout(holdTimer);
       }
