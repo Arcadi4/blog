@@ -1,21 +1,26 @@
-import { getContentIndex } from "./content-index";
+import {getContentIndex} from "./content-index";
 
 export interface Post {
-  slug: string;
+  id: string;
   title: string;
-  date: string;
-  excerpt?: string;
-  content?: string;
+  tags: string[];
+  publishedAt: Date;
+  lastModifiedAt: Date;
+  excerpt: string;
+  content: string;
   banner?: string;
 }
 
 export async function getSortedPostsData(): Promise<Post[]> {
   const index = await getContentIndex();
   return index.articles.map((article) => ({
-    slug: article.slug,
+    id: article.slug,
     title: article.title,
-    date: article.publishDate.toISOString(),
+    tags: article.tags,
+    publishedAt: article.publishDate,
+    lastModifiedAt: article.lastEditedTime,
     excerpt: article.excerpt,
+    content: article.content,
     banner: article.banner,
   }));
 }
@@ -34,9 +39,11 @@ export async function getPostData(slug: string): Promise<Post | null> {
   }
 
   return {
-    slug: article.slug,
+    id: article.slug,
     title: article.title,
-    date: article.publishDate.toISOString(),
+    tags: article.tags,
+    publishedAt: article.publishDate,
+    lastModifiedAt: article.lastEditedTime,
     excerpt: article.excerpt,
     content: article.content,
     banner: article.banner,
