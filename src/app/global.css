@@ -11,9 +11,9 @@
 @theme {
   --color-background: #fafafa;
   --color-foreground: #0f0f0f;
-  --color-acid: #c3ff00;
-  --color-klein: #0048ff;
-  --color-magenta: #ff00a6;
+  --color-acid: #ccff00;
+  --color-klein: #2323ff;
+  --color-magenta: #ff1dce;
 
   --font-funnel-display: var(--font-funnel-display), sans-serif;
 
