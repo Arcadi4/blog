@@ -10,17 +10,20 @@ if (!process.env.VERCEL_ENV) {
 async function main() {
   const [
     { NotionValidationError },
+    { createMarkdownCompiler },
     { getAllArticles },
     { getAllTranslations },
   ] = await Promise.all([
     import("./lib/validation-shared"),
+    import("./lib/validate-markdown"),
     import("./lib/validate-articles"),
     import("./lib/validate-translations"),
   ]);
+  const compiler = await createMarkdownCompiler();
 
   try {
-    const articles = await getAllArticles();
-    const translations = await getAllTranslations();
+    const articles = await getAllArticles(compiler);
+    const translations = await getAllTranslations(compiler);
     const generatedPath = join(
       process.cwd(),
       "src/generated/content-index.json",
@@ -37,7 +40,7 @@ async function main() {
     console.log(`Completed translations count: ${translations.length}`);
     console.log(`Generated content index: ${generatedPath}`);
     console.log("\n✅ Validation passed");
-    process.exit(0);
+    process.exitCode = 0;
   } catch (error) {
     if (error instanceof NotionValidationError) {
       console.error("\n❌ Validation failed:");
@@ -49,7 +52,9 @@ async function main() {
     } else {
       console.error("\n❌ Unexpected error:", error);
     }
-    process.exit(1);
+    process.exitCode = 1;
+  } finally {
+    compiler.dispose();
   }
 }
 void main();

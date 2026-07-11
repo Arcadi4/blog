@@ -7,7 +7,7 @@ import {
   TRANSLATIONS_DATA_SOURCE_ID,
 } from "../../src/lib/notion/config";
 import type { Locale, NotionTranslation } from "../../src/lib/notion/types";
-import { convertMarkdownToHtml } from "./validate-markdown";
+import type { MarkdownCompiler } from "./validate-markdown";
 import {
   isLocale,
   NotionValidationError,
@@ -168,7 +168,9 @@ export function validateCompletedTranslation(
   }
 }
 
-export async function getAllTranslations(): Promise<NotionTranslation[]> {
+export async function getAllTranslations(
+  compiler: MarkdownCompiler,
+): Promise<NotionTranslation[]> {
   const rows = (await queryDataSource(
     TRANSLATIONS_DATA_SOURCE_ID,
   )) as NotionPage[];
@@ -262,7 +264,7 @@ export async function getAllTranslations(): Promise<NotionTranslation[]> {
       );
     }
 
-    const content = await convertMarkdownToHtml(pageMarkdown, page.id, {
+    const content = await compiler.compile(pageMarkdown, page.id, {
       pageTitle: titleForError(fields, page),
       propertyName: TRANSLATION_PROPS.TITLE,
     });
