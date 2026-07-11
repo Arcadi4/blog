@@ -7,7 +7,7 @@ import {
   ARTICLES_DATA_SOURCE_ID,
 } from "../../src/lib/notion/config";
 import type { ArticleStatus, NotionArticle } from "../../src/lib/notion/types";
-import { convertMarkdownToHtml } from "./validate-markdown";
+import type { MarkdownCompiler } from "./validate-markdown";
 import {
   dateValue,
   getCoverUrl,
@@ -215,7 +215,7 @@ export function validatePublicArticle(page: NotionPage, fields: ArticleFields) {
   }
 }
 
-export async function getAllArticles(): Promise<NotionArticle[]> {
+export async function getAllArticles(compiler: MarkdownCompiler): Promise<NotionArticle[]> {
   const rows = (await queryDataSource(ARTICLES_DATA_SOURCE_ID)) as NotionPage[];
   const articles: NotionArticle[] = [];
   const slugs = new Map<string, NotionArticle>();
@@ -278,7 +278,7 @@ export async function getAllArticles(): Promise<NotionArticle[]> {
       );
     }
 
-    const content = await convertMarkdownToHtml(pageMarkdown, page.id, {
+    const content = await compiler.compile(pageMarkdown, page.id, {
       pageTitle: titleForError(fields, page),
       propertyName: ARTICLE_PROPS.TITLE,
     });
