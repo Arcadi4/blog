@@ -26,7 +26,7 @@ type QueryResponse = {
 
 export type PageMarkdown = {
   markdown: string;
-  warnings: {
+  warnings?: {
     truncated?: boolean;
     unknown_block_ids?: string[];
   };
