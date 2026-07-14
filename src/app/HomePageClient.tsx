@@ -8,7 +8,6 @@ import {colorKlein} from "@/lib/colors";
 import VerticalGrid from "@/components/VerticalGrid";
 import {ScaleIn} from "@/components/animations/ScaleIn";
 import type {ContentArticle} from "@/lib/content-index";
-import Dither from "@/components/Dither";
 import MarqueeCard from "@/components/MarqueeCard";
 import {Menu} from "@/components/Menu";
 import NextLink from "next/link";
@@ -125,21 +124,6 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           ↓↓
         </span>
 
-        {/* Menu - cards */}
-        <ScaleIn from="top-left" minPosition={15} delayMs={0} onSeen>
-          <MarqueeCard className="z-10 col-span-6 col-start-4 row-span-4 row-start-6 bg-acid">
-            navigation navigation navigation navigation navigation
-          </MarqueeCard>
-        </ScaleIn>
-        <ScaleIn from="top-right" delayMs={0} onSeen minPosition={15}>
-          <MarqueeCard
-            className="col-span-4 col-start-7 row-span-3 row-start-9 bg-magenta"
-            trackClassName="text-background"
-          >
-            social media social media social media social media
-          </MarqueeCard>
-        </ScaleIn>
-
         {/*
         Lyrics from "秒針を噛み". Reserved, plans:
           - Uncomment if I found a good Japanese font.
@@ -199,12 +183,26 @@ export function HomePageClient({ articles }: HomePageClientProps) {
         */}
 
         {/* Menu - grid lines */}
-        <div className="separator absolute row-span-1 row-start-5 h-full w-screen border-b" />
-        <div className="separator absolute row-start-10 w-screen border-b" />
-        <div className="separator absolute z-50 row-start-12 w-screen border-b" />
+        <div className="separator absolute z-10 row-span-5 row-start-6 h-full w-screen border-y" />
+
+        {/* Menu - cards */}
+        <ScaleIn from="top-left" delayMs={200} onSeen minPosition={10}>
+          <MarqueeCard className="col-span-8 col-start-3 row-span-3 row-start-6 -mb-4 bg-acid">
+            navigation navigation navigation navigation navigation
+          </MarqueeCard>
+        </ScaleIn>
+
+        <ScaleIn from="top-right" delayMs={200} onSeen minPosition={10}>
+          <MarqueeCard
+            className="col-span-8 col-start-3 row-span-2 row-start-9 bg-magenta"
+            trackClassName="text-background"
+          >
+            social media social media social media social media
+          </MarqueeCard>
+        </ScaleIn>
 
         {/* Menu - links */}
-        <nav className="z-50 col-span-full col-start-4 row-start-6">
+        <nav className="z-50 col-span-8 col-start-3 row-start-6">
           <Menu
             items={menuItems}
             itemClassName="font-funnel-display text-7xl leading-none"
@@ -213,11 +211,12 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           />
         </nav>
 
-        <nav className="z-50 col-span-full col-start-7 row-start-10">
+        <nav className="z-50 col-span-8 col-start-3 row-span-2 row-start-9 justify-self-end">
           <Menu
             items={socialMediaItems}
-            itemClassName="font-funnel-display text-7xl leading-none text-background"
-            prefix="↗ "
+            itemClassName="font-funnel-display text-7xl leading-none text-background text-end"
+            prefix=""
+            suffix=" ↗"
             shadowColor="#000"
             onSeen
           />

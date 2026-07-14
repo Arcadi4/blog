@@ -1,7 +1,7 @@
 "use client";
 
-import ProximityLink from "@/components/ProximityLink";
 import type {ProximityLinkProps} from "@/components/ProximityLink";
+import ProximityLink from "@/components/ProximityLink";
 import {EaseIn} from "@/components/animations/EaseIn";
 import type {LinkItem} from "@/app/posts/menuItems";
 
@@ -11,6 +11,7 @@ type MenuProps = {
   readonly itemClassName?: string;
   readonly linkClassName?: string;
   readonly prefix?: string;
+  readonly suffix?: string;
   readonly shadowColor?: ProximityLinkProps["shadowColor"];
   readonly delayMs?: number;
   readonly delayStepMs?: number;
@@ -23,6 +24,7 @@ export function Menu({
   itemClassName,
   linkClassName,
   prefix = "→ ",
+  suffix,
   shadowColor,
   delayMs = 0,
   delayStepMs = 0,
@@ -46,6 +48,7 @@ export function Menu({
                 shadowColor={shadowColor}
                 className={linkClassName}
               />
+              {suffix}
             </div>
           ) : (
             <ProximityLink
