@@ -241,10 +241,8 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           .slice(0, 3)
           .map((article, i) => (
             <div
-              className={cn(
-                "grid grid-cols-subgrid col-span-full row-span-1 relative group grid-rows-[min-content_1fr_min-content]",
-                `row-start-${13 + i}`,
-              )}
+              className="group relative col-span-full row-span-1 grid grid-cols-subgrid grid-rows-[min-content_1fr_min-content]"
+              style={{ gridRowStart: 13 + i }}
               key={article.id}
             >
               <ScaleIn
