@@ -16,9 +16,9 @@ type HomePageClientProps = {
   readonly articles: readonly ContentArticle[];
 };
 
-// roughly 4.4 screens (64rem per screen)
-// the grid system is 5 rows per screen, so its 22 rows
-const homepageHeight = "h-[281.6rem]";
+// roughly 3.4 screens (64rem per screen)
+// the grid system is 5 rows per screen, so its 17 rows
+const homepageHeight = "h-[217.6rem]";
 
 export function HomePageClient({ articles }: HomePageClientProps) {
   const [useRealName, setUseRealName] = useState(false);
@@ -66,14 +66,16 @@ export function HomePageClient({ articles }: HomePageClientProps) {
 
   return (
     <main className="relative">
-      <VerticalGrid height={homepageHeight} />
-
       <div
         className={cn(
-          "relative grid grid-cols-12 grid-rows-22 gap-x-4 gap-y-4 p-8 w-dvw ",
+          "relative grid grid-cols-12 grid-rows-17 gap-x-4 gap-y-4 p-8 w-dvw",
           homepageHeight,
         )}
       >
+        <div className="absolute inset-0 row-span-12 row-start-1 -mt-8">
+          <VerticalGrid className="h-full" />
+        </div>
+
         <p className="z-30 col-span-full col-start-3 row-start-1 font-sans text-2xl leading-none font-semibold">
           <span className="text-klein">©</span> 2026
           <br />
@@ -187,14 +189,14 @@ export function HomePageClient({ articles }: HomePageClientProps) {
 
         {/* Menu - cards */}
         <ScaleIn from="top-left" delayMs={200} onSeen minPosition={10}>
-          <MarqueeCard className="col-span-8 col-start-3 row-span-3 row-start-6 -mb-4 bg-acid">
+          <MarqueeCard className="col-span-7 col-start-3 row-span-3 row-start-6 -mb-4 bg-acid">
             navigation navigation navigation navigation navigation
           </MarqueeCard>
         </ScaleIn>
 
         <ScaleIn from="top-right" delayMs={200} onSeen minPosition={10}>
           <MarqueeCard
-            className="col-span-8 col-start-3 row-span-2 row-start-9 bg-magenta"
+            className="col-span-7 col-start-4 row-span-2 row-start-9 bg-magenta"
             trackClassName="text-background"
           >
             social media social media social media social media
@@ -222,77 +224,74 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           />
         </nav>
 
-        <div className="z-30 col-span-6 col-start-1 row-span-2 row-start-12">
-          <Dither
-            enableMouseInteraction={false}
-            disableAnimation={false}
-            waveSpeed={0.2}
-            waveColor={[0, 0.2, 1]}
-            waveAmplitude={0.2}
-            waveFrequency={3}
-          />
-        </div>
-
         <EaseIn
           onSeen
-          from="right"
-          className="z-30 col-start-7 row-start-13 self-end"
+          from="none"
+          className="z-30 col-span-full col-start-1 row-start-12 self-end"
         >
-          <h1 className="font-funnel-display text-[10rem] text-trim-cap leading-none text-klein">
-            Latest
-            <br />
-            Articles
+          <h1 className="text-justify font-funnel-display text-[8rem] text-trim-cap leading-none text-klein [text-align-last:justify]">
+            Latest Articles
           </h1>
         </EaseIn>
-        <div className="separator absolute row-start-14 w-screen border-t" />
 
-        <div className="col-span-full row-start-15 flex flex-col gap-8">
-          {articles
-            .toSorted(
-              (a, b) => b.publishDate.valueOf() - a.publishDate.valueOf(),
-            )
-            .slice(0, 3)
-            .map((article, index) => (
-              <div key={article.id} className="grid w-full grid-cols-12 gap-4">
-                <ScaleIn
-                  from="horizontal"
-                  onSeen
-                  className="group relative col-span-8 col-start-3 row-start-1 bg-acid text-[10rem] text-trim-cap transition-all hover:bg-klein"
-                >
-                  <NextLink href={`/posts/${article.slug}`}>
-                    <div className="separator absolute ml-[-50dvw] h-full w-[150dvw] border-y" />
-                    <h1 className="text-magenta transition-all group-hover:text-acid">
-                      {" "}
-                      {`{${(index + 1).toString()}}`}
-                    </h1>
-                    <p className="absolute right-0 bottom-0 text-end text-2xl transition-all group-hover:text-background">
-                      {`Published ${formatDate(article.publishDate.toISOString())}`}
-                      <br />
-                      {`Last edited ${formatDate(article.lastEditedTime.toISOString())}`}
-                    </p>
-                  </NextLink>
-                </ScaleIn>
+        <div className="separator absolute z-50 row-span-1 row-start-12 h-full w-screen border-b" />
 
-                <EaseIn onSeen>
-                  <h1 className="col-start-3 col-end-11 row-start-2 mt-8 text-7xl font-semibold">
-                    <NextLink
-                      className="text-black transition-all hover:text-magenta"
-                      href={`/posts/${article.slug}`}
-                    >
-                      {article.title}
-                    </NextLink>
-                  </h1>
-                  <p className="col-span-8 col-start-3 row-start-3 text-4xl">
-                    {article.excerpt}
-                  </p>
-                </EaseIn>
-              </div>
-            ))}
-        </div>
+        {articles
+          .toSorted((a, b) => b.publishDate.valueOf() - a.publishDate.valueOf())
+          .slice(0, 3)
+          .map((article, i) => (
+            <div
+              className={cn(
+                "grid grid-cols-subgrid col-span-full row-span-1 relative group grid-rows-[min-content_1fr_min-content]",
+                `row-start-${13 + i}`,
+              )}
+              key={article.id}
+            >
+              <ScaleIn
+                from="right"
+                onSeen
+                className={cn(
+                  "absolute bg-magenta inset-0",
+                  `col-end-5 col-start-${3 - Math.abs((i % 4) - 2)}`,
+                )}
+              >
+                <h1 className="absolute top-0 right-0 origin-top-right font-funnel-display text-5xl text-trim-cap font-bold transition-transform duration-300 ease-out group-hover:scale-200">
+                  (0{i + 1})
+                </h1>
+              </ScaleIn>
+
+              <p className="col-span-3 col-start-5 row-start-1 text-lg leading-none">
+                published {formatDate(article.publishDate)}
+                <br />
+                {article.publishDate == article.lastEditedTime
+                  ? null
+                  : `(edited ${formatDate(article.lastEditedTime)})`}
+              </p>
+              <p className="col-span-3 col-start-8 row-start-1 text-lg leading-none">
+                {article.tags.map((tag) => `#${tag}`).join(" ")}
+              </p>
+              <NextLink
+                href={`/posts/${article.slug}`}
+                className="col-span-3 col-start-8 row-start-2 self-end text-lg leading-none font-medium text-pretty hover:text-magenta"
+              >
+                {article.excerpt}
+              </NextLink>
+              <NextLink
+                href={`/posts/${article.slug}`}
+                className="col-span-3 col-start-5 row-start-3 max-h-fit self-end font-funnel-display text-4xl leading-none hover:text-magenta"
+              >
+                {article.title}
+              </NextLink>
+
+              <div className="separator absolute inset-0 col-start-5 col-end-11 -mx-4 border-b" />
+              <div className="absolute inset-0 col-span-1 col-start-11 bg-acid" />
+            </div>
+          ))}
 
         <Menu
-          className="col-span-4 col-start-7 row-start-21 self-end justify-self-end text-right"
-          prefix="..."
+          className="col-span-full row-start-17 text-center"
+          prefix="{{"
+          suffix="}}"
           itemClassName="font-funnel-display text-7xl leading-none"
           items={[{ name: "View All", href: "/all" }]}
         />

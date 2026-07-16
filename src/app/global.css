@@ -62,7 +62,7 @@ h6,
 
 @layer components {
   .separator {
-    @apply border-0 border-gray-400;
+    @apply pointer-events-none border-0 border-gray-400;
   }
 
   .h1-hero {

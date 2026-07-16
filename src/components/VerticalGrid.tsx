@@ -2,7 +2,7 @@ import {ScaleIn} from "@/components/animations/ScaleIn";
 import {cn} from "@/lib/utils";
 
 interface VerticalGridProps {
-  height: string;
+  className: string;
 }
 
 type GridLinePairProps = VerticalGridProps & {
@@ -17,7 +17,7 @@ const animationDurationMs = 1600;
 function GridLinePair({
   delayMs,
   elevated = false,
-  height,
+  className,
   leftColumnClassName,
   rightColumnClassName,
 }: GridLinePairProps) {
@@ -30,10 +30,10 @@ function GridLinePair({
         delayMs={delayMs}
         durationMs={animationDurationMs}
         className={cn(
-          "separator col-span-1 row-start-1 border-r",
+          "separator col-span-1 border-r",
           leftColumnClassName,
           zIndexClass,
-          height,
+          className,
         )}
       />
       <ScaleIn
@@ -41,20 +41,20 @@ function GridLinePair({
         delayMs={delayMs}
         durationMs={animationDurationMs}
         className={cn(
-          "separator col-span-1 row-start-1 border-l",
+          "separator col-span-1 border-l",
           rightColumnClassName,
           zIndexClass,
-          height,
+          className,
         )}
       />
     </>
   );
 }
 
-export function VerticalGridL({ height }: VerticalGridProps) {
+export function VerticalGridL({ className }: VerticalGridProps) {
   return (
     <GridLinePair
-      height={height}
+      className={className}
       leftColumnClassName="col-start-2"
       rightColumnClassName="col-start-3"
       elevated
@@ -62,10 +62,10 @@ export function VerticalGridL({ height }: VerticalGridProps) {
   );
 }
 
-export function VerticalGridM({ height }: VerticalGridProps) {
+export function VerticalGridM({ className }: VerticalGridProps) {
   return (
     <GridLinePair
-      height={height}
+      className={className}
       leftColumnClassName="col-start-6"
       rightColumnClassName="col-start-7"
       delayMs={200}
@@ -73,10 +73,10 @@ export function VerticalGridM({ height }: VerticalGridProps) {
   );
 }
 
-export function VerticalGridR({ height }: VerticalGridProps) {
+export function VerticalGridR({ className }: VerticalGridProps) {
   return (
     <GridLinePair
-      height={height}
+      className={className}
       leftColumnClassName="col-start-10"
       rightColumnClassName="col-start-11"
       delayMs={400}
@@ -85,12 +85,12 @@ export function VerticalGridR({ height }: VerticalGridProps) {
   );
 }
 
-export default function VerticalGrid({ height }: VerticalGridProps) {
+export default function VerticalGrid({ className }: VerticalGridProps) {
   return (
-    <div className="absolute grid h-dvh w-dvw grid-cols-12 gap-x-4 px-8">
-      <VerticalGridL height={height} />
-      <VerticalGridM height={height} />
-      <VerticalGridR height={height} />
+    <div className="absolute grid h-full w-dvw grid-cols-12 gap-x-4 px-8">
+      <VerticalGridL className={className} />
+      <VerticalGridM className={className} />
+      <VerticalGridR className={className} />
     </div>
   );
 }
