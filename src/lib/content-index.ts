@@ -1,5 +1,4 @@
 import generatedContentIndex from "@/generated/content-index.json";
-import { buildAlternates } from "./notion/routes";
 import type { Locale } from "./notion/types";
 
 export interface ContentArticle {
@@ -69,16 +68,6 @@ export async function getArticleBySlug(
   return articles.find((article) => article.slug === slug) ?? null;
 }
 
-export async function getTranslationParams(): Promise<
-  Array<{ locale: Locale; slug: string }>
-> {
-  const { translations } = await getContentIndex();
-  return translations.map(({ locale, originalSlug }) => ({
-    locale,
-    slug: originalSlug,
-  }));
-}
-
 export async function getTranslation(
   locale: Locale,
   slug: string,
@@ -90,19 +79,4 @@ export async function getTranslation(
         translation.locale === locale && translation.originalSlug === slug,
     ) ?? null
   );
-}
-
-export async function getArticleAlternates(
-  slug: string,
-): Promise<{ canonical: string; languages: Record<string, string> }> {
-  const { articles, translations } = await getContentIndex();
-  const article = articles.find((item) => item.slug === slug);
-  const translationLocales = translations
-    .filter((translation) => translation.originalSlug === slug)
-    .map((translation) => translation.locale);
-  const locales = article
-    ? [article.originalLanguage, ...translationLocales]
-    : translationLocales;
-
-  return buildAlternates(slug, locales);
 }
