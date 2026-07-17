@@ -1,26 +1,33 @@
-import "../styles/animated-link.css";
-import "../styles/proximity-link.css";
-import "./global.css";
-import CustomCursor from "@/components/CustomCursor";
-import Footer from "@/components/Footer";
-import MobileGate from "@/components/MobileGate";
-import {NoiseOverlay} from "@/components/NoiseOverlay";
-import type {Metadata} from "next";
-import {Analytics} from "@vercel/analytics/next";
-import {SpeedInsights} from "@vercel/speed-insights/next";
-import {bricolageGrotesque, funnelDisplay, geist, ibmPlexMono, ibmPlexSans, playfairDisplay,} from "@/app/fonts";
-import {cn} from "@/lib/utils";
-import React from "react";
+import "../styles/animated-link.css"
+import "../styles/proximity-link.css"
+import "./global.css"
+import CustomCursor from "@/components/CustomCursor"
+import Footer from "@/components/Footer"
+import MobileGate from "@/components/MobileGate"
+import { NoiseOverlay } from "@/components/NoiseOverlay"
+import type { Metadata } from "next"
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import {
+  bricolageGrotesque,
+  funnelDisplay,
+  geist,
+  ibmPlexMono,
+  ibmPlexSans,
+  playfairDisplay
+} from "@/app/fonts"
+import { cn } from "@/lib/utils"
+import React from "react"
 
 export const metadata: Metadata = {
   title: "@4rcadia",
-  description: "My personal blog.",
-};
+  description: "My personal blog."
+}
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html
@@ -34,7 +41,7 @@ export default function RootLayout({
         geist.variable,
         "overflow-x-clip antialiased",
         "font-sans",
-        "selection:bg-magenta selection:text-white",
+        "selection:bg-magenta selection:text-white"
       )}
     >
       <body>
@@ -47,5 +54,5 @@ export default function RootLayout({
         <Footer />
       </body>
     </html>
-  );
+  )
 }

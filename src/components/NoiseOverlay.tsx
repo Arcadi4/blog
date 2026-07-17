@@ -10,5 +10,5 @@ export function NoiseOverlay() {
         </filter>
       </svg>
     </figure>
-  );
+  )
 }

@@ -1,37 +1,37 @@
-import {notFound} from "next/navigation";
-import NextLink from "next/link";
-import {getAllPostSlugs, getPostData} from "@/lib/posts";
-import {formatDate} from "@/lib/utils";
-import {menuItems} from "@/app/posts/menuItems";
-import {EaseIn} from "@/components/animations/EaseIn";
-import {ScaleIn} from "@/components/animations/ScaleIn";
-import {Menu} from "@/components/Menu";
-import MarqueeCard from "@/components/MarqueeCard";
-import VerticalGrid from "@/components/VerticalGrid";
-import {Metadata} from "next";
-import {colorKlein} from "@/lib/colors";
+import { notFound } from "next/navigation"
+import NextLink from "next/link"
+import { getAllPostSlugs, getPostData } from "@/lib/posts"
+import { formatDate } from "@/lib/utils"
+import { menuItems } from "@/app/posts/menuItems"
+import { EaseIn } from "@/components/animations/EaseIn"
+import { ScaleIn } from "@/components/animations/ScaleIn"
+import { Menu } from "@/components/Menu"
+import MarqueeCard from "@/components/MarqueeCard"
+import VerticalGrid from "@/components/VerticalGrid"
+import { Metadata } from "next"
+import { colorKlein } from "@/lib/colors"
 
-export const dynamicParams = false;
+export const dynamicParams = false
 
 export async function generateStaticParams() {
-  const posts = await getAllPostSlugs();
+  const posts = await getAllPostSlugs()
   return posts.map((post) => ({
-    slug: post.slug,
-  }));
+    slug: post.slug
+  }))
 }
 
 export async function generateMetadata({
-  params,
+  params
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>
 }): Promise<Metadata> {
-  const { slug } = await params;
-  const post = await getPostData(slug);
+  const { slug } = await params
+  const post = await getPostData(slug)
 
   if (!post) {
     return {
-      title: slug,
-    };
+      title: slug
+    }
   }
 
   return {
@@ -39,9 +39,9 @@ export async function generateMetadata({
     description: post.excerpt,
     openGraph: {
       title: post.title,
-      description: post.excerpt,
-    },
-  };
+      description: post.excerpt
+    }
+  }
 }
 
 const yearRampRows = [
@@ -49,26 +49,26 @@ const yearRampRows = [
   { row: "row-start-2", weight: "font-normal" },
   { row: "row-start-3", weight: "font-medium" },
   { row: "row-start-4", weight: "font-semibold" },
-  { row: "row-start-5", weight: "font-bold" },
-];
+  { row: "row-start-5", weight: "font-bold" }
+]
 
 const titleType =
-  "font-title text-[clamp(3rem,8vw,9.5rem)] leading-[0.85] font-light tracking-[-0.06em] text-pretty";
+  "font-title text-[clamp(3rem,8vw,9.5rem)] leading-[0.85] font-light tracking-[-0.06em] text-pretty"
 
 export default async function Post({
-  params,
+  params
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string }>
 }) {
-  const { slug } = await params;
-  const post = await getPostData(slug);
+  const { slug } = await params
+  const post = await getPostData(slug)
 
   if (!post) {
-    notFound();
+    notFound()
   }
 
-  const edited = post.publishedAt.getTime() !== post.lastModifiedAt.getTime();
-  const year = String(post.publishedAt.getFullYear());
+  const edited = post.publishedAt.getTime() !== post.lastModifiedAt.getTime()
+  const year = String(post.publishedAt.getFullYear())
 
   return (
     <main id="top" className="relative overflow-x-clip">
@@ -124,7 +124,7 @@ export default async function Post({
             key={item.row}
             from="up"
             delayMs={100 * index}
-            className={`col-start-8 ${item.row} ${item.weight} self-start text-2xl leading-none tracking-[-0.06em] text-trim-cap select-none`}
+            className={`col-start-8 ${item.row} ${item.weight} self-start text-2xl text-trim-cap leading-none tracking-[-0.06em] select-none`}
           >
             <span>{year}</span>
           </EaseIn>
@@ -238,7 +238,7 @@ export default async function Post({
           <Menu
             items={[
               { name: "Back to home", href: "/" },
-              { name: "All posts", href: "/all" },
+              { name: "All posts", href: "/all" }
             ]}
             itemClassName="font-funnel-display text-6xl leading-none"
             prefix="← "
@@ -265,5 +265,5 @@ export default async function Post({
         </NextLink>
       </section>
     </main>
-  );
+  )
 }

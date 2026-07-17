@@ -1,44 +1,44 @@
-"use client";
+"use client"
 
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
+import { useEffect, useRef, useState } from "react"
+import { cn } from "@/lib/utils"
 
-const SHOW_AFTER_PX = 360;
+const SHOW_AFTER_PX = 360
 
 export default function BackToTopButton({ className }: { className?: string }) {
-  const frameRef = useRef<number | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const frameRef = useRef<number | null>(null)
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const updateVisibility = () => {
-      frameRef.current = null;
-      setIsVisible(window.scrollY > SHOW_AFTER_PX);
-    };
+      frameRef.current = null
+      setIsVisible(window.scrollY > SHOW_AFTER_PX)
+    }
 
     const scheduleVisibilityUpdate = () => {
       if (frameRef.current !== null) {
-        return;
+        return
       }
 
-      frameRef.current = window.requestAnimationFrame(updateVisibility);
-    };
+      frameRef.current = window.requestAnimationFrame(updateVisibility)
+    }
 
-    updateVisibility();
+    updateVisibility()
     window.addEventListener("scroll", scheduleVisibilityUpdate, {
-      passive: true,
-    });
+      passive: true
+    })
 
     return () => {
-      window.removeEventListener("scroll", scheduleVisibilityUpdate);
+      window.removeEventListener("scroll", scheduleVisibilityUpdate)
       if (frameRef.current !== null) {
-        window.cancelAnimationFrame(frameRef.current);
+        window.cancelAnimationFrame(frameRef.current)
       }
-    };
-  }, []);
+    }
+  }, [])
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
 
   return (
     <div className="pointer-events-none absolute z-200 mx-auto grid w-dvw grid-cols-12 gap-x-4 px-8">
@@ -51,11 +51,11 @@ export default function BackToTopButton({ className }: { className?: string }) {
           isVisible
             ? "pointer-events-auto opacity-100"
             : "pointer-events-none opacity-0",
-          className,
+          className
         )}
       >
         ↑↑
       </button>
     </div>
-  );
+  )
 }

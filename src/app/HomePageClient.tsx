@@ -1,75 +1,75 @@
-"use client";
+"use client"
 
-import {EaseIn} from "@/components/animations/EaseIn";
-import {menuItems, socialMediaItems} from "@/app/posts/menuItems";
-import {useEffect, useRef, useState} from "react";
-import {cn, formatDate} from "@/lib/utils";
-import {colorKlein} from "@/lib/colors";
-import VerticalGrid from "@/components/VerticalGrid";
-import {ScaleIn} from "@/components/animations/ScaleIn";
-import type {ContentArticle} from "@/lib/content-index";
-import MarqueeCard from "@/components/MarqueeCard";
-import {Menu} from "@/components/Menu";
-import NextLink from "next/link";
+import { EaseIn } from "@/components/animations/EaseIn"
+import { menuItems, socialMediaItems } from "@/app/posts/menuItems"
+import { useEffect, useRef, useState } from "react"
+import { cn, formatDate } from "@/lib/utils"
+import { colorKlein } from "@/lib/colors"
+import VerticalGrid from "@/components/VerticalGrid"
+import { ScaleIn } from "@/components/animations/ScaleIn"
+import type { ContentArticle } from "@/lib/content-index"
+import MarqueeCard from "@/components/MarqueeCard"
+import { Menu } from "@/components/Menu"
+import NextLink from "next/link"
 
 type HomePageClientProps = {
-  readonly articles: readonly ContentArticle[];
-};
+  readonly articles: readonly ContentArticle[]
+}
 
 // roughly 3.4 screens (64rem per screen)
 // the grid system is 5 rows per screen, so its 17 rows
-const homepageHeight = "h-[217.6rem]";
+const homepageHeight = "h-[217.6rem]"
 
 export function HomePageClient({ articles }: HomePageClientProps) {
-  const [useRealName, setUseRealName] = useState(false);
+  const [useRealName, setUseRealName] = useState(false)
   useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
+    const queryParams = new URLSearchParams(window.location.search)
     setUseRealName(
-      queryParams.has("name") && queryParams.get("name") === "skylar",
-    );
-  }, []);
-  const name = useRealName ? "Skylar" : "4rcadia";
+      queryParams.has("name") && queryParams.get("name") === "skylar"
+    )
+  }, [])
+  const name = useRealName ? "Skylar" : "4rcadia"
 
-  const variableBgRef = useRef<HTMLDivElement>(null);
+  const variableBgRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    let frameId: number | null = null;
+    let frameId: number | null = null
 
     const update = () => {
-      frameId = null;
+      frameId = null
 
-      const progress = Math.min(window.scrollY / (window.innerHeight * 0.2), 1);
+      const progress = Math.min(window.scrollY / (window.innerHeight * 0.2), 1)
 
       if (variableBgRef.current) {
-        variableBgRef.current.style.transform = `scaleX(${1 + progress * 11})`;
+        variableBgRef.current.style.transform = `scaleX(${1 + progress * 11})`
       }
-    };
+    }
 
     const handleScroll = () => {
       if (frameId === null) {
-        frameId = requestAnimationFrame(update);
+        frameId = requestAnimationFrame(update)
       }
-    };
+    }
 
-    update();
+    update()
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    window.addEventListener("resize", handleScroll)
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("resize", handleScroll)
       if (frameId !== null) {
-        cancelAnimationFrame(frameId);
+        cancelAnimationFrame(frameId)
       }
-    };
-  }, []);
+    }
+  }, [])
 
   return (
     <main className="relative">
       <div
         className={cn(
           "relative grid grid-cols-12 grid-rows-17 gap-x-4 gap-y-4 p-8 w-dvw",
-          homepageHeight,
+          homepageHeight
         )}
       >
         <div className="absolute inset-0 row-span-12 row-start-1 -mt-8">
@@ -250,7 +250,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
                 onSeen
                 className={cn(
                   "absolute bg-magenta inset-0",
-                  `col-end-5 col-start-${3 - Math.abs((i % 4) - 2)}`,
+                  `col-end-5 col-start-${3 - Math.abs((i % 4) - 2)}`
                 )}
               >
                 <h1 className="absolute top-0 right-0 origin-top-right font-funnel-display text-5xl text-trim-cap font-bold transition-transform duration-300 ease-out group-hover:scale-200">
@@ -295,5 +295,5 @@ export function HomePageClient({ articles }: HomePageClientProps) {
         />
       </div>
     </main>
-  );
+  )
 }

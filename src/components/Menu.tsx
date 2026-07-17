@@ -1,22 +1,22 @@
-"use client";
+"use client"
 
-import type {ProximityLinkProps} from "@/components/ProximityLink";
-import ProximityLink from "@/components/ProximityLink";
-import {EaseIn} from "@/components/animations/EaseIn";
-import type {LinkItem} from "@/app/posts/menuItems";
+import type { ProximityLinkProps } from "@/components/ProximityLink"
+import ProximityLink from "@/components/ProximityLink"
+import { EaseIn } from "@/components/animations/EaseIn"
+import type { LinkItem } from "@/app/posts/menuItems"
 
 type MenuProps = {
-  readonly items: readonly LinkItem[];
-  readonly className?: string;
-  readonly itemClassName?: string;
-  readonly linkClassName?: string;
-  readonly prefix?: string;
-  readonly suffix?: string;
-  readonly shadowColor?: ProximityLinkProps["shadowColor"];
-  readonly delayMs?: number;
-  readonly delayStepMs?: number;
-  readonly onSeen?: boolean;
-};
+  readonly items: readonly LinkItem[]
+  readonly className?: string
+  readonly itemClassName?: string
+  readonly linkClassName?: string
+  readonly prefix?: string
+  readonly suffix?: string
+  readonly shadowColor?: ProximityLinkProps["shadowColor"]
+  readonly delayMs?: number
+  readonly delayStepMs?: number
+  readonly onSeen?: boolean
+}
 
 export function Menu({
   items,
@@ -28,7 +28,7 @@ export function Menu({
   shadowColor,
   delayMs = 0,
   delayStepMs = 0,
-  onSeen = false,
+  onSeen = false
 }: MenuProps) {
   return (
     <div className={className}>
@@ -62,5 +62,5 @@ export function Menu({
         </EaseIn>
       ))}
     </div>
-  );
+  )
 }

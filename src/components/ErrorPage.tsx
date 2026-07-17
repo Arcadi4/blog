@@ -1,42 +1,42 @@
-"use client";
+"use client"
 
-import {usePathname} from "next/navigation";
-import type {ReactNode} from "react";
-import {menuItems} from "@/app/posts/menuItems";
-import {EaseIn} from "@/components/animations/EaseIn";
-import {ScaleIn} from "@/components/animations/ScaleIn";
-import {Menu} from "@/components/Menu";
+import { usePathname } from "next/navigation"
+import type { ReactNode } from "react"
+import { menuItems } from "@/app/posts/menuItems"
+import { EaseIn } from "@/components/animations/EaseIn"
+import { ScaleIn } from "@/components/animations/ScaleIn"
+import { Menu } from "@/components/Menu"
 
 type ErrorPageLink = {
-  name: string;
-  href: string;
-};
+  name: string
+  href: string
+}
 
 type ErrorPageProps = {
-  code: number | string;
-  title: string;
-  codeDisplay?: string;
-  familyLabel?: string;
-  caption?: string;
-  description?: ReactNode;
-  titleLines?: string[];
-  heroSymbol?: ReactNode;
-  marker?: string;
-  pathnameRepeats?: number;
-  links?: ErrorPageLink[];
-};
+  code: number | string
+  title: string
+  codeDisplay?: string
+  familyLabel?: string
+  caption?: string
+  description?: ReactNode
+  titleLines?: string[]
+  heroSymbol?: ReactNode
+  marker?: string
+  pathnameRepeats?: number
+  links?: ErrorPageLink[]
+}
 
 export default function ErrorPage({
   code,
   title,
-  codeDisplay,
+  codeDisplay
 }: ErrorPageProps) {
-  const pathname = usePathname();
-  const normalizedCode = String(code);
-  const resolvedCodeDisplay = codeDisplay ?? normalizedCode;
+  const pathname = usePathname()
+  const normalizedCode = String(code)
+  const resolvedCodeDisplay = codeDisplay ?? normalizedCode
 
-  const delayPerMenuItem = 100;
-  const baseUrl = "https://blog.arcadia.moe";
+  const delayPerMenuItem = 100
+  const baseUrl = "https://blog.arcadia.moe"
 
   return (
     <main className="relative overflow-hidden">
@@ -125,9 +125,9 @@ export default function ErrorPage({
 
         {/* Error code */}
         {Array.from({ length: 5 }, (_, index) => {
-          const row = index + 1;
-          const delay = 100 * index;
-          const weight = 300 + 100 * index;
+          const row = index + 1
+          const delay = 100 * index
+          const weight = 300 + 100 * index
 
           return (
             <EaseIn
@@ -138,12 +138,12 @@ export default function ErrorPage({
             >
               {resolvedCodeDisplay}
             </EaseIn>
-          );
+          )
         })}
         {Array.from({ length: 5 }, (_, index) => {
-          const col = 5 + index * 2;
-          const delay = 100 * index;
-          const weight = 300 + 100 * index;
+          const col = 5 + index * 2
+          const delay = 100 * index
+          const weight = 300 + 100 * index
 
           return (
             <EaseIn
@@ -154,7 +154,7 @@ export default function ErrorPage({
             >
               {resolvedCodeDisplay}
             </EaseIn>
-          );
+          )
         })}
         {/* Hero */}
         <div className="z-10 col-start-2 row-start-4 self-end font-title text-[320px] text-trim-cap leading-[0.9] font-light tracking-[-0.06em] text-nowrap text-magenta mix-blend-difference select-none">
@@ -165,5 +165,5 @@ export default function ErrorPage({
         </div>
       </div>
     </main>
-  );
+  )
 }

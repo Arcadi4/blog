@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import Link from "@/components/Link";
+import Link from "@/components/Link"
 
 export default function Footer() {
   return (
@@ -23,5 +23,5 @@ export default function Footer() {
         *moe
       </div>
     </footer>
-  );
+  )
 }

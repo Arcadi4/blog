@@ -1,8 +1,8 @@
-import NextLink from "next/link";
-import { AnchorHTMLAttributes } from "react";
+import NextLink from "next/link"
+import { AnchorHTMLAttributes } from "react"
 
 interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  href: string;
+  href: string
 }
 
 /**
@@ -19,17 +19,17 @@ export default function Link({
   className = "",
   ...props
 }: LinkProps) {
-  const isExternal = href.startsWith("http") || href.startsWith("mailto:");
-  const linkClass = `animated-link ${className}`;
+  const isExternal = href.startsWith("http") || href.startsWith("mailto:")
+  const linkClass = `animated-link ${className}`
 
   // Treat null/undefined/empty-string/empty-array children as "no children"
   const childrenEmpty =
     children === undefined ||
     children === null ||
     (typeof children === "string" && children.trim() === "") ||
-    (Array.isArray(children) && children.length === 0);
+    (Array.isArray(children) && children.length === 0)
 
-  const content = childrenEmpty ? href : children;
+  const content = childrenEmpty ? href : children
 
   if (isExternal) {
     return (
@@ -42,12 +42,12 @@ export default function Link({
       >
         {content}
       </a>
-    );
+    )
   }
 
   return (
     <NextLink href={href} className={linkClass} {...props}>
       {content}
     </NextLink>
-  );
+  )
 }
