@@ -7,20 +7,29 @@
       "skillPath": "frontend-debugging/SKILL.md",
       "computedHash": "3ed121903110f616761ff002291011e0d04346abcf46edeafe489c10dcb94b0a"
     },
-    "frontend-design": {
-      "source": "anthropics/skills",
+    "next-cache-components-adoption": {
+      "source": "vercel/next.js",
       "sourceType": "github",
-      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+      "skillPath": "skills/next-cache-components-adoption/SKILL.md",
+      "computedHash": "d4371ab1c921704f8b855463deef68502118e18a98d60f8b45619d9910f94fee"
     },
-    "next-best-practices": {
-      "source": "vercel-labs/next-skills",
+    "next-cache-components-optimizer": {
+      "source": "vercel/next.js",
       "sourceType": "github",
-      "computedHash": "db85045827ebeb83ac8dbc992b69188755eeb74dcf01cbf5e694d58aa494a106"
+      "skillPath": "skills/next-cache-components-optimizer/SKILL.md",
+      "computedHash": "b8d757a1fe10ebe7b10de1d5ee83f9bcdbd1de1e1147efc68cf249377f471067"
     },
-    "next-cache-components": {
-      "source": "vercel-labs/next-skills",
+    "next-dev-loop": {
+      "source": "vercel/next.js",
       "sourceType": "github",
-      "computedHash": "f835d8226c28abf012cc013928e2627c8a7a046de61127ef229be1711bd1f255"
+      "skillPath": "skills/next-dev-loop/SKILL.md",
+      "computedHash": "aad97b32ba6efd31e92d063ec77120a694fe0d4a9401daf9af4c205cd5e21b07"
+    },
+    "next-partial-prefetching-adoption": {
+      "source": "vercel/next.js",
+      "sourceType": "github",
+      "skillPath": "skills/next-partial-prefetching-adoption/SKILL.md",
+      "computedHash": "45fd0e5f600e946cfcca44bd47d89619dc23c21c126734ff7d43d1e55eb39ad8"
     },
     "web-design-guidelines": {
       "source": "vercel-labs/agent-skills",
