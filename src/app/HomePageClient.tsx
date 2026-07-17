@@ -2,7 +2,7 @@
 
 import { EaseIn } from "@/components/animations/EaseIn"
 import { menuItems, socialMediaItems } from "@/app/posts/menuItems"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { cn, formatDate } from "@/lib/utils"
 import { colorKlein } from "@/lib/colors"
 import VerticalGrid from "@/components/VerticalGrid"
@@ -11,6 +11,7 @@ import type { ContentArticle } from "@/lib/content-index"
 import MarqueeCard from "@/components/MarqueeCard"
 import { Menu } from "@/components/Menu"
 import NextLink from "next/link"
+import { ScrollScale } from "@/components/animations/ScrollScale"
 
 type HomePageClientProps = {
   readonly articles: readonly ContentArticle[]
@@ -29,40 +30,6 @@ export function HomePageClient({ articles }: HomePageClientProps) {
     )
   }, [])
   const name = useRealName ? "Skylar" : "4rcadia"
-
-  const variableBgRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    let frameId: number | null = null
-
-    const update = () => {
-      frameId = null
-
-      const progress = Math.min(window.scrollY / (window.innerHeight * 0.2), 1)
-
-      if (variableBgRef.current) {
-        variableBgRef.current.style.transform = `scaleX(${1 + progress * 11})`
-      }
-    }
-
-    const handleScroll = () => {
-      if (frameId === null) {
-        frameId = requestAnimationFrame(update)
-      }
-    }
-
-    update()
-
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    window.addEventListener("resize", handleScroll)
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-      window.removeEventListener("resize", handleScroll)
-      if (frameId !== null) {
-        cancelAnimationFrame(frameId)
-      }
-    }
-  }, [])
 
   return (
     <main className="relative">
@@ -83,8 +50,11 @@ export function HomePageClient({ articles }: HomePageClientProps) {
         </p>
 
         {/* Hero */}
-        <div
-          ref={variableBgRef}
+        <ScrollScale
+          from={1}
+          to={12}
+          axis="x"
+          scrollRange={0.2}
           className="col-start-1 row-span-4 row-start-1 -mt-8 -ml-8 origin-left bg-klein transition-transform duration-400 ease-out"
         />
         <span className="h- pointer-events-none z-10 col-start-3 row-start-2 font-funnel-display text-[10rem] text-trim-cap">
