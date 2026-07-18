@@ -1,0 +1,81 @@
+.summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.fold::details-content {
+  display: contents;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summaryText {
+  position: relative;
+}
+
+.summaryText::after {
+  color: var(--color-magenta);
+  content: attr(data-summary);
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 100ms steps(2, end),
+    transform 150ms steps(3, end);
+}
+
+.summary:hover .summaryText::after,
+.summary:focus-visible .summaryText::after {
+  opacity: 0.9;
+  transform: translate3d(0.08em, -0.06em, 0);
+}
+
+.summary:focus-visible {
+  outline: 3px solid var(--color-klein);
+  outline-offset: -3px;
+}
+
+.openIcon {
+  display: none;
+}
+
+.fold[open] .closedIcon {
+  display: none;
+}
+
+.fold[open] .openIcon {
+  display: inline;
+}
+
+.foldBody {
+  animation: fold-open 180ms steps(4, end) both;
+  transform-origin: top;
+}
+
+@keyframes fold-open {
+  from {
+    clip-path: inset(0 0 100%);
+    opacity: 0;
+    transform: translateY(-0.75rem);
+  }
+
+  to {
+    clip-path: inset(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summaryText::after {
+    transition: none;
+  }
+
+  .foldBody {
+    animation: none;
+  }
+}

@@ -1,0 +1,62 @@
+.matrixSurface {
+  background-image: radial-gradient(
+    rgb(255 255 255 / 24%) 0.7px,
+    transparent 0.7px
+  );
+  background-size: 16px 16px;
+}
+
+.matrixCell {
+  background: rgb(255 255 255 / 10%);
+  min-height: 1.25rem;
+}
+
+.matrixTarget {
+  min-height: 1.5rem;
+  min-width: 1.5rem;
+  outline: 1px solid rgb(255 255 255 / 50%);
+  outline-offset: -1px;
+  transition:
+    filter 120ms steps(2, end),
+    transform 120ms steps(2, end);
+}
+
+.matrixTarget:hover,
+.matrixTarget:has(input:focus-visible) {
+  filter: brightness(1.2);
+  transform: scale(1.16);
+  z-index: 20;
+}
+
+.matrixTarget:has(input:focus-visible) {
+  outline: 2px solid var(--color-background);
+  outline-offset: 4px;
+}
+
+.activePanel::after {
+  animation: matrix-scan 420ms steps(4, end) both;
+  background: rgb(255 255 255 / 35%);
+  content: "";
+  height: 2px;
+  inset-inline: 0;
+  position: absolute;
+  top: 0;
+}
+
+@keyframes matrix-scan {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(31rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .matrixTarget,
+  .activePanel::after {
+    animation: none;
+    transition: none;
+  }
+}

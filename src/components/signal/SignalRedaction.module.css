@@ -1,0 +1,75 @@
+.redaction {
+  color: var(--color-foreground);
+  cursor: pointer;
+  display: inline-block;
+  font: inherit;
+  line-height: inherit;
+  padding-inline: 0.12em;
+  position: relative;
+  vertical-align: baseline;
+}
+
+.redactionText {
+  color: transparent;
+  display: inline-block;
+  position: relative;
+  transition: color 90ms steps(2, end);
+}
+
+.redactionText::before {
+  background: var(--color-foreground);
+  content: "";
+  inset: 0.12em -0.08em 0.05em;
+  position: absolute;
+  transform-origin: bottom;
+  transition:
+    opacity 90ms steps(2, end),
+    transform 140ms steps(3, end);
+}
+
+.redactionText::after {
+  color: var(--color-magenta);
+  content: attr(data-text);
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 90ms steps(2, end),
+    transform 140ms steps(3, end);
+  white-space: pre;
+}
+
+.redaction:hover .redactionText,
+.redaction:focus-visible .redactionText,
+.redaction[data-revealed="true"] .redactionText {
+  color: var(--color-foreground);
+}
+
+.redaction:hover .redactionText::before,
+.redaction:focus-visible .redactionText::before,
+.redaction[data-revealed="true"] .redactionText::before {
+  opacity: 0;
+  transform: scaleY(0.08);
+}
+
+.redaction:hover .redactionText::after,
+.redaction:focus-visible .redactionText::after,
+.redaction[data-revealed="true"] .redactionText::after {
+  opacity: 0.9;
+  transform: translate3d(0.1em, -0.08em, 0);
+}
+
+.redaction:focus-visible {
+  outline: 2px solid var(--color-klein);
+  outline-offset: 0.15em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .redactionText,
+  .redactionText::before,
+  .redactionText::after {
+    transition: none;
+  }
+}

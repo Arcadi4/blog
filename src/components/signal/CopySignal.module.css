@@ -1,0 +1,75 @@
+.copySignal {
+  align-items: center;
+  background: transparent;
+  border: 1px solid currentColor;
+  color: currentColor;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 0.55rem;
+  min-height: 2rem;
+  min-width: 6.25rem;
+  padding: 0.35rem 0.5rem;
+  transition:
+    background-color 100ms steps(2, end),
+    color 100ms steps(2, end);
+}
+
+.blocks {
+  align-items: end;
+  display: grid;
+  gap: 2px;
+  grid-template-columns: repeat(3, 0.28rem);
+  height: 0.8rem;
+}
+
+.blocks > span {
+  background: currentColor;
+  display: block;
+  height: 42%;
+  transition: height 140ms steps(3, end);
+}
+
+.blocks > span:nth-child(2) {
+  height: 100%;
+}
+
+.blocks > span:nth-child(3) {
+  height: 68%;
+}
+
+.copySignal:hover .blocks > span:first-child,
+.copySignal:focus-visible .blocks > span:first-child {
+  height: 100%;
+}
+
+.copySignal:hover .blocks > span:nth-child(2),
+.copySignal:focus-visible .blocks > span:nth-child(2) {
+  height: 54%;
+}
+
+.copySignal:hover .blocks > span:nth-child(3),
+.copySignal:focus-visible .blocks > span:nth-child(3) {
+  height: 86%;
+}
+
+.copySignal[data-status="copied"] {
+  background: var(--color-acid);
+  color: var(--color-foreground);
+}
+
+.copySignal[data-status="denied"] {
+  background: var(--color-magenta);
+  color: var(--color-foreground);
+}
+
+.copySignal:focus-visible {
+  outline: 2px solid var(--color-acid);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copySignal,
+  .blocks > span {
+    transition: none;
+  }
+}

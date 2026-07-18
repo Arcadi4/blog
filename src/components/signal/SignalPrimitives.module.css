@@ -1,0 +1,41 @@
+.signalBar {
+  animation: signal-bar-boot 700ms steps(4, end) both;
+  transform-origin: bottom;
+}
+
+.segmentedRing {
+  background: repeating-conic-gradient(
+    from -10deg,
+    currentColor 0deg 13deg,
+    transparent 13deg 19deg
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--ring-width, 9px)),
+    #000 calc(100% - var(--ring-width, 9px) + 1px)
+  );
+}
+
+@keyframes signal-bar-boot {
+  0% {
+    transform: scaleY(0);
+  }
+
+  55% {
+    transform: scaleY(1);
+  }
+
+  72% {
+    transform: scaleY(0.55);
+  }
+
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signalBar {
+    animation: none;
+  }
+}
