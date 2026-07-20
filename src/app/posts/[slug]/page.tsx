@@ -4,6 +4,7 @@ import { formatDate } from "@/lib/utils"
 import { menuItems } from "@/app/posts/menuItems"
 import { EaseIn } from "@/components/animations/EaseIn"
 import { ScaleIn } from "@/components/animations/ScaleIn"
+import { MarkdownContent } from "@/components/article/MarkdownContent"
 import { Menu } from "@/components/Menu"
 import MarqueeCard from "@/components/MarqueeCard"
 import VerticalGrid from "@/components/VerticalGrid"
@@ -190,12 +191,10 @@ export default async function Post({
           </div>
         </aside>
 
-        <article className="col-span-8 col-start-3 row-start-2 py-16">
-          <div
-            className="prose prose-lg max-w-none prose-headings:font-title prose-headings:font-semibold prose-headings:text-foreground prose-h2:text-4xl prose-h3:text-3xl prose-p:text-foreground/80 prose-a:text-klein prose-a:underline prose-a:decoration-klein prose-blockquote:border-l-magenta prose-blockquote:text-foreground/70 prose-strong:text-foreground prose-code:rounded-none prose-code:bg-foreground prose-code:px-1 prose-code:py-0.5 prose-code:text-acid prose-code:before:content-none prose-code:after:content-none prose-pre:rounded-none prose-li:text-foreground/80 prose-img:w-full prose-hr:border-gray-400"
-            dangerouslySetInnerHTML={{ __html: post.content || "" }}
-          />
-        </article>
+        <MarkdownContent
+          className="col-span-8 col-start-3 row-start-2 py-16"
+          html={post.content}
+        />
       </section>
 
       {/* End */}

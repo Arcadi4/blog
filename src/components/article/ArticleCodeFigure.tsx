@@ -21,7 +21,7 @@ export function ArticleCodeFigure({
   return (
     <figure
       className={cn(
-        "not-prose col-span-full grid min-h-[32rem] grid-cols-subgrid overflow-hidden border-y border-foreground bg-foreground text-background",
+        "col-span-full grid min-h-[32rem] grid-cols-subgrid overflow-hidden border-y border-foreground bg-foreground text-background",
         className
       )}
     >

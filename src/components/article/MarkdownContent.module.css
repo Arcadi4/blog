@@ -1,0 +1,192 @@
+.content {
+  color: color-mix(in srgb, var(--color-foreground) 80%, transparent);
+  font-size: 1.125rem;
+  line-height: 1.75;
+  min-width: 0;
+}
+
+.content > :first-child {
+  margin-top: 0;
+}
+
+.content > :last-child {
+  margin-bottom: 0;
+}
+
+/* Headings */
+.content :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--color-foreground);
+  font-family: var(--font-title), serif;
+  font-weight: 600;
+  line-height: 1.1;
+  margin-block: 1.75em 0.75em;
+  text-wrap: pretty;
+}
+
+.content h1 {
+  font-size: 3rem;
+}
+
+.content h2 {
+  font-size: 2.25rem;
+}
+
+.content h3 {
+  font-size: 1.875rem;
+}
+
+.content h4 {
+  font-size: 1.5rem;
+}
+
+.content h5 {
+  font-size: 1.25rem;
+}
+
+.content h6 {
+  font-size: 1.125rem;
+}
+
+/* Body copy */
+.content p {
+  margin-block: 1.25em;
+}
+
+.content strong {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+.content a {
+  color: var(--color-klein);
+  text-decoration-line: underline;
+  text-decoration-color: var(--color-klein);
+  text-underline-offset: 0.15em;
+}
+
+.content blockquote {
+  border-left: 0.25rem solid var(--color-magenta);
+  color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+  font-style: italic;
+  margin-block: 1.75em;
+  padding-left: 1em;
+}
+
+.content blockquote > :first-child {
+  margin-top: 0;
+}
+
+.content blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* Lists */
+.content :is(ul, ol) {
+  margin-block: 1.25em;
+  padding-left: 1.625em;
+}
+
+.content ul {
+  list-style-type: disc;
+}
+
+.content ol {
+  list-style-type: decimal;
+}
+
+.content :is(ul, ol) :is(ul, ol) {
+  margin-block: 0.5em;
+}
+
+.content li {
+  margin-block: 0.4em;
+  padding-left: 0.375em;
+}
+
+.content li::marker {
+  color: color-mix(in srgb, var(--color-foreground) 55%, transparent);
+}
+
+.content [class~="contains-task-list"],
+.content [class~="task-list-item"] {
+  list-style: none;
+}
+
+.content [class~="contains-task-list"] {
+  padding-left: 0;
+}
+
+.content [class~="task-list-item"] input[type="checkbox"] {
+  accent-color: var(--color-klein);
+  margin-right: 0.5em;
+}
+
+/* Code */
+.content :not(pre) > code {
+  background: var(--color-foreground);
+  color: var(--color-acid);
+  font-size: 0.875em;
+  padding: 0.125em 0.25em;
+}
+
+.content pre {
+  border-radius: 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  margin-block: 2em;
+  overflow-x: auto;
+  padding: 1.25rem 1.5rem;
+  tab-size: 2;
+}
+
+.content pre code {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font-size: inherit;
+  padding: 0;
+}
+
+/* Media and separators */
+.content img {
+  display: block;
+  height: auto;
+  margin-block: 2em;
+  width: 100%;
+}
+
+.content hr {
+  border: 0;
+  border-top: 1px solid #9ca3af;
+  margin-block: 3em;
+}
+
+/* Tables */
+.content table {
+  border-collapse: collapse;
+  display: block;
+  font-size: 0.95em;
+  margin-block: 2em;
+  overflow-x: auto;
+  text-align: left;
+  width: 100%;
+}
+
+.content thead {
+  border-bottom: 1px solid var(--color-foreground);
+  color: var(--color-foreground);
+}
+
+.content tr {
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-foreground) 25%, transparent);
+}
+
+.content :is(th, td) {
+  padding: 0.6em 0.8em;
+  vertical-align: top;
+}
+
+.content th {
+  font-weight: 600;
+}

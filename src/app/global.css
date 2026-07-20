@@ -6,8 +6,6 @@
 */
 @custom-variant dark (&:is(.dark *));
 
-@plugin "@tailwindcss/typography";
-
 @theme {
   --color-background: #fafafa;
   --color-foreground: #0f0f0f;
@@ -110,18 +108,4 @@ body {
   -webkit-text-stroke-width: 1.5px;
   -webkit-text-stroke-color: var(--color-acid);
   color: transparent;
-}
-
-/* GFM task-list normalization */
-.contains-task-list {
-  list-style: none;
-  padding-left: 0;
-}
-
-.task-list-item {
-  list-style: none;
-}
-
-.task-list-item input[type="checkbox"] {
-  margin-right: 0.5em;
 }

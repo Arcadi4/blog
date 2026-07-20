@@ -18,7 +18,7 @@ export function ArticleFold({
     <details
       className={cn(
         styles.fold,
-        "not-prose col-span-full grid grid-cols-subgrid border-y border-foreground",
+        "col-span-full grid grid-cols-subgrid border-y border-foreground",
         className
       )}
     >
