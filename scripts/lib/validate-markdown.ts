@@ -74,6 +74,17 @@ const htmlBlockEnd = /^<\/(?:details|table)>$/
 const notionTableRow = /<tr>\s*([\s\S]*?)\s*<\/tr>/g
 const notionTableCell = /<td>\s*([\s\S]*?)\s*<\/td>/g
 const escapedInlineHtmlTag = /(?:\\<|&lt;)(\/?(?:sub|sup|u))\\?>/gi
+const markdownEscapablePunctuation = new Set(
+  `!"#$%&'()*+,-./:;<=>?@[\\]^_\`{|}~`
+)
+
+function restoreNotionInlineSyntax(line: string): string {
+  return line
+    .replace(escapedInlineHtmlTag, "<$1>")
+    .replace(/\\\\(.)/g, (escape, character) =>
+      markdownEscapablePunctuation.has(character) ? `\\${character}` : escape
+    )
+}
 
 function notionTableToGfm(lines: string[]): string[] | undefined {
   if (!/\bheader-row=(?:"true"|'true')/.test(lines[0])) return
@@ -152,8 +163,10 @@ function normalizeNotionMarkdown(markdown: string): string {
       continue
     }
 
-    if (notionTableStart.test(line.trim())) {
-      const tableLines = [line]
+    const normalizedLine = restoreNotionInlineSyntax(line)
+
+    if (notionTableStart.test(normalizedLine.trim())) {
+      const tableLines = [normalizedLine]
       let end = index + 1
       while (end < lines.length) {
         tableLines.push(lines[end])
@@ -172,16 +185,13 @@ function normalizeNotionMarkdown(markdown: string): string {
       }
     }
 
-    normalized.push(line)
-    if (htmlBlockEnd.test(line.trim()) && lines[index + 1] !== "") {
+    normalized.push(normalizedLine)
+    if (htmlBlockEnd.test(normalizedLine.trim()) && lines[index + 1] !== "") {
       normalized.push("")
     }
   }
 
-  // Notion escapes these supported inline HTML tags in its Markdown export.
-  // Restore only their attribute-free forms; the sanitizer still rejects every
-  // other raw HTML element and all attributes.
-  return normalized.join("\n").replace(escapedInlineHtmlTag, "<$1>")
+  return normalized.join("\n")
 }
 
 function validationContext(
