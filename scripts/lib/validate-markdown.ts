@@ -1,7 +1,7 @@
 import rehypeShikiFromHighlighter from "@shikijs/rehype/core"
 import type { Parent, Root, RootContent } from "mdast"
 import rehypeRaw from "rehype-raw"
-import rehypeSanitize from "rehype-sanitize"
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize"
 import rehypeStringify from "rehype-stringify"
 import remarkDirective from "remark-directive"
 import remarkGfm from "remark-gfm"
@@ -35,6 +35,13 @@ const reservedDirectiveTypes = new Set([
   "containerDirective"
 ])
 
+// Keep the sanitizer's default restrictions while preserving the small set of
+// semantic inline HTML tags that Notion's Markdown export may emit.
+const markdownSanitizationSchema = {
+  ...defaultSchema,
+  tagNames: [...(defaultSchema.tagNames ?? []), "sub", "sup", "u"]
+}
+
 function isParent(node: RootContent): node is RootContent & Parent {
   return "children" in node
 }
@@ -66,6 +73,7 @@ const notionTableStart = /^<table(?:\s[^>]*)?>$/
 const htmlBlockEnd = /^<\/(?:details|table)>$/
 const notionTableRow = /<tr>\s*([\s\S]*?)\s*<\/tr>/g
 const notionTableCell = /<td>\s*([\s\S]*?)\s*<\/td>/g
+const escapedInlineHtmlTag = /(?:\\<|&lt;)(\/?(?:sub|sup|u))\\?>/gi
 
 function notionTableToGfm(lines: string[]): string[] | undefined {
   if (!/\bheader-row=(?:"true"|'true')/.test(lines[0])) return
@@ -170,7 +178,10 @@ function normalizeNotionMarkdown(markdown: string): string {
     }
   }
 
-  return normalized.join("\n")
+  // Notion escapes these supported inline HTML tags in its Markdown export.
+  // Restore only their attribute-free forms; the sanitizer still rejects every
+  // other raw HTML element and all attributes.
+  return normalized.join("\n").replace(escapedInlineHtmlTag, "<$1>")
 }
 
 function validationContext(
@@ -244,7 +255,7 @@ export async function createMarkdownCompiler(): Promise<MarkdownCompiler> {
     .use(removeReservedDirectives)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
-    .use(rehypeSanitize)
+    .use(rehypeSanitize, markdownSanitizationSchema)
     .use(rehypeShikiFromHighlighter, highlighter, {
       theme: "one-dark-pro",
       defaultLanguage: "plaintext",
