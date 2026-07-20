@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation"
-import NextLink from "next/link"
 import { getAllPostSlugs, getPostData } from "@/lib/posts"
 import { formatDate } from "@/lib/utils"
 import { menuItems } from "@/app/posts/menuItems"
@@ -200,7 +199,9 @@ export default async function Post({
       </section>
 
       {/* End */}
-      <section className="relative grid w-dvw grid-cols-12 gap-x-4 gap-y-4 p-8">
+      <section className="relative grid w-dvw grid-cols-12 grid-rows-1 gap-x-4 px-8">
+        <div className="separator absolute top-0 z-10 w-dvw border-t" />
+
         <ScaleIn durationMs={1000} from="left" onSeen minPosition={5}>
           <MarqueeCard className="col-span-7 col-start-1 row-start-1 -ml-8 h-32 bg-acid">
             end of transmission end of transmission end of transmission
@@ -216,7 +217,6 @@ export default async function Post({
             itemClassName="font-funnel-display text-6xl leading-none"
             prefix="← "
             shadowColor={colorKlein}
-            onSeen
           />
         </nav>
 
@@ -225,17 +225,6 @@ export default async function Post({
           onSeen
           className="separator col-span-full row-start-2 -mx-8 border-t"
         />
-
-        <p className="col-start-1 row-start-3 self-end font-mono leading-none">
-          <span className="text-klein">EOF</span>
-          {` /posts/${post.id}`}
-        </p>
-        <NextLink
-          href="#top"
-          className="col-start-12 row-start-3 self-end justify-self-end font-mono leading-none text-klein"
-        >
-          ↑↑
-        </NextLink>
       </section>
     </main>
   )
