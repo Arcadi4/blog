@@ -47,9 +47,7 @@ export async function generateMetadata({
 const yearRampRows = [
   { row: "row-start-1", weight: "font-light" },
   { row: "row-start-2", weight: "font-normal" },
-  { row: "row-start-3", weight: "font-medium" },
-  { row: "row-start-4", weight: "font-semibold" },
-  { row: "row-start-5", weight: "font-bold" }
+  { row: "row-start-3", weight: "font-medium" }
 ]
 
 const titleType =
@@ -72,41 +70,25 @@ export default async function Post({
 
   return (
     <main id="top" className="relative overflow-x-clip">
-      {/* ============ Hero poster ============ */}
-      <section className="relative grid h-dvh w-dvw grid-cols-12 grid-rows-5 gap-x-4 gap-y-4 p-8">
-        {/* Color blocks */}
+      {/* Hero */}
+      <section className="relative grid h-[60dvh] w-dvw grid-cols-12 grid-rows-3 gap-x-4 gap-y-4 px-8 pt-8">
+        {/* Color Block */}
         <ScaleIn
           from="top"
           className="-z-10 col-span-6 col-start-1 row-span-4 row-start-1 -mt-8 -ml-8 bg-klein"
-        />
-        <ScaleIn
-          from="left"
-          delayMs={300}
-          className="-z-10 col-start-8 row-start-2 h-2/3 self-end bg-magenta"
-        />
-        <ScaleIn
-          from="bottom"
-          delayMs={200}
-          className="-z-10 col-span-2 col-start-11 row-start-5 -mr-8 -mb-8 bg-acid"
         />
 
         {/* Guidelines */}
         <ScaleIn
           from="top"
           delayMs={100}
-          className="separator -z-10 col-span-1 col-start-7 row-span-full row-start-1 -my-8 border-r"
-        />
-        <ScaleIn
-          from="right"
-          delayMs={150}
-          className="separator -z-10 col-span-full col-start-1 row-start-5 -mx-8 border-t"
+          className="separator absolute inset-0 -z-10 col-span-1 col-start-7 border-r"
         />
 
         {/* Corner text */}
         <p className="col-start-1 row-start-1 leading-none whitespace-pre-line text-background">
           {"https://\nblog.\narcadia\n.moe"}
         </p>
-        <p className="col-start-1 row-start-5 self-end">POST_PAGE</p>
 
         {/* Menu */}
         <aside className="z-50 col-span-full col-start-10 row-start-1">
@@ -135,20 +117,11 @@ export default async function Post({
           from="up"
           distance="lg"
           delayMs={200}
-          className="col-span-5 col-start-2 row-span-3 row-start-2 self-end"
+          className="col-span-5 col-start-2 row-span-3 row-start-1 self-end"
         >
-          <div className="relative">
-            <h1
-              aria-hidden
-              className={`${titleType} text-stroke-magenta absolute inset-0 translate-x-[0.05em] translate-y-[0.05em] select-none`}
-            >
-              {post.title}.
-            </h1>
-            <h1 className={`${titleType} relative text-background`}>
-              {post.title}
-              <span className="text-magenta">.</span>
-            </h1>
-          </div>
+          <h1 className={`${titleType} relative font-bold text-background`}>
+            {post.title}
+          </h1>
         </EaseIn>
 
         {/* Rotated slug */}
@@ -195,14 +168,14 @@ export default async function Post({
         </div>
 
         {/* Scroll hint */}
-        <span className="col-start-12 row-start-4 self-end justify-self-end font-mono text-5xl leading-none text-klein">
+        <span className="col-start-12 row-start-3 self-end justify-self-end font-mono text-5xl leading-none text-klein">
           ↓↓
         </span>
       </section>
 
-      {/* ============ Body ============ */}
-      <section className="relative grid w-dvw grid-cols-12 gap-x-4 p-8">
-        <div className="absolute inset-0">
+      {/* Body */}
+      <section className="relative grid w-dvw grid-cols-12 gap-x-4 px-8">
+        <div className="absolute inset-0 -z-10">
           <VerticalGrid className="h-full" />
         </div>
 
@@ -218,7 +191,7 @@ export default async function Post({
           </div>
         </aside>
 
-        <article className="col-span-6 col-start-4 row-start-2 py-16">
+        <article className="col-span-8 col-start-3 row-start-2 py-16">
           <div
             className="prose prose-lg max-w-none prose-headings:font-title prose-headings:font-semibold prose-headings:text-foreground prose-h2:text-4xl prose-h3:text-3xl prose-p:text-foreground/80 prose-a:text-klein prose-a:underline prose-a:decoration-klein prose-blockquote:border-l-magenta prose-blockquote:text-foreground/70 prose-strong:text-foreground prose-code:rounded-none prose-code:bg-foreground prose-code:px-1 prose-code:py-0.5 prose-code:text-acid prose-code:before:content-none prose-code:after:content-none prose-pre:rounded-none prose-li:text-foreground/80 prose-img:w-full prose-hr:border-gray-400"
             dangerouslySetInnerHTML={{ __html: post.content || "" }}
@@ -226,7 +199,7 @@ export default async function Post({
         </article>
       </section>
 
-      {/* ============ End cap ============ */}
+      {/* End */}
       <section className="relative grid w-dvw grid-cols-12 gap-x-4 gap-y-4 p-8">
         <ScaleIn durationMs={1000} from="left" onSeen minPosition={5}>
           <MarqueeCard className="col-span-7 col-start-1 row-start-1 -ml-8 h-32 bg-acid">
