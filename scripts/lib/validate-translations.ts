@@ -7,7 +7,7 @@ import {
   TRANSLATIONS_DATA_SOURCE_ID
 } from "../../src/lib/notion/config"
 import type { Locale, NotionTranslation } from "../../src/lib/notion/types"
-import type { MarkdownCompiler } from "./validate-markdown"
+import type { NotionMarkdownCompiler } from "./notion-markdown/compiler"
 import {
   isLocale,
   NotionValidationError,
@@ -169,7 +169,7 @@ export function validateCompletedTranslation(
 }
 
 export async function getAllTranslations(
-  compiler: MarkdownCompiler
+  compiler: NotionMarkdownCompiler
 ): Promise<NotionTranslation[]> {
   const rows = (await queryDataSource(
     TRANSLATIONS_DATA_SOURCE_ID

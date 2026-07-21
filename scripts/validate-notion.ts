@@ -10,16 +10,16 @@ if (!process.env.VERCEL_ENV) {
 async function main() {
   const [
     { NotionValidationError },
-    { createMarkdownCompiler },
+    { createNotionMarkdownCompiler },
     { getAllArticles },
     { getAllTranslations }
   ] = await Promise.all([
     import("./lib/validation-shared"),
-    import("./lib/validate-markdown"),
+    import("./lib/notion-markdown/compiler"),
     import("./lib/validate-articles"),
     import("./lib/validate-translations")
   ])
-  const compiler = await createMarkdownCompiler()
+  const compiler = await createNotionMarkdownCompiler()
 
   try {
     const articles = await getAllArticles(compiler)

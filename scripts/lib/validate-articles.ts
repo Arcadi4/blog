@@ -7,7 +7,7 @@ import {
   ARTICLES_DATA_SOURCE_ID
 } from "../../src/lib/notion/config"
 import type { ArticleStatus, NotionArticle } from "../../src/lib/notion/types"
-import type { MarkdownCompiler } from "./validate-markdown"
+import type { NotionMarkdownCompiler } from "./notion-markdown/compiler"
 import {
   dateValue,
   getCoverUrl,
@@ -216,7 +216,7 @@ export function validatePublicArticle(page: NotionPage, fields: ArticleFields) {
 }
 
 export async function getAllArticles(
-  compiler: MarkdownCompiler
+  compiler: NotionMarkdownCompiler
 ): Promise<NotionArticle[]> {
   const rows = (await queryDataSource(ARTICLES_DATA_SOURCE_ID)) as NotionPage[]
   const articles: NotionArticle[] = []
