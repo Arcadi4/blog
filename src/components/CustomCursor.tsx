@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
-const CURSOR_SIZE = 64
-const CURSOR_OFFSET = CURSOR_SIZE / 2
+const SIZE = 64
+const OFFSET = SIZE / 2
 const INTERACTIVE_SELECTOR = [
   "[data-cursor='interactive']",
   "a",
@@ -17,12 +17,7 @@ const INTERACTIVE_SELECTOR = [
   "label"
 ].join(", ")
 
-type CursorPosition = {
-  x: number
-  y: number
-}
-
-function canUseCustomCursor() {
+function supportsCustomCursor() {
   return (
     window.matchMedia("(any-pointer: fine)").matches &&
     window.matchMedia("(any-hover: hover)").matches &&
@@ -30,133 +25,127 @@ function canUseCustomCursor() {
   )
 }
 
-function isInteractiveTarget(target: EventTarget | null) {
+function isInteractive(target: EventTarget | null) {
   return (
     target instanceof Element && Boolean(target.closest(INTERACTIVE_SELECTOR))
   )
 }
 
-function getElementAtCursor(position: CursorPosition | null) {
-  if (!position) {
-    return null
-  }
-
-  return document.elementFromPoint(position.x, position.y)
-}
-
-function getCursorTransform({ x, y }: CursorPosition) {
-  return `translate3d(${x - CURSOR_OFFSET}px, ${y - CURSOR_OFFSET}px, 0)`
-}
-
 export default function CustomCursor() {
-  const cursorRef = useRef<HTMLDivElement>(null)
-  const positionRef = useRef<CursorPosition | null>(null)
-  const [isInteractive, setIsInteractive] = useState(false)
-  const [isPressed, setIsPressed] = useState(false)
+  const fillRef = useRef<HTMLDivElement>(null)
+  const outlineRef = useRef<HTMLDivElement>(null)
+  const [interactive, setInteractive] = useState(false)
+  const [pressed, setPressed] = useState(false)
 
   useEffect(() => {
-    if (!canUseCustomCursor()) {
-      return
-    }
+    if (!supportsCustomCursor()) return
 
-    const handlePointerMove = (event: MouseEvent) => {
-      const position = {
-        x: event.clientX,
-        y: event.clientY
-      }
+    let position: { x: number; y: number } | null = null
+    let holdTimer: ReturnType<typeof setTimeout> | null = null
 
-      positionRef.current = position
-      document.body.classList.add("custom-cursor-enabled")
-
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = getCursorTransform(position)
-      }
-
-      setIsInteractive(isInteractiveTarget(event.target))
+    const moveTo = (x: number, y: number) => {
+      position = { x, y }
+      const transform = `translate3d(${x - OFFSET}px, ${y - OFFSET}px, 0)`
+      fillRef.current?.style.setProperty("transform", transform)
+      outlineRef.current?.style.setProperty("transform", transform)
     }
 
     const updateInteractiveTarget = () => {
-      setIsInteractive(
-        isInteractiveTarget(getElementAtCursor(positionRef.current))
-      )
-    }
-
-    let holdTimer: ReturnType<typeof setTimeout> | null = null
-
-    const clearHold = () => {
-      if (holdTimer !== null) {
-        clearTimeout(holdTimer)
-        holdTimer = null
+      if (position) {
+        setInteractive(
+          isInteractive(document.elementFromPoint(position.x, position.y))
+        )
       }
-      setIsPressed(false)
     }
 
-    const handleMouseDown = (event: MouseEvent) => {
-      // Only track primary button (left click)
+    const clearPress = () => {
+      if (holdTimer) clearTimeout(holdTimer)
+      holdTimer = null
+      setPressed(false)
+    }
+
+    const handlePointerMove = (event: PointerEvent) => {
+      moveTo(event.clientX, event.clientY)
+      document.body.classList.add("custom-cursor-enabled")
+      setInteractive(isInteractive(event.target))
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
       if (event.button !== 0) return
       holdTimer = setTimeout(() => {
-        setIsPressed(true)
         holdTimer = null
+        setPressed(true)
       }, 150)
     }
 
-    const handleMouseUp = () => {
-      clearHold()
-    }
-
-    window.addEventListener("mousemove", handlePointerMove, {
-      passive: true
-    })
+    window.addEventListener("pointermove", handlePointerMove, { passive: true })
     window.addEventListener("scroll", updateInteractiveTarget, {
       passive: true
     })
     window.addEventListener("resize", updateInteractiveTarget, {
       passive: true
     })
-    window.addEventListener("mousedown", handleMouseDown)
-    window.addEventListener("mouseup", handleMouseUp)
-    // Reset hold when focus is lost (tab away, alt-tab, etc.)
-    window.addEventListener("blur", clearHold)
-    // Reset hold when pointer leaves the document (drag outside window)
-    document.addEventListener("mouseleave", clearHold)
-    // Reset hold on context menu (right-click during hold)
-    window.addEventListener("contextmenu", clearHold)
+    window.addEventListener("pointerdown", handlePointerDown)
+    window.addEventListener("pointerup", clearPress)
+    window.addEventListener("pointercancel", clearPress)
+    window.addEventListener("blur", clearPress)
+    document.addEventListener("mouseleave", clearPress)
+    window.addEventListener("contextmenu", clearPress)
 
     return () => {
-      window.removeEventListener("mousemove", handlePointerMove)
+      window.removeEventListener("pointermove", handlePointerMove)
       window.removeEventListener("scroll", updateInteractiveTarget)
       window.removeEventListener("resize", updateInteractiveTarget)
-      window.removeEventListener("mousedown", handleMouseDown)
-      window.removeEventListener("mouseup", handleMouseUp)
-      window.removeEventListener("blur", clearHold)
-      document.removeEventListener("mouseleave", clearHold)
-      window.removeEventListener("contextmenu", clearHold)
-      if (holdTimer !== null) {
-        clearTimeout(holdTimer)
-      }
+      window.removeEventListener("pointerdown", handlePointerDown)
+      window.removeEventListener("pointerup", clearPress)
+      window.removeEventListener("pointercancel", clearPress)
+      window.removeEventListener("blur", clearPress)
+      document.removeEventListener("mouseleave", clearPress)
+      window.removeEventListener("contextmenu", clearPress)
+      if (holdTimer) clearTimeout(holdTimer)
       document.body.classList.remove("custom-cursor-enabled")
     }
   }, [])
 
   return (
-    <div
-      ref={cursorRef}
-      aria-hidden="true"
-      className={cn(
-        "pointer-events-none fixed top-0 left-0 z-9999 will-change-transform",
-        isInteractive ? "mix-blend-exclusion" : "mix-blend-multiply"
-      )}
-    >
+    <>
       <div
+        ref={fillRef}
+        aria-hidden="true"
         className={cn(
-          "size-16 transition-all ease-in-out will-change-transform",
-          isPressed
-            ? "scale-x-25 bg-klein transition-colors duration-1250"
-            : "rounded-full",
-          isInteractive && "scale-[0.375] bg-white outline-2 duration-400",
-          !isInteractive && !isPressed && "bg-magenta"
+          "pointer-events-none fixed top-0 left-0 z-9999 will-change-transform",
+          pressed
+            ? "mix-blend-multiply"
+            : interactive
+              ? "mix-blend-exclusion"
+              : "mix-blend-multiply"
         )}
-      />
-    </div>
+      >
+        <div
+          className={cn(
+            "size-16 transition-all ease-in-out will-change-transform",
+            pressed
+              ? "scale-x-25 bg-klein transition-colors duration-1250"
+              : interactive
+                ? "rounded-full scale-[0.375] bg-white duration-400"
+                : "rounded-full bg-magenta"
+          )}
+        />
+      </div>
+      <div
+        ref={outlineRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed top-0 left-0 z-9999 size-16 will-change-transform"
+      >
+        <div
+          className={cn(
+            "absolute inset-0 rounded-full border-2 border-black transition-all duration-400 ease-in-out",
+            interactive && !pressed
+              ? "scale-[0.375] opacity-100"
+              : "scale-0 opacity-0"
+          )}
+        />
+      </div>
+    </>
   )
 }
