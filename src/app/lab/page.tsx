@@ -12,6 +12,7 @@ import { ArticleMarginNote } from "@/components/article/ArticleMarginNote"
 import { ArticleProse } from "@/components/article/ArticleProse"
 import { ArticlePullQuote } from "@/components/article/ArticlePullQuote"
 import { ArticleReferences } from "@/components/article/ArticleReferences"
+import Link from "@/components/Link"
 import { SiteGrid } from "@/components/layout/SiteGrid"
 import type { PageContactSheetItem } from "@/components/page/PageContactSheet"
 import { PageContactSheet } from "@/components/page/PageContactSheet"
@@ -375,10 +376,15 @@ export default function LabPage() {
             index="A-03"
             name="ArticleCallout"
           >
-            Holds a caveat, definition, or constraint that deserves structure
-            but should not interrupt the argument like a feature panel.
+            Holds a caveat, definition, or constraint. Quiet is the reading
+            default; strong is reserved for a consequential warning or
+            conclusion.
           </LabSpec>
-          <ArticleCallout label="Constraint" title="One physical grid">
+          <ArticleCallout
+            emphasis="strong"
+            label="Constraint"
+            title="One physical grid"
+          >
             Every block inherits the site&apos;s twelve tracks. Article
             components narrow themselves inside that field instead of creating a
             second, almost-matching layout.
@@ -415,13 +421,15 @@ export default function LabPage() {
             index="A-06"
             name="ArticleFigure"
           >
-            Renders a normal image, diagram, or video still at reading width
-            with a durable figure number, caption, and optional credit.
+            Renders images, diagrams, and video stills with durable caption
+            metadata. Reading width is the default; wide media may claim all
+            twelve columns while its caption returns to the article lane.
           </LabSpec>
           <ArticleFigure
             caption="A static specimen proves the calmer figure frame. Interactive media is possible, but not assumed."
             credit="CSS study"
             figureId="F01"
+            width="wide"
           >
             <div className="flex min-h-[28rem] items-center justify-center p-12">
               <div className="w-[min(88%,32rem)]">
@@ -469,10 +477,10 @@ export default function LabPage() {
             index="A-09"
             name="ArticleDivider"
           >
-            Separates chapters when a heading alone is not enough, without the
-            scale and saturation of a page interruption.
+            Separates chapters when a heading alone is not enough. The rule is
+            quiet; the route treatment marks a more deliberate change of phase.
           </LabSpec>
-          <ArticleDivider index="03" label="Implementation" />
+          <ArticleDivider index="03" label="Implementation" variant="route" />
 
           <LabSpec
             directive=":::arc-contents"
@@ -593,6 +601,36 @@ export default function LabPage() {
               12
             </span>
           </SignalDotField>
+
+          <LabSpec index="S-04" name="Link / directional">
+            Adds a route-like hover response to the existing link primitive. Use
+            it for previous, next, continuation, or related-destination actions;
+            body-copy links keep the underline default.
+          </LabSpec>
+          <nav
+            aria-label="Directional link variants"
+            className="col-span-8 col-start-3 grid min-h-52 grid-cols-8 items-center border-y border-foreground max-md:col-span-full max-md:col-start-1"
+          >
+            <Link
+              className="col-span-3 px-4 font-funnel-display text-[clamp(1.75rem,4vw,3.5rem)] leading-none tracking-[-0.04em]"
+              direction="back"
+              href="#reader-method"
+              variant="directional"
+            >
+              Previous
+            </Link>
+            <span
+              aria-hidden="true"
+              className="col-span-2 h-px bg-foreground/25"
+            />
+            <Link
+              className="col-span-3 justify-self-end px-4 font-funnel-display text-[clamp(1.75rem,4vw,3.5rem)] leading-none tracking-[-0.04em]"
+              href="#exit-condition"
+              variant="directional"
+            >
+              Continue
+            </Link>
+          </nav>
 
           <LabSpec index="P-09" name="PageSignalAction">
             Closes an expressive page with one high-priority destination. Its
