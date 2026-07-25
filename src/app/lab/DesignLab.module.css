@@ -1,56 +1,82 @@
-.heroField {
-  background-image:
-    linear-gradient(rgb(15 15 15 / 10%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(15 15 15 / 10%) 1px, transparent 1px);
-  background-size: 4rem 4rem;
-}
-
 .artifact {
   aspect-ratio: 1.58;
   background: var(--color-magenta);
-  box-shadow: 2.25rem 2.25rem 0 rgb(15 15 15 / 24%);
-  clip-path: polygon(0 0, 92% 0, 100% 14%, 100% 100%, 8% 100%, 0 86%);
-  display: block;
+  border: 1px solid var(--color-foreground);
+  container-type: inline-size;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   overflow: hidden;
+  padding: clamp(0.75rem, 3.5cqw, 1.25rem);
   position: relative;
   width: 100%;
 }
 
 .artifact::before {
   background-image:
-    linear-gradient(rgb(15 15 15 / 15%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(15 15 15 / 15%) 1px, transparent 1px);
-  background-size: 2rem 2rem;
+    linear-gradient(rgb(15 15 15 / 13%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(15 15 15 / 13%) 1px, transparent 1px);
+  background-size:
+    100% 12.5%,
+    calc(100% / 12) 100%;
   content: "";
   inset: 0;
+  pointer-events: none;
   position: absolute;
 }
 
+.artifactMeta {
+  align-items: center;
+  border-bottom: 1px solid var(--color-foreground);
+  display: flex;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: clamp(0.5rem, 2.25cqw, 0.7rem);
+  font-weight: 600;
+  justify-content: space-between;
+  letter-spacing: 0.12em;
+  padding-bottom: clamp(0.4rem, 1.8cqw, 0.65rem);
+  position: relative;
+  text-transform: uppercase;
+  z-index: 1;
+}
+
 .artifactWindow {
+  align-self: center;
+  aspect-ratio: 2.45;
   background: var(--color-foreground);
-  border: 0.7rem solid var(--color-foreground);
-  height: 45%;
-  left: 12%;
-  position: absolute;
-  top: 19%;
-  width: 54%;
+  border: clamp(0.35rem, 1.8cqw, 0.7rem) solid var(--color-foreground);
+  position: relative;
+  width: calc(100% * 7 / 12);
+  z-index: 1;
 }
 
 .artifactWindow::after {
   background: var(--color-acid);
   content: "";
-  inset: 0.7rem;
+  inset: clamp(0.35rem, 2cqw, 0.75rem);
   position: absolute;
 }
 
+.artifactFooter {
+  align-items: end;
+  border-top: 1px solid var(--color-foreground);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding-top: clamp(0.45rem, 2.2cqw, 0.8rem);
+  position: relative;
+  z-index: 1;
+}
+
 .artifactCode {
-  bottom: 0.8rem;
-  font-family: var(--font-funnel-display), sans-serif;
-  font-size: clamp(4rem, 8vw, 8rem);
-  letter-spacing: -0.08em;
-  line-height: 0.7;
-  position: absolute;
-  right: 1.2rem;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: clamp(2.25rem, 14cqw, 6rem);
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -0.09em;
+  line-height: 0.78;
+  min-width: 25%;
+  text-align: right;
 }
 
 .artifactTicks {
@@ -59,11 +85,9 @@
     var(--color-foreground) 0 0.35rem,
     transparent 0.35rem 0.7rem
   );
-  bottom: 1rem;
-  height: 0.8rem;
-  left: 1rem;
-  position: absolute;
-  width: 32%;
+  height: clamp(0.4rem, 1.8cqw, 0.7rem);
+  margin-bottom: 0.1rem;
+  width: calc(100% / 3);
 }
 
 .artifactSignal {
@@ -80,4 +104,195 @@
     var(--color-acid) 0 0.35rem,
     transparent 0.35rem 0.7rem
   );
+}
+
+.typeFieldMark,
+.dotFieldMark {
+  align-items: center;
+  border: 1px solid currentColor;
+  display: flex;
+  font-family: var(--font-funnel-display), sans-serif;
+  font-size: clamp(5rem, 11vw, 10rem);
+  height: clamp(9rem, 18vw, 15rem);
+  justify-content: center;
+  letter-spacing: -0.08em;
+  line-height: 0.75;
+  position: relative;
+  width: clamp(9rem, 18vw, 15rem);
+}
+
+.typeFieldMark::before,
+.typeFieldMark::after,
+.dotFieldMark::before,
+.dotFieldMark::after {
+  background: currentColor;
+  content: "";
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.typeFieldMark::before,
+.dotFieldMark::before {
+  height: 1px;
+  width: calc(100% + 3rem);
+}
+
+.typeFieldMark::after,
+.dotFieldMark::after {
+  height: calc(100% + 3rem);
+  width: 1px;
+}
+
+.sheetMedia {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  min-height: 20rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.sheetMediaAcid {
+  background: var(--color-acid);
+  color: var(--color-foreground);
+}
+
+.sheetMediaAcid::before {
+  background-image:
+    linear-gradient(rgb(15 15 15 / 18%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(15 15 15 / 18%) 1px, transparent 1px);
+  background-size:
+    calc(100% / 8) 100%,
+    100% 25%;
+  content: "";
+  inset: 0;
+  position: absolute;
+}
+
+.sheetMediaAcid span {
+  font-family: var(--font-funnel-display), sans-serif;
+  font-size: clamp(10rem, 20vw, 20rem);
+  font-weight: 600;
+  letter-spacing: -0.1em;
+  line-height: 0.65;
+  position: relative;
+}
+
+.sheetMediaKlein {
+  background-color: var(--color-klein);
+  color: var(--color-background);
+}
+
+.sheetDotMark {
+  align-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  display: flex;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 4rem;
+  height: 8rem;
+  justify-content: center;
+  width: 8rem;
+}
+
+.sheetMediaPaper {
+  background:
+    linear-gradient(
+      135deg,
+      transparent 49.8%,
+      rgb(15 15 15 / 16%) 50% 50.2%,
+      transparent 50.4%
+    ),
+    #e9e9e9;
+  color: var(--color-foreground);
+}
+
+.sheetMediaPaper span {
+  font-family: var(--font-funnel-display), sans-serif;
+  font-size: clamp(7rem, 16vw, 14rem);
+  font-weight: 600;
+  letter-spacing: -0.08em;
+  line-height: 0.7;
+  transform: rotate(-90deg);
+  white-space: nowrap;
+}
+
+.sheetMediaMono {
+  align-items: end;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 0.7rem,
+      rgb(255 255 255 / 13%) 0.7rem 0.75rem
+    ),
+    var(--color-foreground);
+  color: var(--color-background);
+  justify-content: start;
+  padding: 1rem;
+}
+
+.sheetMediaMono span {
+  font-family: var(--font-funnel-display), sans-serif;
+  font-size: clamp(3.5rem, 9vw, 9rem);
+  letter-spacing: -0.06em;
+  line-height: 0.75;
+  white-space: nowrap;
+}
+
+.factPortrait {
+  align-items: end;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 49.8%,
+      rgb(255 255 255 / 24%) 50% 50.2%,
+      transparent 50.4%
+    ),
+    linear-gradient(rgb(255 255 255 / 24%) 1px, transparent 1px),
+    var(--color-foreground);
+  background-size:
+    100% 100%,
+    100% 25%,
+    100% 100%;
+  color: var(--color-background);
+  display: flex;
+  height: 100%;
+  justify-content: space-between;
+  min-height: 24rem;
+  overflow: hidden;
+  padding: 1rem;
+  position: relative;
+}
+
+.factPortrait span {
+  font-family: var(--font-funnel-display), sans-serif;
+  font-size: clamp(10rem, 18vw, 18rem);
+  letter-spacing: -0.1em;
+  line-height: 0.55;
+  margin-left: -0.08em;
+}
+
+.factPortrait small {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+
+.dotFieldMark {
+  color: var(--color-acid);
+}
+
+@media (max-width: 48rem) {
+  .sheetMedia {
+    min-height: 16rem;
+  }
+
+  .factPortrait {
+    min-height: 16rem;
+  }
 }

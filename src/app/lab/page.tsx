@@ -2,7 +2,9 @@ import type { Metadata } from "next"
 import type { ReactNode } from "react"
 import { ArticleCallout } from "@/components/article/ArticleCallout"
 import { ArticleCodeFigure } from "@/components/article/ArticleCodeFigure"
+import { ArticleContents } from "@/components/article/ArticleContents"
 import { ArticleDivider } from "@/components/article/ArticleDivider"
+import { ArticleFactGrid } from "@/components/article/ArticleFactGrid"
 import { ArticleFigure } from "@/components/article/ArticleFigure"
 import { ArticleFold } from "@/components/article/ArticleFold"
 import { ArticleLead } from "@/components/article/ArticleLead"
@@ -11,6 +13,9 @@ import { ArticleProse } from "@/components/article/ArticleProse"
 import { ArticlePullQuote } from "@/components/article/ArticlePullQuote"
 import { ArticleReferences } from "@/components/article/ArticleReferences"
 import { SiteGrid } from "@/components/layout/SiteGrid"
+import { PageContactSheet } from "@/components/page/PageContactSheet"
+import type { PageContactSheetItem } from "@/components/page/PageContactSheet"
+import { PageFactSheet } from "@/components/page/PageFactSheet"
 import { PageFeatureFigure } from "@/components/page/PageFeatureFigure"
 import { PageIndexRow } from "@/components/page/PageIndexRow"
 import { PageInterruption } from "@/components/page/PageInterruption"
@@ -18,11 +23,13 @@ import { PageMasthead } from "@/components/page/PageMasthead"
 import { PagePullQuote } from "@/components/page/PagePullQuote"
 import { PageSectionIntro } from "@/components/page/PageSectionIntro"
 import { PageSignalAction } from "@/components/page/PageSignalAction"
+import { PageTypeField } from "@/components/page/PageTypeField"
 import { ArchiveMatrix } from "@/components/signal/ArchiveMatrix"
 import type { ArchiveMatrixItem } from "@/components/signal/ArchiveMatrix"
 import { EvidenceScan } from "@/components/signal/EvidenceScan"
 import { SegmentedRing } from "@/components/signal/SegmentedRing"
 import { SignalBars } from "@/components/signal/SignalBars"
+import { SignalDotField } from "@/components/signal/SignalDotField"
 import { SignalRedaction } from "@/components/signal/SignalRedaction"
 import styles from "./DesignLab.module.css"
 
@@ -77,6 +84,74 @@ return renderArticle({
   directives: allowlistedDirectives
 })`
 
+const contactSheetItems: readonly PageContactSheetItem[] = [
+  {
+    className: "col-span-5",
+    href: "/",
+    id: "01",
+    media: (
+      <div
+        aria-hidden="true"
+        className={`${styles.sheetMedia} ${styles.sheetMediaAcid}`}
+      >
+        <span>12</span>
+      </div>
+    ),
+    meta: "Grid study / CSS / 2026",
+    title: "Measured field"
+  },
+  {
+    className: "col-span-3 col-start-6",
+    id: "02",
+    media: (
+      <SignalDotField
+        className={`${styles.sheetMedia} ${styles.sheetMediaKlein}`}
+      >
+        <span aria-hidden="true" className={styles.sheetDotMark}>
+          +
+        </span>
+      </SignalDotField>
+    ),
+    meta: "Signal substrate / decorative",
+    title: "Blue register"
+  },
+  {
+    className: "col-span-4 col-start-9",
+    id: "03",
+    media: (
+      <div
+        aria-hidden="true"
+        className={`${styles.sheetMedia} ${styles.sheetMediaPaper}`}
+      >
+        <span>TYPE</span>
+      </div>
+    ),
+    meta: "Type crop / editorial",
+    title: "Off-frame language"
+  },
+  {
+    className: "col-span-8 col-start-3",
+    href: "/",
+    id: "04",
+    media: (
+      <div
+        aria-hidden="true"
+        className={`${styles.sheetMedia} ${styles.sheetMediaMono}`}
+      >
+        <span>ARCHIVE / 004</span>
+      </div>
+    ),
+    meta: "Index feature / authored placement",
+    title: "One wide exception"
+  }
+]
+
+const articleContentsItems = [
+  { href: "#reader-method", label: "Reader method" },
+  { href: "#semantic-surface", label: "Semantic surface" },
+  { href: "#exit-condition", label: "Exit condition" }
+] as const
+
 type LabSpecProps = {
   readonly children: ReactNode
   readonly directive?: string
@@ -111,9 +186,15 @@ function Artifact({ signal = false }: { readonly signal?: boolean }) {
       aria-hidden="true"
       className={`${styles.artifact} ${signal ? styles.artifactSignal : ""}`}
     >
+      <span className={styles.artifactMeta}>
+        <span>Form / 017</span>
+        <span>12 × 08</span>
+      </span>
       <span className={styles.artifactWindow} />
-      <span className={styles.artifactCode}>{signal ? "X17" : "A17"}</span>
-      <span className={styles.artifactTicks} />
+      <span className={styles.artifactFooter}>
+        <span className={styles.artifactTicks} />
+        <span className={styles.artifactCode}>{signal ? "X17" : "A17"}</span>
+      </span>
     </span>
   )
 }
@@ -141,7 +222,7 @@ export default function LabPage() {
             </>
           }
         >
-          <div className="w-[min(90%,24rem)] rotate-3">
+          <div className="w-[min(82%,22rem)]">
             <Artifact />
           </div>
         </PageMasthead>
@@ -226,6 +307,76 @@ export default function LabPage() {
             narrower measure. Its identity comes from exact typography and
             small, meaningful signals.
           </PageInterruption>
+
+          <LabSpec index="P-07" name="PageTypeField">
+            Turns one short phrase into the composition for a campaign, visual
+            essay, or rare About-page moment. It is a poster surface, never an
+            article heading.
+          </LabSpec>
+
+          <PageTypeField
+            details={[
+              "Output / authored",
+              "Field / 12 columns",
+              "Frequency / rare"
+            ]}
+            eyebrow="Typography as image"
+            index="07"
+            summary="The crop is intentional, while the summary, details, and media remain ordinary semantic content on the shared grid."
+            title="Type is space"
+          >
+            <SignalDotField
+              className="h-full min-h-48 bg-foreground text-acid"
+              label="Twelve-column calibration mark"
+            >
+              <span aria-hidden="true" className={styles.typeFieldMark}>
+                12
+              </span>
+            </SignalDotField>
+          </PageTypeField>
+
+          <LabSpec index="P-08" name="PageContactSheet">
+            Makes a portfolio, project archive, or image-led index where media
+            is the primary navigation. Each item owns a real title and caption;
+            explicit grid classes author exceptional placement without a
+            coordinate API.
+          </LabSpec>
+
+          <PageContactSheet
+            items={contactSheetItems}
+            label="Selected records"
+            title="Contact / field"
+          />
+
+          <LabSpec index="P-09" name="PageFactSheet">
+            Structures an About page, CV, contributor profile, or project
+            dossier. The visual slot is optional; the facts remain a semantic
+            definition list when the poster treatment is removed.
+          </LabSpec>
+
+          <PageFactSheet
+            eyebrow="Profile dossier"
+            facts={[
+              { label: "Role", value: "Designer / engineer" },
+              { label: "Base", value: "New York / remote" },
+              { label: "Focus", value: "Systems / language" },
+              { label: "Status", value: "Independent" }
+            ]}
+            lede="A factual, modular identity surface for pages that need more structure than a biography paragraph and less theater than a masthead."
+            title={
+              <>
+                Skylar
+                <br />
+                Arcadia
+              </>
+            }
+            year="2026"
+          >
+            <div aria-hidden="true" className={styles.factPortrait}>
+              <span>SK</span>
+              <small>Profile / 01</small>
+            </div>
+          </PageFactSheet>
         </section>
 
         <section className="col-span-full mt-32 grid grid-cols-subgrid">
@@ -380,8 +531,56 @@ export default function LabPage() {
           <ArticleDivider index="03" label="Implementation" />
 
           <LabSpec
-            directive=':::arc-references{title="Sources"}'
+            directive=":::arc-contents"
             index="A-10"
+            name="ArticleContents"
+          >
+            Adds a visible outline only when a long post has at least three
+            meaningful sections. It uses ordinary hash links, so it remains
+            useful without client JavaScript.
+          </LabSpec>
+          <ArticleContents items={articleContentsItems} />
+          <ArticleProse>
+            <h2 id="reader-method">Reader method</h2>
+            <p>
+              The outline previews the argument instead of reproducing every
+              heading. A reader can scan the route, enter at the useful point,
+              and keep browser-native navigation.
+            </p>
+            <h2 id="semantic-surface">Semantic surface</h2>
+            <p>
+              The component is a navigation landmark containing a numbered list.
+              Its visual system is editorial; its structure is ordinary web
+              content.
+            </p>
+            <h2 id="exit-condition">Exit condition</h2>
+            <p>
+              Short posts omit it. A contents panel with only one or two links
+              adds chrome without improving orientation.
+            </p>
+          </ArticleProse>
+
+          <LabSpec
+            directive=':::arc-facts{label="Build context"}'
+            index="A-11"
+            name="ArticleFactGrid"
+          >
+            Summarizes versions, scope, status, or measured results near the
+            start of a technical post. It is for factual context, not a row of
+            marketing metrics.
+          </LabSpec>
+          <ArticleFactGrid
+            facts={[
+              { label: "Grid", value: "12 columns" },
+              { label: "Runtime", value: "Server first" },
+              { label: "Status", value: "Field test" }
+            ]}
+            label="Build context"
+          />
+
+          <LabSpec
+            directive=':::arc-references{title="Sources"}'
+            index="A-12"
             name="ArticleReferences"
           >
             Gives citations and further reading consistent end-matter hierarchy
@@ -443,7 +642,21 @@ export default function LabPage() {
             </SegmentedRing>
           </div>
 
-          <LabSpec index="P-07" name="PageSignalAction">
+          <LabSpec index="S-04" name="SignalDotField">
+            Supplies a quiet dotted registration field behind a logo, icon, or
+            single object. It is decorative by default and becomes a labeled
+            image only when the composition itself carries meaning.
+          </LabSpec>
+          <SignalDotField
+            className="col-span-8 col-start-3 min-h-[30rem] bg-klein text-background max-md:col-span-full max-md:col-start-1"
+            label="Twelve-column registration field"
+          >
+            <span aria-hidden="true" className={styles.dotFieldMark}>
+              12
+            </span>
+          </SignalDotField>
+
+          <LabSpec index="P-10" name="PageSignalAction">
             Closes an expressive page with one high-priority destination. Its
             ProximityLink shade is absent at rest and appears only on hover.
           </LabSpec>
@@ -452,7 +665,7 @@ export default function LabPage() {
             description="Leave the internal field manual and return to the live homepage."
             eyebrow="Navigation / stable"
             href="/"
-            index="07"
+            index="10"
             label="Return / Home"
           />
         </section>
