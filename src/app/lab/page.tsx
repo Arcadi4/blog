@@ -13,8 +13,8 @@ import { ArticleProse } from "@/components/article/ArticleProse"
 import { ArticlePullQuote } from "@/components/article/ArticlePullQuote"
 import { ArticleReferences } from "@/components/article/ArticleReferences"
 import { SiteGrid } from "@/components/layout/SiteGrid"
-import { PageContactSheet } from "@/components/page/PageContactSheet"
 import type { PageContactSheetItem } from "@/components/page/PageContactSheet"
+import { PageContactSheet } from "@/components/page/PageContactSheet"
 import { PageFactSheet } from "@/components/page/PageFactSheet"
 import { PageFeatureFigure } from "@/components/page/PageFeatureFigure"
 import { PageIndexRow } from "@/components/page/PageIndexRow"
@@ -313,17 +313,11 @@ export default function LabPage() {
               { label: "Status", value: "Independent" }
             ]}
             lede="A factual, modular identity surface for pages that need more structure than a biography paragraph and less theater than a masthead."
-            title={
-              <>
-                Skylar
-                <br />
-                Arcadia
-              </>
-            }
+            title="@4rcadia"
             year="2026"
           >
             <div aria-hidden="true" className={styles.factPortrait}>
-              <span>SK</span>
+              <span>4rc</span>
               <small>Profile / 01</small>
             </div>
           </PageFactSheet>

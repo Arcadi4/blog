@@ -2,7 +2,6 @@
 
 import { EaseIn } from "@/components/animations/EaseIn"
 import { menuItems, socialMediaItems } from "@/app/posts/menuItems"
-import { useEffect, useState } from "react"
 import { cn, formatDate } from "@/lib/utils"
 import { colorKlein } from "@/lib/colors"
 import VerticalGrid from "@/components/VerticalGrid"
@@ -22,15 +21,6 @@ type HomePageClientProps = {
 const homepageHeight = "h-[217.6rem]"
 
 export function HomePageClient({ articles }: HomePageClientProps) {
-  const [useRealName, setUseRealName] = useState(false)
-  useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search)
-    setUseRealName(
-      queryParams.has("name") && queryParams.get("name") === "skylar"
-    )
-  }, [])
-  const name = useRealName ? "Skylar" : "4rcadia"
-
   return (
     <main className="relative">
       <div
@@ -58,7 +48,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           className="col-start-1 row-span-4 row-start-1 -mt-8 -ml-8 origin-left bg-klein transition-transform duration-400 ease-out"
         />
         <span className="h- pointer-events-none z-10 col-start-3 row-start-2 font-funnel-display text-[10rem] text-trim-cap">
-          @{name}
+          @4rcadia
         </span>
 
         <div className="z-30 col-span-full col-start-3 row-start-3 font-funnel-display text-5xl leading-none whitespace-pre-line text-klein">
