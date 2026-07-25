@@ -1,7 +1,7 @@
 import ProximityLink from "@/components/ProximityLink"
 import { cn } from "@/lib/utils"
 
-type SignalActionProps = {
+type PageSignalActionProps = {
   readonly className?: string
   readonly description?: string
   readonly eyebrow?: string
@@ -10,14 +10,15 @@ type SignalActionProps = {
   readonly label: string
 }
 
-export function SignalAction({
+/** High-emphasis destination link for the end of a landing or index page. */
+export function PageSignalAction({
   className,
   description,
   eyebrow = "Open channel",
   href,
   index = "01",
   label
-}: SignalActionProps) {
+}: PageSignalActionProps) {
   return (
     <div
       className={cn(
@@ -25,7 +26,7 @@ export function SignalAction({
         className
       )}
     >
-      <div className="col-span-2 flex flex-col justify-between bg-klein p-4 text-background">
+      <div className="col-span-2 flex flex-col justify-between bg-klein p-4 text-background max-md:col-span-3">
         <span className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase">
           Action / {index}
         </span>
@@ -34,11 +35,11 @@ export function SignalAction({
         </span>
       </div>
 
-      <div className="col-span-8 flex flex-col justify-between py-4">
+      <div className="col-span-8 flex flex-col justify-between py-4 max-md:col-span-9 max-md:px-4">
         <span className="font-mono text-xs leading-none tracking-[0.16em] uppercase">
           {eyebrow}
         </span>
-        <div className="font-funnel-display text-[clamp(3.5rem,6.6vw,7rem)] leading-[0.76] tracking-[-0.05em]">
+        <div className="font-funnel-display text-[clamp(3.5rem,6.6vw,7rem)] leading-[0.76] tracking-[-0.05em] max-md:text-[clamp(2.5rem,12vw,3.5rem)]">
           <ProximityLink
             className="max-w-full"
             href={href}
@@ -53,7 +54,7 @@ export function SignalAction({
 
       <div
         aria-hidden="true"
-        className="col-span-2 col-start-11 flex items-center justify-center border-l border-foreground"
+        className="col-span-2 col-start-11 flex items-center justify-center border-l border-foreground max-md:col-span-full max-md:col-start-1 max-md:row-start-2 max-md:min-h-24 max-md:border-t max-md:border-l-0"
       >
         <span className="font-funnel-display text-8xl leading-none">→</span>
       </div>

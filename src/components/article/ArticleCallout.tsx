@@ -1,6 +1,5 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
-import { SignalBars } from "@/components/signal/SignalBars"
 
 type ArticleCalloutProps = {
   readonly children: ReactNode
@@ -9,6 +8,7 @@ type ArticleCalloutProps = {
   readonly title?: string
 }
 
+/** Restrained note for a caveat, definition, or constraint inside an article. */
 export function ArticleCallout({
   children,
   className,
@@ -17,43 +17,32 @@ export function ArticleCallout({
 }: ArticleCalloutProps) {
   return (
     <aside
-      className={cn(
-        "col-span-full grid min-h-64 grid-cols-subgrid overflow-hidden border-y border-foreground bg-background",
-        className
-      )}
+      className={cn("col-span-full grid grid-cols-subgrid", className)}
       role="note"
     >
-      <div className="col-span-2 flex flex-col justify-between bg-acid p-4 text-foreground">
-        <span className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase">
-          Note / retained
-        </span>
-        <span
-          aria-hidden="true"
-          className="font-funnel-display text-8xl leading-[0.7]"
-        >
-          !
-        </span>
-        <SignalBars className="w-full" />
-      </div>
-
-      <div className="col-span-6 col-start-4 flex flex-col justify-center py-8">
-        <p className="font-mono text-xs leading-none tracking-[0.16em] text-klein uppercase">
-          {label}
-        </p>
-        {title ? (
-          <h2 className="mt-4 font-funnel-display text-5xl leading-[0.82] tracking-[-0.04em]">
-            {title}
-          </h2>
-        ) : null}
-        <div className="mt-6 text-lg leading-relaxed text-foreground/80">
-          {children}
+      <div className="col-span-8 col-start-3 grid grid-cols-8 border-y border-foreground/35 py-6 max-md:col-span-full max-md:col-start-1">
+        <div className="col-span-1 flex items-start gap-2 font-mono text-[10px] leading-none tracking-[0.14em] text-klein uppercase">
+          <span
+            aria-hidden="true"
+            className="mt-0.5 size-2 bg-acid ring-1 ring-foreground"
+          />
+          <span>{label}</span>
         </div>
-      </div>
-
-      <div className="col-span-2 col-start-11 flex items-center justify-center border-l border-foreground">
-        <code className="font-mono text-[10px] leading-none uppercase [writing-mode:vertical-rl]">
-          :::arc-callout
-        </code>
+        <div className="col-span-6 col-start-3">
+          {title ? (
+            <h2 className="font-funnel-display text-2xl leading-tight tracking-[-0.025em]">
+              {title}
+            </h2>
+          ) : null}
+          <div
+            className={cn(
+              "text-base leading-relaxed text-foreground/75",
+              title && "mt-3"
+            )}
+          >
+            {children}
+          </div>
+        </div>
       </div>
     </aside>
   )

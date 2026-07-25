@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import styles from "./CopySignal.module.css"
 
-type CopyStatus = "idle" | "copied" | "denied"
+type CopyStatus = "idle" | "copying" | "copied" | "denied"
 
 type CopySignalProps = {
   readonly className?: string
@@ -13,6 +13,7 @@ type CopySignalProps = {
 
 const statusLabel: Record<CopyStatus, string> = {
   copied: "Copied",
+  copying: "Copying",
   denied: "Copy denied",
   idle: "Copy"
 }
@@ -32,8 +33,15 @@ export function CopySignal({ className, value }: CopySignalProps) {
   )
 
   const copy = async () => {
+    setStatus("copying")
+
     try {
-      await navigator.clipboard.writeText(value)
+      await Promise.race([
+        navigator.clipboard.writeText(value),
+        new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error("Clipboard write timed out")), 1500)
+        })
+      ])
       setStatus("copied")
     } catch {
       setStatus("denied")
@@ -42,7 +50,7 @@ export function CopySignal({ className, value }: CopySignalProps) {
     if (resetTimer.current) {
       clearTimeout(resetTimer.current)
     }
-    resetTimer.current = setTimeout(() => setStatus("idle"), 1600)
+    resetTimer.current = setTimeout(() => setStatus("idle"), 3000)
   }
 
   return (

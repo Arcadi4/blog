@@ -1,6 +1,5 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
-import { SegmentedRing } from "@/components/signal/SegmentedRing"
 
 type ArticlePullQuoteProps = {
   readonly children: ReactNode
@@ -8,6 +7,7 @@ type ArticlePullQuoteProps = {
   readonly className?: string
 }
 
+/** Mid-article emphasis that stays inside the reading rhythm. */
 export function ArticlePullQuote({
   children,
   citation,
@@ -15,46 +15,25 @@ export function ArticlePullQuote({
 }: ArticlePullQuoteProps) {
   return (
     <figure
-      className={cn(
-        "col-span-full grid min-h-[32rem] grid-cols-subgrid overflow-hidden border-y border-foreground bg-background",
-        className
-      )}
+      className={cn("col-span-full grid grid-cols-subgrid py-8", className)}
     >
-      <div className="relative col-span-2 flex items-center justify-center bg-magenta text-foreground">
+      <div className="col-span-1 col-start-2 flex justify-end pr-3 max-md:hidden">
         <span
           aria-hidden="true"
-          className="font-serif text-[12rem] leading-none"
+          className="font-serif text-6xl leading-none text-magenta"
         >
           “
         </span>
-        <code className="absolute top-4 left-4 font-mono text-[10px] leading-none tracking-[0.16em] uppercase">
-          :::arc-quote
-        </code>
       </div>
 
-      <blockquote className="col-span-8 col-start-3 flex flex-col justify-between py-8">
-        <div className="font-funnel-display text-[clamp(3.5rem,6vw,7rem)] leading-[0.82] tracking-[-0.045em] text-pretty">
+      <blockquote className="col-span-7 col-start-3 border-l border-foreground/35 pl-6 max-md:col-span-full max-md:col-start-1">
+        <div className="font-funnel-display text-[clamp(2rem,4vw,3.75rem)] leading-[0.95] tracking-[-0.035em] text-pretty">
           {children}
         </div>
-        <figcaption className="border-t border-foreground pt-4 font-mono text-xs leading-tight uppercase">
+        <figcaption className="mt-5 font-mono text-[10px] leading-tight tracking-[0.12em] text-foreground/65 uppercase">
           <cite className="not-italic">{citation}</cite>
         </figcaption>
       </blockquote>
-
-      <div className="col-span-2 col-start-11 flex flex-col items-center justify-between border-l border-foreground py-4">
-        <span className="font-mono text-[10px] leading-none uppercase [writing-mode:vertical-rl]">
-          Citation / retained
-        </span>
-        <SegmentedRing
-          className="size-24"
-          ringClassName="text-klein"
-          ringWidth={7}
-        >
-          <span aria-hidden="true" className="font-mono text-sm">
-            Q
-          </span>
-        </SegmentedRing>
-      </div>
     </figure>
   )
 }

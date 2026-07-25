@@ -1,7 +1,6 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { CopySignal } from "@/components/signal/CopySignal"
-import { SignalBars } from "@/components/signal/SignalBars"
 
 type ArticleCodeFigureProps = {
   readonly caption?: string
@@ -11,6 +10,7 @@ type ArticleCodeFigureProps = {
   readonly filename: string
 }
 
+/** Captioned reading-width frame around already-highlighted source code. */
 export function ArticleCodeFigure({
   caption,
   children,
@@ -19,43 +19,26 @@ export function ArticleCodeFigure({
   filename
 }: ArticleCodeFigureProps) {
   return (
-    <figure
-      className={cn(
-        "col-span-full grid min-h-[32rem] grid-cols-subgrid overflow-hidden border-y border-foreground bg-foreground text-background",
-        className
-      )}
-    >
-      <div className="col-span-2 flex flex-col justify-between bg-magenta p-4 text-foreground">
-        <code className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase">
-          :::arc-code
-        </code>
-        <span className="font-mono text-sm leading-tight break-all">
-          {filename}
-        </span>
-        {copyValue ? <CopySignal value={copyValue} /> : null}
-        <SignalBars className="w-full" />
-      </div>
-
-      <section
-        aria-label={`Source code: ${filename}`}
-        className="col-span-8 col-start-3 flex min-w-0 items-center overflow-x-auto border-x border-background/35 p-8"
-      >
-        <div className="w-max min-w-full text-sm leading-relaxed">
-          {children}
+    <figure className={cn("col-span-full grid grid-cols-subgrid", className)}>
+      <div className="col-span-8 col-start-3 overflow-hidden bg-foreground text-background max-md:col-span-full max-md:col-start-1">
+        <div className="flex min-h-12 items-center justify-between border-b border-background/25 px-4">
+          <span className="font-mono text-[10px] leading-tight tracking-[0.12em] break-all uppercase">
+            {filename}
+          </span>
+          {copyValue ? <CopySignal value={copyValue} /> : null}
         </div>
-      </section>
-
-      <figcaption className="col-span-2 col-start-11 flex flex-col justify-between bg-acid p-4 text-foreground">
-        <span className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase">
-          Code specimen
-        </span>
-        <p className="text-sm leading-tight">
+        <section
+          aria-label={`Source code: ${filename}`}
+          className="min-w-0 overflow-x-auto p-5"
+        >
+          <div className="w-max min-w-full text-sm leading-relaxed">
+            {children}
+          </div>
+        </section>
+        <figcaption className="border-t border-background/25 px-4 py-3 text-xs leading-tight text-background/65">
           {caption ?? "Highlighted source excerpt"}
-        </p>
-        <span className="font-mono text-[10px] leading-none uppercase [writing-mode:vertical-rl]">
-          Language / from fence
-        </span>
-      </figcaption>
+        </figcaption>
+      </div>
     </figure>
   )
 }
