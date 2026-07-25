@@ -20,12 +20,9 @@ import { PageFeatureFigure } from "@/components/page/PageFeatureFigure"
 import { PageIndexRow } from "@/components/page/PageIndexRow"
 import { PageInterruption } from "@/components/page/PageInterruption"
 import { PageMasthead } from "@/components/page/PageMasthead"
-import { PagePullQuote } from "@/components/page/PagePullQuote"
 import { PageSectionIntro } from "@/components/page/PageSectionIntro"
 import { PageSignalAction } from "@/components/page/PageSignalAction"
 import { PageTypeField } from "@/components/page/PageTypeField"
-import { ArchiveMatrix } from "@/components/signal/ArchiveMatrix"
-import type { ArchiveMatrixItem } from "@/components/signal/ArchiveMatrix"
 import { EvidenceScan } from "@/components/signal/EvidenceScan"
 import { SegmentedRing } from "@/components/signal/SegmentedRing"
 import { SignalBars } from "@/components/signal/SignalBars"
@@ -38,44 +35,6 @@ export const metadata: Metadata = {
   description:
     "A development surface for the blog's page, article, and signal systems."
 }
-
-const matrixItems: readonly ArchiveMatrixItem[] = [
-  {
-    coordinate: [1, 2],
-    id: "notes",
-    meta: "Writing / long form / active",
-    title: "Field Notes",
-    tone: "acid"
-  },
-  {
-    coordinate: [4, 4],
-    id: "builds",
-    meta: "Code / systems / indexed",
-    title: "Build Logs",
-    tone: "klein"
-  },
-  {
-    coordinate: [7, 2],
-    id: "graphics",
-    meta: "Design / image / volatile",
-    title: "Graphic Tests",
-    tone: "magenta"
-  },
-  {
-    coordinate: [9, 5],
-    id: "games",
-    meta: "Play / observation / open",
-    title: "Game Studies",
-    tone: "acid"
-  },
-  {
-    coordinate: [11, 3],
-    id: "fragments",
-    meta: "Short form / uncategorized",
-    title: "Fragments",
-    tone: "klein"
-  }
-]
 
 const processorCode = `const document = await compileArticle(source)
 
@@ -288,16 +247,7 @@ export default function LabPage() {
             />
           </PageFeatureFigure>
 
-          <LabSpec index="P-05" name="PagePullQuote">
-            Reserves manifesto-scale quotation for About pages and visual
-            essays. Ordinary article quotations use the quieter article block.
-          </LabSpec>
-
-          <PagePullQuote citation="Field manual / separation principle">
-            Expressive pages announce a world. Articles let a thought unfold.
-          </PagePullQuote>
-
-          <LabSpec index="P-06" name="PageInterruption">
+          <LabSpec index="P-05" name="PageInterruption">
             Marks a real state change in a long visual page. It is deliberately
             too strong for normal Markdown rendering.
           </LabSpec>
@@ -308,7 +258,7 @@ export default function LabPage() {
             small, meaningful signals.
           </PageInterruption>
 
-          <LabSpec index="P-07" name="PageTypeField">
+          <LabSpec index="P-06" name="PageTypeField">
             Turns one short phrase into the composition for a campaign, visual
             essay, or rare About-page moment. It is a poster surface, never an
             article heading.
@@ -321,7 +271,7 @@ export default function LabPage() {
               "Frequency / rare"
             ]}
             eyebrow="Typography as image"
-            index="07"
+            index="06"
             summary="The crop is intentional, while the summary, details, and media remain ordinary semantic content on the shared grid."
             title="Type is space"
           >
@@ -335,7 +285,7 @@ export default function LabPage() {
             </SignalDotField>
           </PageTypeField>
 
-          <LabSpec index="P-08" name="PageContactSheet">
+          <LabSpec index="P-07" name="PageContactSheet">
             Makes a portfolio, project archive, or image-led index where media
             is the primary navigation. Each item owns a real title and caption;
             explicit grid classes author exceptional placement without a
@@ -348,7 +298,7 @@ export default function LabPage() {
             title="Contact / field"
           />
 
-          <LabSpec index="P-09" name="PageFactSheet">
+          <LabSpec index="P-08" name="PageFactSheet">
             Structures an About page, CV, contributor profile, or project
             dossier. The visual slot is optional; the facts remain a semantic
             definition list when the poster treatment is removed.
@@ -619,13 +569,7 @@ export default function LabPage() {
             <SignalRedaction>human attention</SignalRedaction>.
           </p>
 
-          <LabSpec index="S-02" name="ArchiveMatrix">
-            A keyboard-operable spatial selector for archives, tags, years, or
-            project clusters on index pages.
-          </LabSpec>
-          <ArchiveMatrix items={matrixItems} />
-
-          <LabSpec index="S-03" name="SignalBars + SegmentedRing">
+          <LabSpec index="S-02" name="SignalBars + SegmentedRing">
             Purely aesthetic calibration marks. They add visual cadence and may
             be hidden from assistive technology unless a real label is supplied.
           </LabSpec>
@@ -642,7 +586,7 @@ export default function LabPage() {
             </SegmentedRing>
           </div>
 
-          <LabSpec index="S-04" name="SignalDotField">
+          <LabSpec index="S-03" name="SignalDotField">
             Supplies a quiet dotted registration field behind a logo, icon, or
             single object. It is decorative by default and becomes a labeled
             image only when the composition itself carries meaning.
@@ -656,7 +600,7 @@ export default function LabPage() {
             </span>
           </SignalDotField>
 
-          <LabSpec index="P-10" name="PageSignalAction">
+          <LabSpec index="P-09" name="PageSignalAction">
             Closes an expressive page with one high-priority destination. Its
             ProximityLink shade is absent at rest and appears only on hover.
           </LabSpec>
@@ -665,7 +609,7 @@ export default function LabPage() {
             description="Leave the internal field manual and return to the live homepage."
             eyebrow="Navigation / stable"
             href="/"
-            index="10"
+            index="09"
             label="Return / Home"
           />
         </section>
