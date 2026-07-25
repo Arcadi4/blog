@@ -4,27 +4,46 @@ import { cn } from "@/lib/utils"
 type ArticleCalloutProps = {
   readonly children: ReactNode
   readonly className?: string
+  readonly emphasis?: "quiet" | "strong"
   readonly label: string
   readonly title?: string
 }
 
-/** Restrained note for a caveat, definition, or constraint inside an article. */
+/** Article note with quiet and strong emphasis levels for editorial priority. */
 export function ArticleCallout({
   children,
   className,
+  emphasis = "quiet",
   label,
   title
 }: ArticleCalloutProps) {
+  const strong = emphasis === "strong"
+
   return (
     <aside
       className={cn("col-span-full grid grid-cols-subgrid", className)}
       role="note"
     >
-      <div className="col-span-8 col-start-3 grid grid-cols-8 border-y border-foreground/35 py-6 max-md:col-span-full max-md:col-start-1">
-        <div className="col-span-1 flex items-start gap-2 font-mono text-[10px] leading-none tracking-[0.14em] text-klein uppercase">
+      <div
+        className={cn(
+          "col-span-8 col-start-3 grid grid-cols-8 border-y py-6 max-md:col-span-full max-md:col-start-1",
+          strong
+            ? "border-klein bg-klein text-background"
+            : "border-foreground/35"
+        )}
+      >
+        <div
+          className={cn(
+            "col-span-1 flex items-start gap-2 font-mono text-[10px] leading-none tracking-[0.14em] uppercase",
+            strong ? "text-acid" : "text-klein"
+          )}
+        >
           <span
             aria-hidden="true"
-            className="mt-0.5 size-2 bg-acid ring-1 ring-foreground"
+            className={cn(
+              "mt-0.5 size-2 bg-acid ring-1",
+              strong ? "ring-background" : "ring-foreground"
+            )}
           />
           <span>{label}</span>
         </div>
@@ -36,7 +55,8 @@ export function ArticleCallout({
           ) : null}
           <div
             className={cn(
-              "text-base leading-relaxed text-foreground/75",
+              "text-base leading-relaxed",
+              strong ? "text-background/80" : "text-foreground/75",
               title && "mt-3"
             )}
           >

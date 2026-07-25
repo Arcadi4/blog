@@ -1,26 +1,33 @@
 import NextLink from "next/link"
-import { AnchorHTMLAttributes } from "react"
+import type { AnchorHTMLAttributes } from "react"
+import { cn } from "@/lib/utils"
+import styles from "./Link.module.css"
 
 interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  href: string
+  readonly direction?: "back" | "forward"
+  readonly href: string
+  readonly variant?: "directional" | "underline"
 }
 
 /**
- * Animated link component with:
- * - Underline that fades in on hover via text-decoration-color transition
- * - Native text-decoration-skip-ink for descender gaps
- *
- * Works on any background (solid, gradient, multi-colour) without
- * needing a colour-matching CSS variable.
+ * Site link with a quiet reading default and an opt-in directional treatment
+ * for previous, next, continuation, and related-destination actions.
  */
 export default function Link({
   href,
   children,
   className = "",
+  direction = "forward",
+  variant = "underline",
   ...props
 }: LinkProps) {
   const isExternal = href.startsWith("http") || href.startsWith("mailto:")
-  const linkClass = `animated-link ${className}`
+  const linkClass = cn(
+    variant === "underline" && "animated-link",
+    variant === "directional" && styles.directional,
+    variant === "directional" && direction === "back" && styles.back,
+    className
+  )
 
   // Treat null/undefined/empty-string/empty-array children as "no children"
   const childrenEmpty =
@@ -30,6 +37,18 @@ export default function Link({
     (Array.isArray(children) && children.length === 0)
 
   const content = childrenEmpty ? href : children
+  const linkContent =
+    variant === "directional" ? (
+      <>
+        {direction === "back" ? <DirectionTrail direction={direction} /> : null}
+        <span className={styles.label}>{content}</span>
+        {direction === "forward" ? (
+          <DirectionTrail direction={direction} />
+        ) : null}
+      </>
+    ) : (
+      content
+    )
 
   if (isExternal) {
     return (
@@ -40,14 +59,32 @@ export default function Link({
         rel="noopener noreferrer"
         {...props}
       >
-        {content}
+        {linkContent}
       </a>
     )
   }
 
   return (
     <NextLink href={href} className={linkClass} {...props}>
-      {content}
+      {linkContent}
     </NextLink>
+  )
+}
+
+function DirectionTrail({
+  direction
+}: {
+  readonly direction: "back" | "forward"
+}) {
+  const arrow = direction === "back" ? "←" : "→"
+
+  return (
+    <span aria-hidden="true" className={styles.trail}>
+      {[0, 1, 2].map((index) => (
+        <span className={styles.arrow} key={index}>
+          {arrow}
+        </span>
+      ))}
+    </span>
   )
 }

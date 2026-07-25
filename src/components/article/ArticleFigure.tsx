@@ -7,19 +7,28 @@ type ArticleFigureProps = {
   readonly className?: string
   readonly credit?: string
   readonly figureId: string
+  readonly width?: "reading" | "wide"
 }
 
-/** Standard reading-width image or media figure with durable caption metadata. */
+/** Image or media figure with reading and full twelve-column width modes. */
 export function ArticleFigure({
   caption,
   children,
   className,
   credit,
-  figureId
+  figureId,
+  width = "reading"
 }: ArticleFigureProps) {
   return (
     <figure className={cn("col-span-full grid grid-cols-subgrid", className)}>
-      <div className="col-span-8 col-start-3 overflow-hidden bg-[#e9e9e9] max-md:col-span-full max-md:col-start-1">
+      <div
+        className={cn(
+          "overflow-hidden bg-[#e9e9e9]",
+          width === "wide"
+            ? "col-span-full"
+            : "col-span-8 col-start-3 max-md:col-span-full max-md:col-start-1"
+        )}
+      >
         {children}
       </div>
 
