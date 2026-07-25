@@ -1,0 +1,23 @@
+.field {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, currentColor 48%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-position: center;
+  background-size: 0.75rem 0.75rem;
+  isolation: isolate;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.content {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
