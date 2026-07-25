@@ -22,7 +22,8 @@ export default defineConfig({
       "pnpm-lock.yaml",
       "next-env.d.ts",
       "src/generated/**",
-      "public/banners/**"
+      "public/banners/**",
+      "AGENTS.md"
     ]
   },
   lint: {
