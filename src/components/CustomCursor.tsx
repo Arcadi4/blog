@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
-const CURSOR_SIZE = 28
+const CURSOR_SIZE = 64
 const CURSOR_OFFSET = CURSOR_SIZE / 2
 const INTERACTIVE_SELECTOR = [
   "[data-cursor='interactive']",
