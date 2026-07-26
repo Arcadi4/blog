@@ -36,14 +36,14 @@ export function ArticleFigure({
       </div>
 
       <figcaption className="col-span-8 col-start-3 grid grid-cols-8 border-b border-foreground/35 py-3 text-sm leading-tight max-md:col-span-full max-md:col-start-1">
-        <span className="col-span-1 font-mono text-[10px] tracking-[0.14em] uppercase">
+        <span className="col-span-1 font-mono text-xs leading-none text-klein">
           Fig. {figureId}
         </span>
         <div className="col-span-5 col-start-2 text-foreground/75">
           {caption}
         </div>
         {credit ? (
-          <span className="col-span-2 text-right font-mono text-[10px] leading-tight uppercase">
+          <span className="col-span-2 text-right leading-tight text-foreground/60">
             {credit}
           </span>
         ) : null}

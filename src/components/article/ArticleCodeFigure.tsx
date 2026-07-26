@@ -25,7 +25,7 @@ export function ArticleCodeFigure({
     <figure className={cn("col-span-full grid grid-cols-subgrid", className)}>
       <div className="col-span-8 col-start-3 overflow-hidden bg-foreground text-background max-md:col-span-full max-md:col-start-1">
         <div className="flex min-h-12 items-center justify-between border-b border-background/25 px-4">
-          <span className="font-mono text-[10px] leading-tight tracking-[0.12em] break-all uppercase">
+          <span className="font-mono text-xs leading-tight break-all">
             {filename}
           </span>
           {copyValue ? <CopySignal value={copyValue} /> : null}

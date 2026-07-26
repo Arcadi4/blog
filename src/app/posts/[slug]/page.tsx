@@ -5,7 +5,7 @@ import { menuItems } from "@/app/posts/menuItems"
 import { EaseIn } from "@/components/animations/EaseIn"
 import { ScaleIn } from "@/components/animations/ScaleIn"
 import { MarkdownContent } from "@/components/article/MarkdownContent"
-import { Menu } from "@/components/Menu"
+import { Menu } from "@/components/layout/Menu"
 import MarqueeCard from "@/components/MarqueeCard"
 import VerticalGrid from "@/components/VerticalGrid"
 import { Metadata } from "next"
@@ -168,7 +168,7 @@ export default async function Post({
         </div>
 
         {/* Scroll hint */}
-        <span className="col-start-12 row-start-3 self-end justify-self-end font-mono text-5xl leading-none text-klein">
+        <span className="col-start-12 row-start-3 self-end justify-self-end font-funnel-display text-5xl leading-none text-klein">
           ↓↓
         </span>
       </section>

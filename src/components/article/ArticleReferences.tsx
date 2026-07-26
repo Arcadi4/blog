@@ -22,7 +22,7 @@ export function ArticleReferences({
       className={cn("col-span-full grid grid-cols-subgrid", className)}
     >
       <div className="col-span-8 col-start-3 grid grid-cols-8 border-t border-foreground py-6 max-md:col-span-full max-md:col-start-1">
-        <h2 className="col-span-2 font-mono text-xs leading-none tracking-[0.14em] uppercase">
+        <h2 className="col-span-2 font-funnel-display text-xl leading-none tracking-[-0.02em]">
           {title}
         </h2>
         <div className="col-span-6 col-start-3 text-sm leading-relaxed text-foreground/70 [&_a]:text-klein [&_a]:underline [&_a]:underline-offset-2 [&_li+li]:mt-3 [&_ol]:list-decimal [&_ol]:pl-5">

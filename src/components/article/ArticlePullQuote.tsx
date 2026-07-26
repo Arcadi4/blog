@@ -5,6 +5,7 @@ type ArticlePullQuoteProps = {
   readonly children: ReactNode
   readonly citation: string
   readonly className?: string
+  readonly voice?: "display" | "serif"
 }
 
 /**
@@ -14,7 +15,8 @@ type ArticlePullQuoteProps = {
 export function ArticlePullQuote({
   children,
   citation,
-  className
+  className,
+  voice = "display"
 }: ArticlePullQuoteProps) {
   return (
     <figure
@@ -30,11 +32,18 @@ export function ArticlePullQuote({
       </div>
 
       <blockquote className="col-span-7 col-start-3 border-l border-foreground/35 pl-6 max-md:col-span-full max-md:col-start-1">
-        <div className="font-funnel-display text-[clamp(2rem,4vw,3.75rem)] leading-[0.95] tracking-[-0.035em] text-pretty">
+        <div
+          className={cn(
+            "text-pretty",
+            voice === "serif"
+              ? "font-serif text-[clamp(1.9rem,3.6vw,3.4rem)] leading-[1.08] tracking-[-0.01em] italic"
+              : "font-funnel-display text-[clamp(2rem,4vw,3.75rem)] leading-[0.95] tracking-[-0.035em]"
+          )}
+        >
           {children}
         </div>
-        <figcaption className="mt-5 font-mono text-[10px] leading-tight tracking-[0.12em] text-foreground/65 uppercase">
-          <cite className="not-italic">{citation}</cite>
+        <figcaption className="mt-5 leading-tight text-foreground/65">
+          <cite className="font-serif italic">{citation}</cite>
         </figcaption>
       </blockquote>
     </figure>

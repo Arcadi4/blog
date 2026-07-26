@@ -1,6 +1,9 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
+import { FieldLabel } from "@/components/signal/FieldLabel"
+import { SignalAsterisk } from "@/components/signal/SignalAsterisk"
 import { SignalBars } from "@/components/signal/SignalBars"
+import { SignalChecker } from "@/components/signal/SignalChecker"
 
 type PageInterruptionProps = {
   readonly children: ReactNode
@@ -28,9 +31,10 @@ export function PageInterruption({
       )}
     >
       <div className="col-span-2 flex flex-col justify-between bg-klein p-4 text-background max-md:col-span-3">
-        <span className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase">
-          Page interruption
-        </span>
+        <div className="flex items-start justify-between gap-2">
+          <FieldLabel className="text-background">interruption</FieldLabel>
+          <SignalAsterisk className="shrink-0 text-4xl text-acid" />
+        </div>
         <span className="font-funnel-display text-8xl leading-[0.7] tracking-[-0.08em]">
           {index}
         </span>
@@ -48,7 +52,8 @@ export function PageInterruption({
         </div>
       </div>
 
-      <div className="col-span-2 col-start-11 flex items-center justify-center bg-acid text-foreground max-md:col-span-full max-md:col-start-1 max-md:row-start-2 max-md:min-h-28">
+      <div className="relative col-span-2 col-start-11 flex items-center justify-center bg-acid text-foreground max-md:col-span-full max-md:col-start-1 max-md:row-start-2 max-md:min-h-28">
+        <SignalChecker className="absolute top-3 right-3 h-4 w-12 [--checker-size:0.5rem]" />
         <span
           aria-hidden="true"
           className="font-funnel-display text-9xl leading-none"

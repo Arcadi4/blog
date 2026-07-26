@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
-import ProximityLink from "@/components/ProximityLink"
+import ProximityLink from "@/components/proximity/ProximityLink"
 import { cn } from "@/lib/utils"
+import { FieldLabel } from "@/components/signal/FieldLabel"
 
 export type PageContactSheetItem = {
   readonly className?: string
@@ -37,13 +38,13 @@ export function PageContactSheet({
       )}
     >
       <header className="col-span-full grid grid-cols-subgrid items-end pb-8">
-        <p className="col-span-2 font-mono text-[10px] leading-none tracking-[0.15em] uppercase max-md:col-span-3">
+        <p className="col-span-2 font-funnel-display text-xl leading-none tracking-[-0.02em] max-md:col-span-3">
           {label}
         </p>
         <h2 className="col-span-7 col-start-3 font-funnel-display text-[clamp(3rem,7vw,7rem)] leading-[0.74] tracking-[-0.055em] uppercase max-md:col-span-9 max-md:col-start-4">
           {title}
         </h2>
-        <p className="col-span-2 col-start-11 text-right font-mono text-[10px] leading-tight uppercase max-md:col-span-3 max-md:col-start-10">
+        <p className="col-span-2 col-start-11 text-right text-sm leading-tight text-foreground/70 max-md:col-span-3 max-md:col-start-10">
           {String(items.length).padStart(2, "0")} records
         </p>
       </header>
@@ -60,9 +61,9 @@ export function PageContactSheet({
             {item.media}
           </div>
           <footer className="grid grid-cols-4 gap-x-4 p-3">
-            <span className="col-span-1 font-mono text-[10px] leading-none uppercase">
+            <FieldLabel className="col-span-1" kind="index">
               {item.id}
-            </span>
+            </FieldLabel>
             <div className="col-span-3">
               <h3 className="font-funnel-display text-3xl leading-[0.9] tracking-[-0.035em]">
                 {item.href ? (
@@ -76,7 +77,7 @@ export function PageContactSheet({
                   item.title
                 )}
               </h3>
-              <p className="mt-3 font-mono text-[10px] leading-tight text-foreground/60 uppercase">
+              <p className="mt-3 text-sm leading-tight text-foreground/60">
                 {item.meta}
               </p>
             </div>

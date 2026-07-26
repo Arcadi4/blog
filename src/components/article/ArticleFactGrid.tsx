@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
+import { FieldLabel } from "@/components/signal/FieldLabel"
 
 export type ArticleFact = {
   readonly label: string
@@ -28,8 +29,8 @@ export function ArticleFactGrid({
     >
       <dl className="col-span-8 col-start-3 grid grid-cols-8 border-y border-foreground/35 max-md:col-span-full max-md:col-start-1">
         <div className="col-span-2 border-r border-foreground/35 p-4 max-md:col-span-full max-md:border-r-0 max-md:border-b">
-          <dt className="font-mono text-[10px] leading-none tracking-[0.14em] uppercase">
-            Context
+          <dt>
+            <FieldLabel>context</FieldLabel>
           </dt>
           <dd className="mt-8 font-funnel-display text-2xl leading-none tracking-[-0.03em]">
             {label}
@@ -40,7 +41,7 @@ export function ArticleFactGrid({
             className="col-span-2 min-h-28 border-r border-foreground/20 p-4 last:border-r-0 max-md:col-span-4 max-md:border-b"
             key={fact.label}
           >
-            <dt className="font-mono text-[10px] leading-none tracking-[0.12em] text-foreground/55 uppercase">
+            <dt className="text-sm leading-none text-foreground/55">
               {fact.label}
             </dt>
             <dd className="mt-5 font-funnel-display text-2xl leading-[0.95] tracking-[-0.025em]">

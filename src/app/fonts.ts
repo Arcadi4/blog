@@ -4,6 +4,7 @@ import {
   Geist,
   IBM_Plex_Mono,
   IBM_Plex_Sans,
+  Libre_Barcode_128,
   Playfair_Display
 } from "next/font/google"
 
@@ -36,6 +37,12 @@ export const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair-display",
   weight: "variable"
+})
+
+export const libreBarcode = Libre_Barcode_128({
+  subsets: ["latin"],
+  variable: "--font-libre-barcode",
+  weight: "400"
 })
 
 export const funnelDisplay = Funnel_Display({

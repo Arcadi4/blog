@@ -13,6 +13,7 @@ import { ArticleProse } from "@/components/article/ArticleProse"
 import { ArticlePullQuote } from "@/components/article/ArticlePullQuote"
 import { ArticleReferences } from "@/components/article/ArticleReferences"
 import Link from "@/components/Link"
+import { Bleed } from "@/components/layout/Bleed"
 import { SiteGrid } from "@/components/layout/SiteGrid"
 import type { PageContactSheetItem } from "@/components/page/PageContactSheet"
 import { PageContactSheet } from "@/components/page/PageContactSheet"
@@ -23,12 +24,20 @@ import { PageInterruption } from "@/components/page/PageInterruption"
 import { PageMasthead } from "@/components/page/PageMasthead"
 import { PageSectionIntro } from "@/components/page/PageSectionIntro"
 import { PageSignalAction } from "@/components/page/PageSignalAction"
+import { PageTickerBand } from "@/components/page/PageTickerBand"
 import { PageTypeField } from "@/components/page/PageTypeField"
 import { EvidenceScan } from "@/components/signal/EvidenceScan"
+import { FieldLabel } from "@/components/signal/FieldLabel"
 import { SegmentedRing } from "@/components/signal/SegmentedRing"
+import { SignalAsterisk } from "@/components/signal/SignalAsterisk"
+import { SignalBarcode } from "@/components/signal/SignalBarcode"
 import { SignalBars } from "@/components/signal/SignalBars"
+import { SignalChecker } from "@/components/signal/SignalChecker"
+import { SignalCrosshairField } from "@/components/signal/SignalCrosshairField"
 import { SignalDotField } from "@/components/signal/SignalDotField"
+import { SignalGlitch } from "@/components/signal/SignalGlitch"
 import { SignalRedaction } from "@/components/signal/SignalRedaction"
+import { SignalScramble } from "@/components/signal/SignalScramble"
 import styles from "./DesignLab.module.css"
 
 export const metadata: Metadata = {
@@ -72,7 +81,7 @@ const contactSheetItems: readonly PageContactSheetItem[] = [
         </span>
       </SignalDotField>
     ),
-    meta: "Signal substrate / decorative",
+    meta: "Signal substrate, decorative",
     title: "Blue register"
   },
   {
@@ -101,7 +110,7 @@ const contactSheetItems: readonly PageContactSheetItem[] = [
         <span>ARCHIVE / 004</span>
       </div>
     ),
-    meta: "Index feature / authored placement",
+    meta: "Index feature, authored placement",
     title: "One wide exception"
   }
 ]
@@ -122,8 +131,8 @@ type LabSpecProps = {
 function LabSpec({ children, directive, index, name }: LabSpecProps) {
   return (
     <div className="col-span-full grid grid-cols-subgrid border-t border-foreground/35 py-4">
-      <p className="col-span-2 font-mono text-[10px] leading-none tracking-[0.14em] uppercase max-md:col-span-3">
-        Component / {index}
+      <p className="col-span-2 max-md:col-span-3">
+        <FieldLabel kind="index">{index}</FieldLabel>
       </p>
       <div className="col-span-6 col-start-3 max-md:col-span-9 max-md:col-start-4">
         <h3 className="font-funnel-display text-3xl leading-none tracking-[-0.03em]">
@@ -133,7 +142,7 @@ function LabSpec({ children, directive, index, name }: LabSpecProps) {
           {children}
         </p>
       </div>
-      <code className="col-span-2 col-start-11 self-start font-mono text-[10px] leading-tight break-all text-klein max-md:col-span-9 max-md:col-start-4 max-md:row-start-2 max-md:mt-3">
+      <code className="col-span-2 col-start-11 self-start font-mono text-xs leading-tight break-all text-klein max-md:col-span-9 max-md:col-start-4 max-md:row-start-2 max-md:mt-3">
         {directive ?? "React composition only"}
       </code>
     </div>
@@ -147,7 +156,7 @@ function Artifact({ signal = false }: { readonly signal?: boolean }) {
       className={`${styles.artifact} ${signal ? styles.artifactSignal : ""}`}
     >
       <span className={styles.artifactMeta}>
-        <span>Form / 017</span>
+        <span>{"{form 017}"}</span>
         <span>12 × 08</span>
       </span>
       <span className={styles.artifactWindow} />
@@ -164,7 +173,7 @@ export default function LabPage() {
     <main className="overflow-x-clip bg-background text-foreground" lang="en">
       <SiteGrid>
         <PageMasthead
-          eyebrow="Component field manual"
+          eyebrow="field manual"
           sequence="V2"
           summary={
             <>
@@ -178,7 +187,9 @@ export default function LabPage() {
             <>
               Design
               <br />
-              <span className="text-klein">by use</span>
+              <span className="font-serif tracking-[-0.01em] text-klein italic">
+                by use
+              </span>
             </>
           }
         >
@@ -258,6 +269,20 @@ export default function LabPage() {
             narrower measure. Its identity comes from exact typography and
             small, meaningful signals.
           </PageInterruption>
+
+          <LabSpec index="P-10" name="PageTickerBand + Bleed">
+            Runs one repeating statement across the full field like a transit
+            board. Wrapped in Bleed, it escapes the twelve columns and hits the
+            viewport edges — the exception that proves the grid. Use it at most
+            once per page, between major phases.
+          </LabSpec>
+
+          <Bleed>
+            <PageTickerBand
+              phrases={["Design by use", "Twelve columns", "Signal over noise"]}
+              tone="klein"
+            />
+          </Bleed>
 
           <LabSpec index="P-06" name="PageTypeField">
             Turns one short phrase into the composition for a campaign, visual
@@ -398,7 +423,7 @@ export default function LabPage() {
             Places a short aside, correction, or source note in the outer rail
             so supporting context remains visibly secondary.
           </LabSpec>
-          <ArticleMarginNote label="Context">
+          <ArticleMarginNote label="context">
             Margin notes should be brief. Longer detours belong in a fold or a
             separate section.
           </ArticleMarginNote>
@@ -414,6 +439,10 @@ export default function LabPage() {
           <ArticlePullQuote citation="Article system / editorial rule">
             A useful component is memorable in the author&apos;s hand and quiet
             in the reader&apos;s way.
+          </ArticlePullQuote>
+          <ArticlePullQuote citation="Voice variant / serif" voice="serif">
+            The serif voice slows the sentence down — use it when the quote is a
+            thought, not a headline.
           </ArticlePullQuote>
 
           <LabSpec
@@ -588,6 +617,27 @@ export default function LabPage() {
             </SegmentedRing>
           </div>
 
+          <LabSpec
+            index="S-05"
+            name="SignalAsterisk + SignalBarcode + SignalChecker"
+          >
+            Registration glyphs from print production: an oversized asterisk, a
+            non-encoding barcode slug, and a calibration checkerboard. They mark
+            authored surfaces the way crop marks mark a mechanical.
+          </LabSpec>
+          <div className="col-span-8 col-start-3 grid min-h-52 grid-cols-8 items-center border-y border-foreground max-md:col-span-full max-md:col-start-1">
+            <SignalAsterisk className="col-span-2 text-[9rem] text-magenta" />
+            <SignalAsterisk
+              className="col-span-1 text-[5rem] text-klein"
+              spin
+            />
+            <SignalBarcode
+              className="col-span-2 col-start-5 text-foreground"
+              code="LAB-2026"
+            />
+            <SignalChecker className="col-span-2 col-start-7 h-10 w-full text-foreground" />
+          </div>
+
           <LabSpec index="S-03" name="SignalDotField">
             Supplies a quiet dotted registration field behind a logo, icon, or
             single object. It is decorative by default and becomes a labeled
@@ -601,6 +651,49 @@ export default function LabPage() {
               12
             </span>
           </SignalDotField>
+
+          <LabSpec index="S-06" name="SignalScramble">
+            Decodes a word on hover or focus: glyphs churn through a technical
+            charset and lock in from the left. Use it on callsigns, titles, and
+            labels — never on running prose.
+          </LabSpec>
+          <p className="col-span-8 col-start-3 py-10 font-funnel-display text-[clamp(2.5rem,5vw,5rem)] leading-[0.88] tracking-[-0.04em]">
+            Transmission from{" "}
+            <SignalScramble className="text-klein">TAU CETI IV</SignalScramble>
+          </p>
+
+          <LabSpec index="S-08" name="SignalGlitch">
+            Transmission losing vertical hold: klein and magenta copies shear
+            through clip bands while the parent link is hovered or focused. Pure
+            CSS — wrap it around nav labels or headline words.
+          </LabSpec>
+          <div className="col-span-8 col-start-3 flex flex-wrap items-baseline gap-x-12 gap-y-6 border-y border-foreground py-10 max-md:col-span-full max-md:col-start-1">
+            <a
+              className="font-funnel-display text-[clamp(2.5rem,5vw,5rem)] leading-[0.88] tracking-[-0.04em] uppercase"
+              href="#top"
+            >
+              <SignalGlitch>Vertical hold</SignalGlitch>
+            </a>
+            <a className="font-mono text-sm" href="#top">
+              <SignalGlitch>Sys / Link 04</SignalGlitch>
+            </a>
+          </div>
+
+          <LabSpec index="S-07" name="SignalCrosshairField">
+            Turns any block into a surveyed surface: crosshair rules track the
+            pointer and a mono readout reports the grid coordinate underneath,
+            like a printer&apos;s registration check.
+          </LabSpec>
+          <SignalCrosshairField
+            className="col-span-8 col-start-3 min-h-72 border-y border-foreground text-foreground/60 max-md:col-span-full max-md:col-start-1"
+            label="Coordinate survey demonstration field"
+          >
+            <div className="flex min-h-72 items-center justify-center">
+              <span className="font-funnel-display text-[clamp(3rem,7vw,7rem)] leading-[0.8] tracking-[-0.05em] text-foreground uppercase">
+                Survey me
+              </span>
+            </div>
+          </SignalCrosshairField>
 
           <LabSpec index="S-04" name="Link / directional">
             Adds a route-like hover response to the existing link primitive. Use
@@ -639,7 +732,7 @@ export default function LabPage() {
           <PageSignalAction
             className="mb-24"
             description="Leave the internal field manual and return to the live homepage."
-            eyebrow="Navigation / stable"
+            eyebrow="Navigation"
             href="/"
             index="09"
             label="Return / Home"

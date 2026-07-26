@@ -16,6 +16,15 @@
   );
 }
 
+.checker {
+  background-image: repeating-conic-gradient(
+    currentColor 0% 25%,
+    transparent 0% 50%
+  );
+  background-size: calc(var(--checker-size, 0.625rem) * 2)
+    calc(var(--checker-size, 0.625rem) * 2);
+}
+
 @keyframes signal-bar-boot {
   0% {
     transform: scaleY(0);

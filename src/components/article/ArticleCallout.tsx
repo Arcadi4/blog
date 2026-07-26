@@ -37,7 +37,7 @@ export function ArticleCallout({
       >
         <div
           className={cn(
-            "col-span-1 flex items-start gap-2 font-mono text-[10px] leading-none tracking-[0.14em] uppercase",
+            "col-span-1 flex items-start gap-2 font-mono text-xs leading-none",
             strong ? "text-acid" : "text-klein"
           )}
         >

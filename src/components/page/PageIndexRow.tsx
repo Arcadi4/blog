@@ -1,4 +1,4 @@
-import ProximityLink from "@/components/ProximityLink"
+import ProximityLink from "@/components/proximity/ProximityLink"
 import { cn } from "@/lib/utils"
 
 type PageIndexRowProps = {
@@ -29,9 +29,11 @@ export function PageIndexRow({
         className
       )}
     >
-      <div className="col-span-2 flex flex-col justify-between font-mono text-[10px] leading-none uppercase max-md:col-span-3">
-        <span>Index / {index}</span>
-        <span>{meta}</span>
+      <div className="col-span-2 flex flex-col justify-between max-md:col-span-3">
+        <span className="font-funnel-display text-5xl leading-[0.7] tracking-[-0.06em] text-klein">
+          {index}
+        </span>
+        <span className="text-sm leading-tight text-foreground/70">{meta}</span>
       </div>
       <h3 className="col-span-7 col-start-3 self-center font-funnel-display text-[clamp(3rem,6vw,6.5rem)] leading-[0.76] tracking-[-0.055em] max-md:col-span-9 max-md:col-start-4 max-md:text-4xl">
         <ProximityLink

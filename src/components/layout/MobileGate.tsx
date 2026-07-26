@@ -169,11 +169,11 @@ export default function MobileGate() {
       <div className="pointer-events-none fixed -inset-x-1 inset-y-10 border border-white" />
       <div className="m-8 space-y-4">
         <h1 className="text-6xl font-bold">Oooops!</h1>
-        <p className="font-mono">
+        <p className="text-lg leading-tight">
           The mobile version is under development. Please access through a
           desktop browser for the best experience.
         </p>
-        <p className="font-mono">
+        <p className="text-lg leading-tight">
           iPad or tablet users, try to rotate your device to landscape mode.
         </p>
       </div>

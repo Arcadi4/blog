@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
+import { FieldLabel } from "@/components/signal/FieldLabel"
 
 export type PageFact = {
   readonly label: string
@@ -42,9 +43,11 @@ export function PageFactSheet({
       </div>
 
       <header className="col-span-8 col-start-5 grid min-h-96 grid-cols-8 p-5 max-md:col-span-full max-md:col-start-1 max-md:min-h-80">
-        <div className="col-span-full flex justify-between font-mono text-[10px] leading-none tracking-[0.15em] uppercase">
-          <span>{eyebrow}</span>
-          {year ? <span>{year}</span> : null}
+        <div className="col-span-full flex items-baseline justify-between gap-3">
+          <span className="font-funnel-display text-xl leading-none tracking-[-0.02em]">
+            {eyebrow}
+          </span>
+          {year ? <FieldLabel>{year}</FieldLabel> : null}
         </div>
         <h2 className="col-span-full self-center font-funnel-display text-[clamp(4.5rem,10vw,11rem)] leading-[0.7] tracking-[-0.07em] text-pretty">
           {title}
@@ -60,8 +63,8 @@ export function PageFactSheet({
             className="col-span-3 min-h-36 border-r border-foreground p-4 last:border-r-0 max-md:col-span-6 max-md:border-b"
             key={fact.label}
           >
-            <dt className="font-mono text-[10px] leading-none tracking-[0.15em] uppercase">
-              {fact.label}
+            <dt>
+              <FieldLabel>{fact.label}</FieldLabel>
             </dt>
             <dd className="mt-8 font-funnel-display text-3xl leading-[0.9] tracking-[-0.035em]">
               {fact.value}

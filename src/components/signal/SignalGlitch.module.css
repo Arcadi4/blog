@@ -1,0 +1,120 @@
+.glitch {
+  display: inline-block;
+  position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.glitch::before {
+  color: var(--color-klein);
+}
+
+.glitch::after {
+  color: var(--color-magenta);
+}
+
+/* Trigger on the glyph itself or any hovered/focused ancestor link/button. */
+.glitch:hover::before,
+.glitch:hover::after,
+a:hover .glitch::before,
+a:hover .glitch::after,
+a:focus-visible .glitch::before,
+a:focus-visible .glitch::after,
+button:hover .glitch::before,
+button:hover .glitch::after,
+button:focus-visible .glitch::before,
+button:focus-visible .glitch::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glitch:hover::before,
+  a:hover .glitch::before,
+  a:focus-visible .glitch::before,
+  button:hover .glitch::before,
+  button:focus-visible .glitch::before {
+    animation: slice-a 640ms steps(2, jump-none) infinite;
+  }
+
+  .glitch:hover::after,
+  a:hover .glitch::after,
+  a:focus-visible .glitch::after,
+  button:hover .glitch::after,
+  button:focus-visible .glitch::after {
+    animation: slice-b 480ms steps(3, jump-none) infinite;
+  }
+}
+
+/* Reduced motion: static offset split, no churn. */
+@media (prefers-reduced-motion: reduce) {
+  .glitch:hover::before,
+  a:hover .glitch::before,
+  a:focus-visible .glitch::before,
+  button:hover .glitch::before,
+  button:focus-visible .glitch::before {
+    clip-path: inset(0 0 55% 0);
+    transform: translateX(-0.04em);
+  }
+
+  .glitch:hover::after,
+  a:hover .glitch::after,
+  a:focus-visible .glitch::after,
+  button:hover .glitch::after,
+  button:focus-visible .glitch::after {
+    clip-path: inset(55% 0 0 0);
+    transform: translateX(0.04em);
+  }
+}
+
+@keyframes slice-a {
+  0% {
+    clip-path: inset(12% 0 74% 0);
+    transform: translate(-0.045em, -0.015em);
+  }
+  25% {
+    clip-path: inset(64% 0 8% 0);
+    transform: translate(0.035em, 0.01em);
+  }
+  50% {
+    clip-path: inset(38% 0 44% 0);
+    transform: translate(-0.03em, 0.02em);
+  }
+  75% {
+    clip-path: inset(80% 0 4% 0);
+    transform: translate(0.05em, -0.01em);
+  }
+  100% {
+    clip-path: inset(4% 0 86% 0);
+    transform: translate(-0.04em, 0.015em);
+  }
+}
+
+@keyframes slice-b {
+  0% {
+    clip-path: inset(70% 0 12% 0);
+    transform: translate(0.04em, 0.015em);
+  }
+  25% {
+    clip-path: inset(22% 0 62% 0);
+    transform: translate(-0.035em, -0.02em);
+  }
+  50% {
+    clip-path: inset(52% 0 30% 0);
+    transform: translate(0.03em, 0.01em);
+  }
+  75% {
+    clip-path: inset(8% 0 78% 0);
+    transform: translate(-0.05em, 0.02em);
+  }
+  100% {
+    clip-path: inset(88% 0 2% 0);
+    transform: translate(0.045em, -0.015em);
+  }
+}

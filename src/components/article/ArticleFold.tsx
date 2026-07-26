@@ -29,7 +29,7 @@ export function ArticleFold({
         aria-label={summary}
         className={`${styles.summary} col-span-8 col-start-3 grid min-h-20 grid-cols-8 border-y border-foreground/35 max-md:col-span-full max-md:col-start-1`}
       >
-        <span className="col-span-2 flex items-center border-r border-foreground/35 font-mono text-[10px] leading-none tracking-[0.14em] uppercase">
+        <span className="col-span-2 flex items-center border-r border-foreground/35 text-sm leading-tight text-foreground/60">
           Optional reading
         </span>
 
@@ -61,8 +61,8 @@ export function ArticleFold({
       <div
         className={`${styles.foldBody} col-span-8 col-start-3 grid grid-cols-8 border-b border-foreground/35 max-md:col-span-full max-md:col-start-1`}
       >
-        <div className="col-span-2 border-r border-foreground/35 py-6 font-mono text-[10px] leading-none tracking-[0.14em] uppercase">
-          Detail / retained
+        <div className="col-span-2 border-r border-foreground/35 py-6 text-sm leading-tight text-foreground/60">
+          Retained detail
         </div>
         <div className="col-span-5 col-start-3 px-4 py-6 text-base leading-relaxed text-foreground/75">
           {children}

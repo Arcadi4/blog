@@ -69,10 +69,7 @@ export function CopySignal({ className, value }: CopySignalProps) {
         <span />
         <span />
       </span>
-      <span
-        aria-live="polite"
-        className="font-mono text-[10px] leading-none uppercase"
-      >
+      <span aria-live="polite" className="font-mono text-xs leading-none">
         {statusLabel[status]}
       </span>
     </button>

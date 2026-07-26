@@ -1,7 +1,7 @@
 "use client"
 
-import type { ProximityLinkProps } from "@/components/ProximityLink"
-import ProximityLink from "@/components/ProximityLink"
+import type { ProximityLinkProps } from "@/components/proximity/ProximityLink"
+import ProximityLink from "@/components/proximity/ProximityLink"
 import { EaseIn } from "@/components/animations/EaseIn"
 import type { LinkItem } from "@/app/posts/menuItems"
 

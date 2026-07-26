@@ -8,9 +8,9 @@ import VerticalGrid from "@/components/VerticalGrid"
 import { ScaleIn } from "@/components/animations/ScaleIn"
 import type { ContentArticle } from "@/lib/content-index"
 import MarqueeCard from "@/components/MarqueeCard"
-import { Menu } from "@/components/Menu"
 import NextLink from "next/link"
 import { ScrollScale } from "@/components/animations/ScrollScale"
+import { Menu } from "@/components/layout/Menu"
 
 type HomePageClientProps = {
   readonly articles: readonly ContentArticle[]

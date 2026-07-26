@@ -1,7 +1,10 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
+import { FieldLabel } from "@/components/signal/FieldLabel"
 import { SegmentedRing } from "@/components/signal/SegmentedRing"
+import { SignalBarcode } from "@/components/signal/SignalBarcode"
 import { SignalBars } from "@/components/signal/SignalBars"
+import { SignalChecker } from "@/components/signal/SignalChecker"
 
 type PageMastheadProps = {
   readonly children?: ReactNode
@@ -32,9 +35,10 @@ export function PageMasthead({
       )}
     >
       <div className="col-span-2 flex flex-col justify-between bg-klein p-4 text-background max-md:col-span-3">
-        <span className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase">
-          {eyebrow}
-        </span>
+        <div className="flex items-start justify-between gap-3">
+          <FieldLabel className="text-background">{eyebrow}</FieldLabel>
+          <SignalChecker className="size-6 shrink-0" />
+        </div>
         <SegmentedRing
           className="size-28 self-center"
           ringClassName="text-acid"
@@ -44,13 +48,16 @@ export function PageMasthead({
             {sequence}
           </span>
         </SegmentedRing>
-        <SignalBars invert />
+        <div className="flex flex-col gap-3">
+          <SignalBars invert />
+          <SignalBarcode code={`SEQ-${sequence}`} />
+        </div>
       </div>
 
       <div className="col-span-7 col-start-3 flex min-w-0 flex-col justify-between px-4 py-5 max-md:col-span-9 max-md:col-start-4 max-md:min-h-[42rem]">
-        <span className="font-mono text-[10px] tracking-[0.16em] uppercase">
-          Page composition / shared 12-column field
-        </span>
+        <FieldLabel className="text-foreground/70">
+          composition · 12-column field
+        </FieldLabel>
         <h1 className="font-funnel-display text-[clamp(5.5rem,10vw,11rem)] leading-[0.68] tracking-[-0.065em] text-pretty uppercase max-md:text-[clamp(3.5rem,17vw,5.5rem)]">
           {title}
         </h1>
@@ -65,6 +72,14 @@ export function PageMasthead({
       </div>
 
       <div className="relative col-span-3 col-start-10 flex min-h-80 items-center justify-center overflow-hidden border-l border-foreground bg-acid p-6 max-md:col-span-full max-md:col-start-1 max-md:min-h-52 max-md:border-t max-md:border-l-0">
+        <FieldLabel
+          aria-hidden
+          className="absolute top-3 left-3 text-foreground"
+          kind="index"
+        >
+          {sequence}
+        </FieldLabel>
+        <SignalChecker className="absolute right-3 bottom-3 h-4 w-16 [--checker-size:0.5rem]" />
         {children ?? (
           <span
             aria-hidden="true"

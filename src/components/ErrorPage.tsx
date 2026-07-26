@@ -5,7 +5,7 @@ import type { ReactNode } from "react"
 import { menuItems } from "@/app/posts/menuItems"
 import { EaseIn } from "@/components/animations/EaseIn"
 import { ScaleIn } from "@/components/animations/ScaleIn"
-import { Menu } from "@/components/Menu"
+import { Menu } from "@/components/layout/Menu"
 
 type ErrorPageLink = {
   name: string
