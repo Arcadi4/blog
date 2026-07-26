@@ -10,7 +10,10 @@ type ArticleFigureProps = {
   readonly width?: "reading" | "wide"
 }
 
-/** Image or media figure with reading and full twelve-column width modes. */
+/**
+ * Editorial figure whose caption stays measured; wide mode borrows the
+ * full-field impact of a poster without abandoning the shared twelve columns.
+ */
 export function ArticleFigure({
   caption,
   children,

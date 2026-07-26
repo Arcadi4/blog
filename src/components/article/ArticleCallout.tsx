@@ -9,7 +9,10 @@ type ArticleCalloutProps = {
   readonly title?: string
 }
 
-/** Article note with quiet and strong emphasis levels for editorial priority. */
+/**
+ * A measured article note: quiet follows the reading grid, while strong takes
+ * its color-blocking cue from International Style field notices and game UI.
+ */
 export function ArticleCallout({
   children,
   className,

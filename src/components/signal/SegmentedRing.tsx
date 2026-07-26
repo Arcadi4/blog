@@ -10,6 +10,10 @@ type SegmentedRingProps = {
   readonly ringWidth?: number
 }
 
+/**
+ * Segmented calibration ring inspired by instrument dials and registration
+ * marks; decorative by default, semantic only when given a label.
+ */
 export function SegmentedRing({
   children,
   className,

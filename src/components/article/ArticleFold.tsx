@@ -8,7 +8,10 @@ type ArticleFoldProps = {
   readonly summary: string
 }
 
-/** Native optional-reading disclosure aligned to the site's twelve tracks. */
+/**
+ * Native optional-reading disclosure aligned to the twelve tracks; its small
+ * double-image response echoes ProximityLink without replacing browser behavior.
+ */
 export function ArticleFold({
   children,
   className,

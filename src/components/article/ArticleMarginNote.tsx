@@ -7,7 +7,10 @@ type ArticleMarginNoteProps = {
   readonly label?: string
 }
 
-/** Brief supporting context that should remain visibly secondary to the argument. */
+/**
+ * Brief supporting context placed like a modernist marginal annotation, using
+ * the outer rail so it remains visibly secondary to the argument.
+ */
 export function ArticleMarginNote({
   children,
   className,

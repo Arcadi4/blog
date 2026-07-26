@@ -12,7 +12,10 @@ type ArticleContentsProps = {
   readonly title?: string
 }
 
-/** Visible article outline for long posts with three or more major sections. */
+/**
+ * Visible outline for long posts, treating hash links like a Swiss contents
+ * table or route map instead of adding a floating application sidebar.
+ */
 export function ArticleContents({
   className,
   items,

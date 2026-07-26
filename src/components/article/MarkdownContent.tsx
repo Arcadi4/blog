@@ -6,7 +6,10 @@ type MarkdownContentProps = {
   readonly html: string
 }
 
-/** Renders the sanitized HTML produced by the build-time Markdown compiler. */
+/**
+ * Sanitized-HTML boundary for live posts; its CSS applies the same restrained
+ * Swiss reading typography without inventing a second document model.
+ */
 export function MarkdownContent({ className, html }: MarkdownContentProps) {
   return (
     <article

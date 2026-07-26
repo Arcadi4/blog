@@ -10,7 +10,10 @@ type PageIndexRowProps = {
   readonly title: string
 }
 
-/** Scannable navigation row for article archives, project indexes, and tag pages. */
+/**
+ * Scannable archive row inspired by editorial indexes and transport boards;
+ * typography carries navigation while the hover signal remains secondary.
+ */
 export function PageIndexRow({
   className,
   href,

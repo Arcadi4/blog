@@ -18,7 +18,10 @@ type PageContactSheetProps = {
   readonly title: string
 }
 
-/** Authored media mosaic for portfolio, project, and image-led archive pages. */
+/**
+ * Authored media mosaic for portfolios and image-led archives, inspired by
+ * contact sheets while keeping every irregular card on the twelve-column field.
+ */
 export function PageContactSheet({
   className,
   items,

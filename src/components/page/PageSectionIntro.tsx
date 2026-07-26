@@ -9,7 +9,10 @@ type PageSectionIntroProps = {
   readonly title: ReactNode
 }
 
-/** Establishes hierarchy between major sections on expressive, non-article pages. */
+/**
+ * Major page-section heading based on Swiss asymmetric hierarchy, with small
+ * color registration marks keeping the transition visibly authored.
+ */
 export function PageSectionIntro({
   children,
   className,

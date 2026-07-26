@@ -27,6 +27,7 @@ function clampPosition(position: number) {
 /**
  * A pointer- and keyboard-operated comparison band for article media.
  * The alternate signal is absent at rest and can be pinned with activation.
+ * Its moving reveal borrows diagnostic scanners and print registration windows.
  * Base and signal should be non-interactive visual media; the label describes
  * the comparison to assistive technology.
  */

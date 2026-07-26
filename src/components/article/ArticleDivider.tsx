@@ -7,7 +7,10 @@ type ArticleDividerProps = {
   readonly variant?: "route" | "rule"
 }
 
-/** Chapter transition with a quiet rule default and an opt-in directional route. */
+/**
+ * Chapter transition built from Swiss rules; the route mode adds transit-map
+ * nodes and technical registration marks for a deliberate change of phase.
+ */
 export function ArticleDivider({
   className,
   index,

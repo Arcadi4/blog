@@ -7,7 +7,10 @@ type ArticleProseProps = {
   readonly className?: string
 }
 
-/** Reading-width prose lane for a future allowlisted AST-to-React renderer. */
+/**
+ * Reading-width semantic lane whose restrained measure and hierarchy follow
+ * Swiss book typography; intended for a future allowlisted React renderer.
+ */
 export function ArticleProse({ children, className }: ArticleProseProps) {
   return (
     <div className={cn("col-span-full grid grid-cols-subgrid", className)}>

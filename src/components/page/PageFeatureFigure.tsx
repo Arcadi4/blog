@@ -9,7 +9,10 @@ type PageFeatureFigureProps = {
   readonly figureId: string
 }
 
-/** Large visual evidence field for landing pages and editorial feature pages. */
+/**
+ * Large evidence field for landing and feature pages, borrowing the caption
+ * rails and numbered plates of modernist exhibition graphics.
+ */
 export function PageFeatureFigure({
   caption,
   children,

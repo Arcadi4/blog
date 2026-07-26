@@ -18,7 +18,10 @@ const statusLabel: Record<CopyStatus, string> = {
   idle: "Copy"
 }
 
-/** A compact clipboard control for code, commands, citations, and identifiers. */
+/**
+ * Compact clipboard control for code and identifiers, combining an ordinary
+ * button with a small technical status-block animation.
+ */
 export function CopySignal({ className, value }: CopySignalProps) {
   const [status, setStatus] = useState<CopyStatus>("idle")
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)

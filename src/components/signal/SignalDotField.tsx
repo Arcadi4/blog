@@ -8,7 +8,10 @@ type SignalDotFieldProps = {
   readonly label?: string
 }
 
-/** Dotted calibration substrate; decorative unless a visual label is supplied. */
+/**
+ * Dotted calibration substrate derived from Swiss graph paper and registration
+ * grids; decorative unless the composed visual is given a real label.
+ */
 export function SignalDotField({
   children,
   className,

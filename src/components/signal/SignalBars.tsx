@@ -8,6 +8,10 @@ type SignalBarsProps = {
   readonly invert?: boolean
 }
 
+/**
+ * Decorative calibration bars inspired by broadcast meters and technical
+ * legends; they provide cadence but intentionally encode no data.
+ */
 export function SignalBars({ className, invert = false }: SignalBarsProps) {
   return (
     <span

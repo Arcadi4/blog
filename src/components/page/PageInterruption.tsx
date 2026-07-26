@@ -9,7 +9,10 @@ type PageInterruptionProps = {
   readonly title: string
 }
 
-/** Rare full-field state change for long visual pages, not ordinary article prose. */
+/**
+ * Rare full-field state change for visual pages, using hard color blocking and
+ * oversized type like a poster intermission rather than ordinary article prose.
+ */
 export function PageInterruption({
   children,
   className,

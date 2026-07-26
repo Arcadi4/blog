@@ -7,7 +7,10 @@ type ArticleReferencesProps = {
   readonly title?: string
 }
 
-/** End matter for citations, source links, and further reading. */
+/**
+ * Citation and further-reading end matter modeled on quiet book back matter,
+ * with a stable label rail and conventional linked list semantics.
+ */
 export function ArticleReferences({
   children,
   className,

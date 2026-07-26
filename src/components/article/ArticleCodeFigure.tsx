@@ -10,7 +10,10 @@ type ArticleCodeFigureProps = {
   readonly filename: string
 }
 
-/** Captioned reading-width frame around already-highlighted source code. */
+/**
+ * Captioned source frame inspired by technical manuals and terminal readouts,
+ * keeping already-highlighted code inside one deliberate scroll region.
+ */
 export function ArticleCodeFigure({
   caption,
   children,

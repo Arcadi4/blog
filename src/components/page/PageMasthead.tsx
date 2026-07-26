@@ -12,7 +12,10 @@ type PageMastheadProps = {
   readonly title: ReactNode
 }
 
-/** Expressive opener for authored pages such as Home, About, and All Articles. */
+/**
+ * Expressive opener for Home, About, and indexes, combining an International
+ * Style title field with small technical calibration marks.
+ */
 export function PageMasthead({
   children,
   className,

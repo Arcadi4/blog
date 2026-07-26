@@ -11,6 +11,7 @@ type SignalRedactionProps = {
 
 /**
  * An inline disclosure for spoilers, withheld terms, and answer reveals.
+ * Its double-image reveal is inspired by offset print and censored documents.
  * Hover or focus previews the text; activating the button pins it open for
  * keyboard and touch users. This is a presentation device, not a way to keep
  * secrets out of the document source.

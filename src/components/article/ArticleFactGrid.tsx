@@ -12,7 +12,10 @@ type ArticleFactGridProps = {
   readonly label?: string
 }
 
-/** Compact factual context for versions, scope, status, or measured results. */
+/**
+ * Compact versions, scope, status, or results arranged like a technical data
+ * sheet; factual labels provide the rhythm rather than marketing metrics.
+ */
 export function ArticleFactGrid({
   className,
   facts,

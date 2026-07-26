@@ -10,7 +10,10 @@ type PageSignalActionProps = {
   readonly label: string
 }
 
-/** High-emphasis destination link for the end of a landing or index page. */
+/**
+ * High-emphasis closing destination for expressive pages, combining a Swiss
+ * action strip with ProximityLink's hover-only double image.
+ */
 export function PageSignalAction({
   className,
   description,

@@ -13,7 +13,8 @@ type PageTypeFieldProps = {
 
 /**
  * Poster-scale statement for authored pages where one phrase should become the
- * composition. Use for campaigns, visual essays, and occasional About sections.
+ * composition. Its cropped type follows Swiss poster practice; use it for
+ * campaigns, visual essays, and occasional About sections.
  */
 export function PageTypeField({
   children,

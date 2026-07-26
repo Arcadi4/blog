@@ -10,8 +10,8 @@ interface LinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 
 /**
- * Site link with a quiet reading default and an opt-in directional treatment
- * for previous, next, continuation, and related-destination actions.
+ * Quiet Swiss-editorial underline by default; the directional mode borrows
+ * transit-map arrow repetition for previous, next, and continuation actions.
  */
 export default function Link({
   href,
@@ -71,6 +71,7 @@ export default function Link({
   )
 }
 
+/** Decorative arrow echo; its fading repetition is inspired by transit signage. */
 function DirectionTrail({
   direction
 }: {

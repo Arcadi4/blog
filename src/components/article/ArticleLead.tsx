@@ -6,7 +6,10 @@ type ArticleLeadProps = {
   readonly className?: string
 }
 
-/** Opening paragraph that states an article's thesis before regular body copy begins. */
+/**
+ * Opening thesis set like an editorial deck: larger than prose, still measured
+ * by the reading grid, and never promoted into poster-scale display.
+ */
 export function ArticleLead({ children, className }: ArticleLeadProps) {
   return (
     <div className={cn("col-span-full grid grid-cols-subgrid", className)}>

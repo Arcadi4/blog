@@ -16,7 +16,10 @@ type PageFactSheetProps = {
   readonly year?: string
 }
 
-/** Structured identity, biography, or project dossier for authored pages. */
+/**
+ * Identity or project dossier inspired by modernist CVs and technical forms;
+ * large naming type is balanced by factual, repeatable metadata cells.
+ */
 export function PageFactSheet({
   children,
   className,

@@ -7,7 +7,10 @@ type ArticlePullQuoteProps = {
   readonly className?: string
 }
 
-/** Mid-article emphasis that stays inside the reading rhythm. */
+/**
+ * Mid-article emphasis inspired by editorial pull quotes, scaled for contrast
+ * but held to the reading lane so it cannot become a competing poster.
+ */
 export function ArticlePullQuote({
   children,
   citation,
