@@ -609,10 +609,10 @@ export default function LabPage() {
           </LabSpec>
           <nav
             aria-label="Directional link variants"
-            className="col-span-8 col-start-3 grid min-h-52 grid-cols-8 items-center border-y border-foreground max-md:col-span-full max-md:col-start-1"
+            className="col-span-8 col-start-3 grid min-h-52 grid-cols-8 items-center border-y border-foreground max-md:col-span-full max-md:col-start-1 max-md:gap-y-8 max-md:py-8"
           >
             <Link
-              className="col-span-3 px-4 font-funnel-display text-[clamp(1.75rem,4vw,3.5rem)] leading-none tracking-[-0.04em]"
+              className="col-span-3 px-4 font-funnel-display text-[clamp(1.75rem,4vw,3.5rem)] leading-none tracking-[-0.04em] max-md:col-span-full"
               direction="back"
               href="#reader-method"
               variant="directional"
@@ -621,10 +621,10 @@ export default function LabPage() {
             </Link>
             <span
               aria-hidden="true"
-              className="col-span-2 h-px bg-foreground/25"
+              className="col-span-2 h-px bg-foreground/25 max-md:hidden"
             />
             <Link
-              className="col-span-3 justify-self-end px-4 font-funnel-display text-[clamp(1.75rem,4vw,3.5rem)] leading-none tracking-[-0.04em]"
+              className="col-span-3 justify-self-end px-4 font-funnel-display text-[clamp(1.75rem,4vw,3.5rem)] leading-none tracking-[-0.04em] max-md:col-span-full"
               href="#exit-condition"
               variant="directional"
             >

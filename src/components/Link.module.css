@@ -1,3 +1,32 @@
+.underline {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: var(--underline-thickness, 0.08em);
+  text-decoration-skip-ink: auto;
+  text-underline-offset: var(--underline-offset, 0.1em);
+  transition: text-decoration-color 400ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+
+.underline:hover,
+.underline:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+.underline::selection {
+  color: var(--background);
+  text-decoration-color: transparent;
+  background: currentColor;
+}
+
+.underline::-moz-selection {
+  color: var(--background);
+  text-decoration-color: transparent;
+  background: currentColor;
+}
+
 .directional {
   display: inline-flex;
   width: fit-content;
@@ -69,6 +98,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .underline,
   .arrow,
   .label::after {
     transition-duration: 0.01ms;

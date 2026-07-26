@@ -23,7 +23,7 @@ export default function Link({
 }: LinkProps) {
   const isExternal = href.startsWith("http") || href.startsWith("mailto:")
   const linkClass = cn(
-    variant === "underline" && "animated-link",
+    variant === "underline" && styles.underline,
     variant === "directional" && styles.directional,
     variant === "directional" && direction === "back" && styles.back,
     className

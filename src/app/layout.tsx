@@ -1,4 +1,3 @@
-import "../styles/animated-link.css"
 import "../styles/proximity-link.css"
 import "./global.css"
 import CustomCursor from "@/components/CustomCursor"
