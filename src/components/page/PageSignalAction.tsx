@@ -1,7 +1,7 @@
 import ProximityLink from "@/components/proximity/ProximityLink"
 import { cn } from "@/lib/utils"
 import { FieldLabel } from "@/components/signal/FieldLabel"
-import { SignalBarcode } from "@/components/signal/SignalBarcode"
+import { Barcode } from "@/components/signal/Barcode"
 
 type PageSignalActionProps = {
   readonly className?: string
@@ -36,7 +36,7 @@ export function PageSignalAction({
         <span className="font-funnel-display text-7xl leading-[0.7] tracking-[-0.08em]">
           {index}
         </span>
-        <SignalBarcode code={`ACT-${index}`} />
+        <Barcode code={`ACT-${index}`} />
       </div>
 
       <div className="col-span-8 flex flex-col justify-between py-4 max-md:col-span-9 max-md:px-4">

@@ -2,7 +2,7 @@ import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { FieldLabel } from "@/components/signal/FieldLabel"
 import { SegmentedRing } from "@/components/signal/SegmentedRing"
-import { SignalBarcode } from "@/components/signal/SignalBarcode"
+import { Barcode } from "@/components/signal/Barcode"
 import { SignalBars } from "@/components/signal/SignalBars"
 import { SignalChecker } from "@/components/signal/SignalChecker"
 
@@ -50,7 +50,7 @@ export function PageMasthead({
         </SegmentedRing>
         <div className="flex flex-col gap-3">
           <SignalBars invert />
-          <SignalBarcode code={`SEQ-${sequence}`} />
+          <Barcode code={`SEQ-${sequence}`} />
         </div>
       </div>
 

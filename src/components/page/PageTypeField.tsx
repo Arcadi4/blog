@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
 import { FieldLabel } from "@/components/signal/FieldLabel"
-import { SignalBarcode } from "@/components/signal/SignalBarcode"
+import { Barcode } from "@/components/signal/Barcode"
 
 type PageTypeFieldProps = {
   readonly children?: ReactNode
@@ -83,7 +83,7 @@ export function PageTypeField({
           >
             ↘
           </span>
-          <SignalBarcode code={`TYP-${index}`} />
+          <Barcode code={`TYP-${index}`} />
         </div>
       </footer>
     </section>

@@ -30,7 +30,7 @@ import { EvidenceScan } from "@/components/signal/EvidenceScan"
 import { FieldLabel } from "@/components/signal/FieldLabel"
 import { SegmentedRing } from "@/components/signal/SegmentedRing"
 import { SignalAsterisk } from "@/components/signal/SignalAsterisk"
-import { SignalBarcode } from "@/components/signal/SignalBarcode"
+import { Barcode } from "@/components/signal/Barcode"
 import { SignalBars } from "@/components/signal/SignalBars"
 import { SignalChecker } from "@/components/signal/SignalChecker"
 import { SignalCrosshairField } from "@/components/signal/SignalCrosshairField"
@@ -631,7 +631,7 @@ export default function LabPage() {
               className="col-span-1 text-[5rem] text-klein"
               spin
             />
-            <SignalBarcode
+            <Barcode
               className="col-span-2 col-start-5 text-foreground"
               code="LAB-2026"
             />
