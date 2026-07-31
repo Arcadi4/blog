@@ -1,0 +1,25 @@
+:global(body:has(main[data-home-deck])) {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+:global(body:has(main[data-home-deck]) > footer) {
+  display: none;
+}
+
+.deck {
+  scrollbar-color: currentColor transparent;
+  scrollbar-width: thin;
+}
+
+.deck::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+.deck::-webkit-scrollbar-thumb {
+  background: currentColor;
+}
+
+.deck::-webkit-scrollbar-track {
+  background: transparent;
+}

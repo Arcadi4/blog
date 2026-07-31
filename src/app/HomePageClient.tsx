@@ -1,259 +1,252 @@
 "use client"
 
-import { EaseIn } from "@/components/animations/EaseIn"
 import { menuItems, socialMediaItems } from "@/app/posts/menuItems"
-import { cn, formatDate } from "@/lib/utils"
-import { colorKlein } from "@/lib/colors"
-import VerticalGrid from "@/components/VerticalGrid"
-import { ScaleIn } from "@/components/animations/ScaleIn"
+import { ScenePersistentElement } from "@/components/animations/ScenePersistentElement"
+import { SceneReveal } from "@/components/animations/SceneReveal"
+import { HomeSlideDeck } from "@/components/home/HomeSlideDeck"
+import { SceneGrid } from "@/components/home/SceneGrid"
+import { Barcode } from "@/components/signal/Barcode"
 import type { ContentArticle } from "@/lib/content-index"
-import MarqueeCard from "@/components/MarqueeCard"
+import { cn } from "@/lib/utils"
 import NextLink from "next/link"
-import { ScrollScale } from "@/components/animations/ScrollScale"
-import { Menu } from "@/components/layout/Menu"
+import ProximityLink from "@/components/proximity/ProximityLink"
 
 type HomePageClientProps = {
   readonly articles: readonly ContentArticle[]
 }
 
-// roughly 3.4 screens (64rem per screen)
-// the grid system is 5 rows per screen, so its 17 rows
-const homepageHeight = "h-[217.6rem]"
-
 export function HomePageClient({ articles }: HomePageClientProps) {
+  const latestArticles = articles
+    .toSorted((a, b) => b.publishDate.valueOf() - a.publishDate.valueOf())
+    .slice(0, 3)
+  const labels = [
+    "Home",
+    "Nav",
+    ...latestArticles.map((article) => article.title),
+    "Footer"
+  ]
+
   return (
-    <main className="relative">
-      <div
-        className={cn(
-          "relative grid grid-cols-12 grid-rows-17 gap-x-4 gap-y-4 p-8 w-dvw",
-          homepageHeight
-        )}
-      >
-        <div className="absolute inset-0 row-span-12 row-start-1 -mt-8">
-          <VerticalGrid className="h-full" />
-        </div>
-
-        <p className="z-30 col-span-full col-start-3 row-start-1 font-sans text-2xl leading-none font-semibold">
-          <span className="text-klein">©</span> 2026
-          <br />
-          <span className="text-klein">https://</span>blog.arcadia.moe
-        </p>
-
-        {/* Hero */}
-        <ScrollScale
-          from={1}
-          to={12}
-          axis="x"
-          scrollRange={0.2}
-          className="col-start-1 row-span-4 row-start-1 -mt-8 -ml-8 origin-left bg-klein transition-transform duration-400 ease-out"
-        />
-        <span className="h- pointer-events-none z-10 col-start-3 row-start-2 font-funnel-display text-[10rem] text-trim-cap">
-          @4rcadia
-        </span>
-
-        <div className="z-30 col-span-full col-start-3 row-start-3 font-funnel-display text-5xl leading-none whitespace-pre-line text-klein">
-          {"studying "}
-          <span className="text-foreground capitalize">
-            applied mathematics;
-          </span>
-          <br />
-          {"i am a "}
-          <span className="text-foreground capitalize">full stack dev;</span>
-          <br />
-          {"hobbyist "}
-          <span className="text-foreground capitalize">
-            graphical designer;
-          </span>
-          <br />
-          {"i play "}
-          <span className="text-foreground capitalize">
-            Dark Souls, Rogue-likes,
-          </span>
-          <br />
-          <span className="opacity-0">{"i play "}</span>
-          <span className="text-foreground capitalize">
-            {"Minecraft, {and more};"}
-          </span>
-          <br />
-          {"fan of "}
-          <span className="text-foreground capitalize">
-            j-pop band ZUTOMAYO;
-          </span>
-          <br />
-        </div>
-
-        <span className="col-start-12 row-start-4 self-end font-mono text-5xl leading-none text-klein">
-          ↓↓
-        </span>
-
-        {/*
-        Lyrics from "秒針を噛み". Reserved, plans:
-          - Uncomment if I found a good Japanese font.
-          - Replace this with some other prose.
-          - I implemented a player component
-        */}
-        {/*
-        <h1 className="col-span-8 col-start-3 row-span-6 row-start-6 overflow-clip text-6xl leading-none text-pretty">
-          {`生活の偽造 いつも通り 通り過ぎて
-            1回言った「わかった。」戻らない
-            確信犯でしょ？ 夕食中に泣いた後
-            君は笑ってた
-            「私もそうだよ。」って 偽りの気持ち合算して
-            吐いて 黙って ずっと溜まってく
-            何が何でも 面と向かって「さよなら」
-            する資格もないまま 僕は
-            灰に潜り 秒針を噛み
-            白昼夢の中で ガンガン砕いた
-            でも壊れない 止まってくれない
-            「本当」を知らないまま 進むのさ
-            このまま奪って 隠して 忘れたい
-            分かり合う○ 1つもなくても
-            会って「ごめん。」って返さないでね
-            形のない言葉は いらないから
-            消えない後遺症「なんでも受け止める。」と
-            言ったきり もう帰ることはない
-            デタラメでも 僕のためじゃなくても
-            君に守られた
-            目も口も 意味がないほどに
-            塞ぎ込んで 動けない僕を
-            みつけないで ほっといてくれないか
-            どこ見ても どこに居ても 開かない
-            肺に潜り 秒針を噛み
-            白昼夢の中で ガンガン砕いた
-            でも壊れない 止まってくれない
-            演じ続けるのなら
-            このまま奪って 隠して 忘れたい
-            分かり合う○ 1つもなくても
-            会って「ごめん。」って返さないでね
-            形のない言葉は いらないから
-            縋って 叫んで 朝はない
-            笑って 転んで 情けない
-            誰のせいでも ないこと
-            誰かのせいに したくて
-            「僕って いるのかな？」
-            本当は わかってるんだ
-            見放されても 信じてしまうよ
-            このまま 奪って 隠して 忘れたい
-            このまま 奪って 隠して 忘れたい
-            このまま 奪って 隠して 話したい
-            分かり合う○ 1つもなくても
-            会って「ごめん。」って返さないでね
-            「疑うだけの 僕をどうして？」
-            救いきれない 嘘はいらないから
-            ハレタ レイラ`}
-        </h1>
-        */}
-
-        {/* Menu - grid lines */}
-        <div className="separator absolute z-10 row-span-5 row-start-6 h-full w-screen border-y" />
-
-        {/* Menu - cards */}
-        <ScaleIn from="top-left" delayMs={200} onSeen minPosition={10}>
-          <MarqueeCard className="col-span-7 col-start-3 row-span-3 row-start-6 -mb-4 bg-acid">
-            navigation navigation navigation navigation navigation
-          </MarqueeCard>
-        </ScaleIn>
-
-        <ScaleIn from="top-right" delayMs={200} onSeen minPosition={10}>
-          <MarqueeCard
-            className="col-span-7 col-start-4 row-span-2 row-start-9 bg-magenta"
-            trackClassName="text-background"
-          >
-            social media social media social media social media
-          </MarqueeCard>
-        </ScaleIn>
-
-        {/* Menu - links */}
-        <nav className="z-50 col-span-8 col-start-3 row-start-6">
-          <Menu
-            items={menuItems}
-            itemClassName="font-funnel-display text-7xl leading-none"
-            shadowColor={colorKlein}
-            onSeen
+    <HomeSlideDeck labels={labels}>
+      <SceneGrid rows={6}>
+        <ScenePersistentElement name="primary-panel">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 left-0 -z-2 w-[8%] bg-klein"
           />
-        </nav>
+        </ScenePersistentElement>
 
-        <nav className="z-50 col-span-8 col-start-3 row-span-2 row-start-9 justify-self-end">
-          <Menu
-            items={socialMediaItems}
-            itemClassName="font-funnel-display text-7xl leading-none text-background text-end"
-            prefix=""
-            suffix=" ↗"
-            shadowColor="#000"
-            onSeen
-          />
-        </nav>
+        <header className="col-span-4 col-start-3 row-start-1 self-start text-sm leading-none">
+          <span className="text-klein">©</span> 2026 4rcadia
+          <br />
+          <span>blog.arcadia.moe</span>
+        </header>
 
-        <EaseIn
-          onSeen
-          from="none"
-          className="z-30 col-span-full col-start-1 row-start-12 self-end"
-        >
-          <h1 className="text-justify font-funnel-display text-[8rem] text-trim-cap leading-none text-klein [text-align-last:justify]">
-            Latest Articles
+        <SceneReveal direction="left" distance="far" durationMs={980}>
+          <h1 className="col-start-3 row-start-2 self-end font-funnel-display text-[12rem] text-trim-cap">
+            @4rcadia
           </h1>
-        </EaseIn>
+        </SceneReveal>
 
-        <div className="separator absolute z-50 row-span-1 row-start-12 h-full w-screen border-b" />
+        <SceneReveal direction="left" distance="far" durationMs={980}>
+          <p className="col-span-7 col-start-4 row-span-3 row-start-3 self-center font-funnel-display text-5xl text-trim-cap leading-none text-klein">
+            studying <span className="text-black">applied mathematics</span>;
+            <br />
+            i am a <span className="text-black">full stack dev</span>;
+            <br />
+            hobbyist <span className="text-black">graphical designer</span>;
+            <br />
+            i play{" "}
+            <span className="text-black">
+              Dark Souls, Rogue-likes, Minecraft
+            </span>
+            , and more;
+            <br />
+            fan of <span className="text-black">j-pop band ZUTOMAYO</span>;
+          </p>
+        </SceneReveal>
 
-        {articles
-          .toSorted((a, b) => b.publishDate.valueOf() - a.publishDate.valueOf())
-          .slice(0, 3)
-          .map((article, i) => (
-            <div
-              className="group relative col-span-full row-span-1 grid grid-cols-subgrid grid-rows-[min-content_1fr_min-content]"
-              style={{ gridRowStart: 13 + i }}
-              key={article.id}
+        <SceneReveal delayMs={280}>
+          <div className="col-span-8 col-start-3 row-start-6 flex justify-between gap-6 border-t border-foreground pt-4">
+            <Barcode code="4rcadia" />
+            <span
+              aria-hidden="true"
+              className="font-funnel-display text-5xl text-klein"
             >
-              <ScaleIn
-                from="right"
-                onSeen
-                className={cn(
-                  "absolute bg-magenta inset-0",
-                  `col-end-5 col-start-${3 - Math.abs((i % 4) - 2)}`
-                )}
-              >
-                <h1 className="absolute top-0 right-0 origin-top-right font-funnel-display text-5xl text-trim-cap font-bold transition-transform duration-300 ease-out group-hover:scale-200">
-                  (0{i + 1})
-                </h1>
-              </ScaleIn>
+              ↓
+            </span>
+          </div>
+        </SceneReveal>
+      </SceneGrid>
 
-              <p className="col-span-3 col-start-5 row-start-1 text-lg leading-none">
-                published {formatDate(article.publishDate)}
-                <br />
-                {article.publishDate == article.lastEditedTime
-                  ? null
-                  : `(edited ${formatDate(article.lastEditedTime)})`}
-              </p>
-              <p className="col-span-3 col-start-8 row-start-1 text-lg leading-none">
-                {article.tags.map((tag) => `#${tag}`).join(" ")}
-              </p>
-              <NextLink
-                href={`/posts/${article.slug}`}
-                className="col-span-3 col-start-8 row-start-2 self-end text-lg leading-none font-medium text-pretty hover:text-magenta"
-              >
-                {article.excerpt}
-              </NextLink>
-              <NextLink
-                href={`/posts/${article.slug}`}
-                className="col-span-3 col-start-5 row-start-3 max-h-fit self-end font-funnel-display text-4xl leading-none hover:text-magenta"
-              >
-                {article.title}
-              </NextLink>
+      <SceneGrid className="text-background" gridLines="background" rows={5}>
+        <ScenePersistentElement name="primary-panel">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-2 bg-klein"
+          />
+        </ScenePersistentElement>
 
-              <div className="separator absolute inset-0 col-start-5 col-end-11 -mx-4 border-b" />
-              <div className="absolute inset-0 col-span-1 col-start-11 bg-acid" />
+        <SceneReveal direction="scale" delayMs={120} distance="far">
+          <h2 className="col-span-4 col-start-5 row-span-full ml-4 self-center justify-self-center font-funnel-display text-[3cqw] leading-none text-gray-800">
+            Navigation.
+            <br />
+            Navigation.
+            <br />
+            <span className="font-medium text-acid">Navigation.</span>
+            <br />
+            Navigation.
+            <br />
+            Navigation.
+            <br />
+          </h2>
+        </SceneReveal>
+
+        <SceneReveal direction="left" delayMs={320}>
+          <nav
+            aria-label="Main navigation"
+            className="col-span-4 col-start-1 row-span-3 row-start-1"
+          >
+            {menuItems
+              .filter((item) => item.href !== "/")
+              .map((item, index) => (
+                <div
+                  key={item.name}
+                  className="w-full border-t border-background"
+                >
+                  <p>({index + 1})</p>
+                  <ProximityLink
+                    href={item.href}
+                    key={item.href}
+                    label={item.name}
+                    className="my-2.5 text-6xl"
+                    shadowColor="#000000"
+                  />
+                </div>
+              ))}
+          </nav>
+        </SceneReveal>
+
+        <SceneReveal direction="right" delayMs={480}>
+          <nav
+            aria-label="Social media"
+            className="col-span-3 col-start-9 row-span-full row-start-4"
+          >
+            {socialMediaItems
+              .filter((item) => item.href !== "/")
+              .map((item, index) => (
+                <div
+                  key={item.name}
+                  className="w-full border-t border-background"
+                >
+                  <p>({index + 1})</p>
+                  <ProximityLink
+                    href={item.href}
+                    key={item.href}
+                    label={item.name}
+                    className="my-2.5 text-6xl"
+                    shadowColor="#000000"
+                  />
+                </div>
+              ))}
+          </nav>
+        </SceneReveal>
+      </SceneGrid>
+
+      {latestArticles.map((article, index) => (
+        <SceneGrid as="article" key={article.id} rows={8}>
+          <ScenePersistentElement name="primary-panel">
+            <div
+              aria-hidden="true"
+              className={cn(
+                "pointer-events-none absolute inset-y-0 w-[16dvw] left-[66.2dvw]",
+                index === 0
+                  ? "bg-magenta"
+                  : index === 1
+                    ? "bg-acid"
+                    : "bg-klein"
+              )}
+            />
+          </ScenePersistentElement>
+
+          <ScenePersistentElement
+            name="total-articles"
+            transition={{
+              in: {
+                opacity: 0,
+                transform: "translateX(35%)"
+              },
+              out: {
+                opacity: 0,
+                transform: "translateX(-35%)"
+              }
+            }}
+          >
+            <div
+              aria-hidden="true"
+              className="col-start-3 row-start-2 font-funnel-display text-[5.9cqw] text-trim-cap leading-none tracking-tighter text-gray-500"
+            >
+              /03
             </div>
-          ))}
+          </ScenePersistentElement>
 
-        <Menu
-          className="col-span-full row-start-17 text-center"
-          prefix="{{"
-          suffix="}}"
-          itemClassName="font-funnel-display text-7xl leading-none"
-          items={[{ name: "View All", href: "/all" }]}
-        />
-      </div>
-    </main>
+          <SceneReveal direction="left" distance="far" durationMs={920}>
+            <div
+              aria-hidden="true"
+              className="col-span-3 col-start-1 row-start-2 -ml-2 font-funnel-display text-[16cqw] text-trim-cap leading-none tracking-tighter"
+              data-article-index={index}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </div>
+          </SceneReveal>
+
+          <SceneReveal delayMs={180} distance="far">
+            <div className="col-span-5 col-start-3 row-start-4">
+              <h2 className="text-justify font-funnel-display text-7xl text-trim-cap leading-none font-medium">
+                {article.title}
+              </h2>
+              <p className="mt-8 text-xl">{article.excerpt}</p>
+            </div>
+          </SceneReveal>
+        </SceneGrid>
+      ))}
+
+      <SceneGrid className="text-background" gridLines="none" rows={8}>
+        <ScenePersistentElement name="primary-panel">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-2 bg-foreground"
+          />
+        </ScenePersistentElement>
+
+        <div
+          aria-hidden="true"
+          className="absolute top-0 left-[7vw] font-serif text-[70rem] leading-none text-magenta"
+        >
+          *
+        </div>
+
+        <SceneReveal delayMs={140} distance="far">
+          <div className="z-1 col-span-7 col-start-3 row-span-5 row-start-2 flex flex-col justify-center">
+            <h2 className="font-funnel-display text-9xl leading-none font-medium text-acid">
+              Looking for more?
+            </h2>
+            <NextLink
+              className="mt-[clamp(1.5rem,4vh,3rem)] flex w-[min(100%,38rem)] items-center justify-between bg-acid p-4 font-mono text-[.78rem] leading-none text-foreground uppercase hover:bg-magenta hover:text-background"
+              href="/all"
+            >
+              <span>All articles</span>
+              <span aria-hidden="true">→</span>
+            </NextLink>
+          </div>
+        </SceneReveal>
+
+        <SceneReveal delayMs={300}>
+          <div className="z-1 col-span-11 row-start-8 flex items-end justify-between border-t border-background/30 pt-[.7rem] font-mono text-[.66rem] uppercase">
+            <Barcode className="text-background" code="End-of-File" />
+          </div>
+        </SceneReveal>
+      </SceneGrid>
+    </HomeSlideDeck>
   )
 }
