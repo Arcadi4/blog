@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 
-type SignalBarcodeProps = {
+type BarcodeProps = {
   readonly className?: string
   readonly code: string
   readonly showCode?: boolean
@@ -11,17 +11,13 @@ type SignalBarcodeProps = {
  * the artwork. Decorative print-production furniture for rails and footers;
  * scale it with text-* classes on the wrapper, color follows currentColor.
  */
-export function SignalBarcode({
-  className,
-  code,
-  showCode = true
-}: SignalBarcodeProps) {
+export function Barcode({ className, code, showCode = true }: BarcodeProps) {
   return (
     <span
       aria-hidden="true"
       className={cn("inline-flex flex-col gap-1 select-none", className)}
     >
-      <span className="font-barcode text-[2.25em] leading-[0.85]">{code}</span>
+      <span className="font-barcode text-[2.25em] leading-none">{code}</span>
       {showCode ? (
         <span className="font-mono text-xs leading-none">{code}</span>
       ) : null}

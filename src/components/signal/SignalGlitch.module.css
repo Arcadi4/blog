@@ -5,7 +5,7 @@
 
 .glitch::before,
 .glitch::after {
-  content: attr(data-text);
+  content: attr(data-text) / "";
   inset: 0;
   opacity: 0;
   pointer-events: none;

@@ -25,6 +25,7 @@ import { PageMasthead } from "@/components/page/PageMasthead"
 import { PageSectionIntro } from "@/components/page/PageSectionIntro"
 import { PageSignalAction } from "@/components/page/PageSignalAction"
 import { PageTickerBand } from "@/components/page/PageTickerBand"
+import { TypeEcho } from "@/components/TypeEcho"
 import { PageTypeField } from "@/components/page/PageTypeField"
 import { EvidenceScan } from "@/components/signal/EvidenceScan"
 import { FieldLabel } from "@/components/signal/FieldLabel"
@@ -310,6 +311,15 @@ export default function LabPage() {
               </span>
             </SignalDotField>
           </PageTypeField>
+
+          <LabSpec index="P-11" name="PageTypeEcho">
+            Repeats one compact mark around a focal row. Size and contrast carry
+            the effect; the surrounding surface remains entirely caller-owned.
+          </LabSpec>
+
+          <TypeEcho className="col-span-full" sizeClassName="text-[18cqw]">
+            4rcadia
+          </TypeEcho>
 
           <LabSpec index="P-07" name="PageContactSheet">
             Makes a portfolio, project archive, or image-led index where media
