@@ -67,8 +67,8 @@ export function HomePageClient({ articles }: HomePageClientProps) {
         </SceneReveal>
 
         <SceneReveal delayMs={280}>
-          <div className="col-span-8 col-start-3 row-start-6 flex justify-between gap-6 border-t border-foreground pt-4">
-            <Barcode code="4rcadia" />
+          <div className="col-span-9 col-start-3 row-start-6 flex justify-between gap-6 border-t border-foreground pt-4">
+            <Barcode code="blog.arcadia.moe" />
             <span
               aria-hidden="true"
               className="font-funnel-display text-5xl text-klein"
@@ -167,7 +167,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             <div
               aria-hidden="true"
               className={cn(
-                "pointer-events-none absolute inset-y-0 w-[16dvw] left-[66.2dvw]",
+                "pointer-events-none absolute inset-y-0 w-[16.03dvw] left-[66.11dvw]",
                 index === 0
                   ? "bg-magenta"
                   : index === 1
@@ -198,7 +198,22 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             </div>
           </ScenePersistentElement>
 
-          <SceneReveal direction="left" distance="far" durationMs={920}>
+          <ScenePersistentElement
+            name="article-index"
+            transition={{
+              change: {
+                effect: "morph"
+              },
+              in: {
+                opacity: 0,
+                transform: "translateY(35%)"
+              },
+              out: {
+                opacity: 0,
+                transform: "translateY(-35%)"
+              }
+            }}
+          >
             <div
               aria-hidden="true"
               className="col-span-3 col-start-1 row-start-2 -ml-2 font-funnel-display text-[16cqw] text-trim-cap leading-none tracking-tighter"
@@ -206,7 +221,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             >
               {String(index + 1).padStart(2, "0")}
             </div>
-          </SceneReveal>
+          </ScenePersistentElement>
 
           <SceneReveal delayMs={180} distance="far">
             <div className="col-span-5 col-start-3 row-start-4">

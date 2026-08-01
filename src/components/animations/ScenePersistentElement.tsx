@@ -1,10 +1,16 @@
 "use client"
 
-import { cloneElement, useLayoutEffect, useRef, useState } from "react"
+import { cloneElement, useLayoutEffect, useMemo, useRef, useState } from "react"
 import type { CSSProperties, ReactElement } from "react"
+import { MorphingText } from "@/components/ui/morphing-text"
 import { cn } from "@/lib/utils"
 
 export type ScenePersistentTransition = {
+  readonly change?: {
+    readonly effect?: "morph"
+    readonly in?: CSSProperties
+    readonly out?: CSSProperties
+  }
   readonly in?: CSSProperties
   readonly out?: CSSProperties
 }
@@ -30,9 +36,13 @@ type CapturedElement = {
 }
 
 type PersistentElementPhase = "active" | "entering" | "exiting"
+type PersistentContentPhase = "starting" | "transitioning"
 
 type PersistentElement = CapturedElement & {
+  readonly contentPhase?: PersistentContentPhase
   readonly phase: PersistentElementPhase
+  readonly previousText?: string
+  readonly previousTransition?: ScenePersistentTransition
   readonly style: CSSProperties
 }
 
@@ -41,12 +51,44 @@ type ScenePersistentLayerProps = {
 }
 
 const PERSISTENT_TRANSITION_DURATION_MS = 900
+const PERSISTENT_MORPH_TIME_SECONDS = 0.45
+
+type ScenePersistentMorphingTextProps = {
+  readonly incomingText: string
+  readonly outgoingText: string
+  readonly textBox?: CSSProperties["textBox"]
+}
+
+function ScenePersistentMorphingText({
+  incomingText,
+  outgoingText,
+  textBox
+}: ScenePersistentMorphingTextProps) {
+  const texts = useMemo(
+    () => [outgoingText, incomingText],
+    [incomingText, outgoingText]
+  )
+
+  return (
+    <MorphingText
+      className="absolute inset-0"
+      loop={false}
+      morphTime={PERSISTENT_MORPH_TIME_SECONDS}
+      textBox={textBox}
+      texts={texts}
+      unstyled
+    />
+  )
+}
 
 /**
  * Declares a scene-local target for a live element that persists between
  * scenes. Position, size, visual styles, and plain-text content are captured
  * from the child. Optional in/out styles animate the element across scene
- * boundaries without requiring placeholder copies in adjacent scenes.
+ * boundaries without requiring placeholder copies in adjacent scenes. When a
+ * persistent element's plain-text content changes, the previous and next text
+ * use either the optional change.out/change.in endpoints or the morph effect
+ * while the live layer remains in place.
  */
 export function ScenePersistentElement({
   children,
@@ -162,9 +204,23 @@ function reconcileElements(
     const current = currentByName.get(target.name)
 
     if (current) {
+      const transitionsText =
+        current.text !== target.text &&
+        Boolean(
+          current.transition?.change?.effect ||
+          current.transition?.change?.out ||
+          target.transition?.change?.effect ||
+          target.transition?.change?.in
+        )
+
       return {
         ...target,
+        contentPhase: transitionsText ? "starting" : current.contentPhase,
         phase: "active",
+        previousText: transitionsText ? current.text : current.previousText,
+        previousTransition: transitionsText
+          ? current.transition
+          : current.previousTransition,
         style: target.targetStyle
       }
     }
@@ -211,6 +267,7 @@ function refreshElements(
     }
 
     return {
+      ...element,
       ...target,
       phase: element.phase,
       style: {
@@ -249,21 +306,40 @@ export function ScenePersistentLayer({
     let enterFrameId = window.requestAnimationFrame(() => {
       enterFrameId = window.requestAnimationFrame(() => {
         setElements((currentElements) =>
-          currentElements.map((element) =>
-            element.phase === "entering"
-              ? {
-                  ...element,
-                  phase: "active",
-                  style: element.targetStyle
-                }
-              : element
-          )
+          currentElements.map((element) => {
+            const entersLayer = element.phase === "entering"
+            const startsContentTransition = element.contentPhase === "starting"
+
+            if (!entersLayer && !startsContentTransition) {
+              return element
+            }
+
+            return {
+              ...element,
+              contentPhase: startsContentTransition
+                ? "transitioning"
+                : element.contentPhase,
+              phase: entersLayer ? "active" : element.phase,
+              style: entersLayer ? element.targetStyle : element.style
+            }
+          })
         )
       })
     })
     const exitTimerId = window.setTimeout(() => {
       setElements((currentElements) =>
-        currentElements.filter((element) => element.phase !== "exiting")
+        currentElements
+          .filter((element) => element.phase !== "exiting")
+          .map((element) =>
+            element.contentPhase
+              ? {
+                  ...element,
+                  contentPhase: undefined,
+                  previousText: undefined,
+                  previousTransition: undefined
+                }
+              : element
+          )
       )
     }, PERSISTENT_TRANSITION_DURATION_MS)
 
@@ -288,18 +364,63 @@ export function ScenePersistentLayer({
 
   return (
     <div className="contents" data-scene-persistent-root ref={rootRef}>
-      {elements.map((element) => (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none fixed z-1 transition-all duration-900 ease-[cubic-bezier(.76,0,.24,1)] motion-reduce:transition-none"
-          data-scene-persistent-layer={element.name}
-          data-scene-persistent-phase={element.phase}
-          key={element.name}
-          style={element.style}
-        >
-          {element.text}
-        </div>
-      ))}
+      {elements.map((element) => {
+        const transitionsContent = element.previousText !== undefined
+        const contentIsMoving = element.contentPhase === "transitioning"
+        const contentEffect =
+          element.transition?.change?.effect ??
+          element.previousTransition?.change?.effect
+        const contentClassName =
+          "absolute inset-0 block transition-all duration-450 ease-[cubic-bezier(.76,0,.24,1)] motion-reduce:transition-none"
+
+        return (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none fixed z-1 transition-all duration-900 ease-[cubic-bezier(.76,0,.24,1)] motion-reduce:transition-none"
+            data-scene-persistent-layer={element.name}
+            data-scene-persistent-phase={element.phase}
+            key={element.name}
+            style={element.style}
+          >
+            {transitionsContent ? (
+              contentEffect === "morph" ? (
+                <ScenePersistentMorphingText
+                  incomingText={element.text}
+                  outgoingText={element.previousText}
+                  textBox={element.targetStyle.textBox}
+                />
+              ) : (
+                <>
+                  <span
+                    className={contentClassName}
+                    style={{
+                      ...(contentIsMoving
+                        ? element.previousTransition?.change?.out
+                        : undefined),
+                      textBox: element.targetStyle.textBox
+                    }}
+                  >
+                    {element.previousText}
+                  </span>
+                  <span
+                    className={contentClassName}
+                    style={{
+                      ...(contentIsMoving
+                        ? undefined
+                        : element.transition?.change?.in),
+                      textBox: element.targetStyle.textBox
+                    }}
+                  >
+                    {element.text}
+                  </span>
+                </>
+              )
+            ) : (
+              element.text
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
