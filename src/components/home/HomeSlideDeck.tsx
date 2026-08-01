@@ -207,7 +207,7 @@ export function HomeSlideDeck({ children, labels }: HomeSlideDeckProps) {
                 <span
                   className={cn(
                     "hidden max-w-28 xl:group-hover/scene-button:inline xl:group-focus-visible/scene-button:inline",
-                    index === activeIndex && "xl:inline"
+                    index === activeIndex && "inline"
                   )}
                 >
                   {label}
