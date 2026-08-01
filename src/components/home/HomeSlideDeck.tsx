@@ -22,6 +22,8 @@ type HomeSlideDeckProps = {
   readonly labels: readonly string[]
 }
 
+type LegacyWheelEvent = WheelEvent & { readonly wheelDeltaY?: number }
+
 const HomeSlideStateContext = createContext<HomeSlideState | null>(null)
 
 export function useHomeSlideState() {
@@ -58,6 +60,35 @@ export function HomeSlideDeck({ children, labels }: HomeSlideDeckProps) {
     },
     [activeIndex, selectSlide]
   )
+
+  useEffect(() => {
+    const deck = deckRef.current
+
+    if (!deck) {
+      return
+    }
+
+    const handleWheel = (event: WheelEvent) => {
+      // Detented wheels typically expose 120-unit steps; pixel gestures stay native.
+      const wheelDeltaY = Math.abs((event as LegacyWheelEvent).wheelDeltaY ?? 0)
+
+      if (
+        event.ctrlKey ||
+        Math.abs(event.deltaY) <= Math.abs(event.deltaX) ||
+        (event.deltaMode === WheelEvent.DOM_DELTA_PIXEL &&
+          (wheelDeltaY < 120 || wheelDeltaY % 120 !== 0))
+      ) {
+        return
+      }
+
+      event.preventDefault()
+      moveBy(Math.sign(event.deltaY))
+    }
+
+    deck.addEventListener("wheel", handleWheel, { passive: false })
+
+    return () => deck.removeEventListener("wheel", handleWheel)
+  }, [moveBy])
 
   useEffect(() => {
     const deck = deckRef.current
