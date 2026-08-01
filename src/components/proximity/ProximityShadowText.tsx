@@ -509,7 +509,14 @@ function ProximityShadowText({
     // (forced layout) per scroll frame.
     let lastScrollX = window.scrollX
     let lastScrollY = window.scrollY
-    const handleScroll = () => {
+    const handleScroll = (event: Event) => {
+      if (event.target !== document) {
+        // Element scroll events do not bubble. Capture them so links inside
+        // nested scrollers are remeasured in their new viewport position.
+        scheduleMeasure()
+        return
+      }
+
       const dx = lastScrollX - window.scrollX
       const dy = lastScrollY - window.scrollY
       lastScrollX = window.scrollX
@@ -546,7 +553,10 @@ function ProximityShadowText({
     }
 
     window.addEventListener("resize", scheduleMeasure, { passive: true })
-    window.addEventListener("scroll", handleScroll, { passive: true })
+    window.addEventListener("scroll", handleScroll, {
+      capture: true,
+      passive: true
+    })
     document.fonts?.ready.then(scheduleMeasure).catch(() => {})
 
     return () => {
@@ -554,7 +564,7 @@ function ProximityShadowText({
       unsubscribe()
       resizeObserver?.disconnect()
       window.removeEventListener("resize", scheduleMeasure)
-      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener("scroll", handleScroll, true)
     }
   }, [
     containerRef,
