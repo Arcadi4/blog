@@ -87,33 +87,40 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           />
         </ScenePersistentElement>
 
-        <SceneReveal direction="scale" delayMs={120} distance="far">
-          <h2 className="col-span-4 col-start-5 row-span-full ml-4 self-center justify-self-center font-funnel-display text-[3cqw] leading-none text-gray-800">
-            Navigation.
-            <br />
-            Navigation.
-            <br />
-            <span className="font-medium text-acid">Navigation.</span>
-            <br />
-            Navigation.
-            <br />
-            Navigation.
-            <br />
-          </h2>
-        </SceneReveal>
+        <h2 className="col-span-4 col-start-5 row-span-full ml-4 self-center justify-self-center font-funnel-display text-[3cqw] leading-none text-gray-800">
+          <SceneReveal direction="up" delayMs={750} distance="near">
+            <div>Navigation.</div>
+          </SceneReveal>
+          <SceneReveal direction="up" delayMs={600} distance="near">
+            <div>Navigation.</div>
+          </SceneReveal>
+          <SceneReveal direction="scale" delayMs={300} distance="near">
+            <div>
+              <span className="font-medium text-acid">Navigation.</span>
+              <br />
+            </div>
+          </SceneReveal>
+          <SceneReveal direction="down" delayMs={600} distance="near">
+            <div>Navigation.</div>
+          </SceneReveal>
+          <SceneReveal direction="down" delayMs={750} distance="near">
+            <div>Navigation.</div>
+          </SceneReveal>
+        </h2>
 
-        <SceneReveal direction="left" delayMs={320}>
-          <nav
-            aria-label="Main navigation"
-            className="col-span-4 col-start-1 row-span-3 row-start-1"
-          >
-            {menuItems
-              .filter((item) => item.href !== "/")
-              .map((item, index) => (
-                <div
-                  key={item.name}
-                  className="w-full border-t border-background"
-                >
+        <nav
+          aria-label="Main navigation"
+          className="col-span-4 col-start-1 row-span-3 row-start-1"
+        >
+          {menuItems
+            .filter((item) => item.href !== "/")
+            .map((item, index) => (
+              <SceneReveal
+                key={item.name}
+                direction="left"
+                delayMs={320 + index * 80}
+              >
+                <div className="w-full border-t border-background">
                   <p>({index + 1})</p>
                   <ProximityLink
                     href={item.href}
@@ -123,22 +130,23 @@ export function HomePageClient({ articles }: HomePageClientProps) {
                     shadowColor="#000000"
                   />
                 </div>
-              ))}
-          </nav>
-        </SceneReveal>
+              </SceneReveal>
+            ))}
+        </nav>
 
-        <SceneReveal direction="right" delayMs={480}>
-          <nav
-            aria-label="Social media"
-            className="col-span-3 col-start-9 row-span-full row-start-4"
-          >
-            {socialMediaItems
-              .filter((item) => item.href !== "/")
-              .map((item, index) => (
-                <div
-                  key={item.name}
-                  className="w-full border-t border-background"
-                >
+        <nav
+          aria-label="Social media"
+          className="col-span-3 col-start-9 row-span-full row-start-4"
+        >
+          {socialMediaItems
+            .filter((item) => item.href !== "/")
+            .map((item, index) => (
+              <SceneReveal
+                key={item.name}
+                direction="right"
+                delayMs={640 + index * 80}
+              >
+                <div className="w-full border-t border-background">
                   <p>({index + 1})</p>
                   <ProximityLink
                     href={item.href}
@@ -148,9 +156,9 @@ export function HomePageClient({ articles }: HomePageClientProps) {
                     shadowColor="#000000"
                   />
                 </div>
-              ))}
-          </nav>
-        </SceneReveal>
+              </SceneReveal>
+            ))}
+        </nav>
       </SceneGrid>
 
       {latestArticles.map((article, index) => (
