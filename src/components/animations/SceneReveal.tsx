@@ -1,6 +1,6 @@
 import { useHomeSlideState } from "@/components/home/HomeSlideDeck"
-import { cn } from "@/lib/utils"
-import { cloneElement } from "react"
+import { motion, useReducedMotion } from "motion/react"
+import { createElement } from "react"
 import type { CSSProperties, ReactElement } from "react"
 
 type RevealDirection = "down" | "left" | "right" | "scale" | "up"
@@ -17,21 +17,19 @@ type SceneRevealProps = {
   readonly durationMs?: number
 }
 
-const offsetClass: Record<RevealDistance, Record<RevealDirection, string>> = {
-  far: {
-    down: "-translate-y-32",
-    left: "-translate-x-32",
-    right: "translate-x-32",
-    scale: "scale-[.82]",
-    up: "translate-y-32"
-  },
-  near: {
-    down: "-translate-y-8",
-    left: "-translate-x-8",
-    right: "translate-x-8",
-    scale: "scale-[.82]",
-    up: "translate-y-8"
-  }
+const motionElements = {
+  div: motion.div,
+  h1: motion.h1,
+  h2: motion.h2,
+  nav: motion.nav,
+  p: motion.p
+} as const
+
+type MotionElementTag = keyof typeof motionElements
+
+const offsetDistance: Record<RevealDistance, string> = {
+  far: "8rem",
+  near: "2rem"
 }
 
 /**
@@ -46,21 +44,50 @@ export function SceneReveal({
   durationMs = 760
 }: SceneRevealProps) {
   const isActive = useHomeSlideState() === "active"
-  const style: CSSProperties = {
-    ...children.props.style,
-    transitionDelay: isActive ? `${delayMs}ms` : "0ms",
-    transitionDuration: `${durationMs}ms`
+  const reduceMotion = useReducedMotion() ?? false
+  const tagName = children.type
+
+  if (typeof tagName !== "string" || !(tagName in motionElements)) {
+    throw new Error(
+      "SceneReveal requires a native element with Motion support as its child."
+    )
   }
 
-  return cloneElement(children, {
-    className: cn(
-      "transition ease-[cubic-bezier(.22,1,.36,1)]",
-      "motion-reduce:blur-none motion-reduce:transition-none",
-      isActive
-        ? "translate-x-0 translate-y-0 scale-100 opacity-100 blur-none"
-        : cn("opacity-0 blur-[.45rem]", offsetClass[distance][direction]),
-      children.props.className
-    ),
-    style
+  const MotionElement = motionElements[tagName as MotionElementTag]
+  const distanceValue = offsetDistance[distance]
+  const hiddenState = {
+    opacity: 0,
+    filter: reduceMotion ? "blur(0px)" : "blur(.45rem)",
+    scale: direction === "scale" ? 0.82 : 1,
+    x:
+      direction === "left"
+        ? `-${distanceValue}`
+        : direction === "right"
+          ? distanceValue
+          : 0,
+    y:
+      direction === "down"
+        ? `-${distanceValue}`
+        : direction === "up"
+          ? distanceValue
+          : 0
+  }
+  const visibleState = {
+    opacity: 1,
+    filter: "blur(0px)",
+    scale: 1,
+    x: 0,
+    y: 0
+  }
+
+  return createElement(MotionElement, {
+    ...children.props,
+    initial: isActive ? false : hiddenState,
+    animate: isActive ? visibleState : hiddenState,
+    transition: {
+      delay: isActive && !reduceMotion ? delayMs / 1000 : 0,
+      duration: reduceMotion ? 0 : durationMs / 1000,
+      ease: [0.22, 1, 0.36, 1]
+    }
   })
 }
