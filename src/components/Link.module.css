@@ -60,7 +60,7 @@
   display: inline-grid;
   grid-template-columns: repeat(3, 0.72em);
   overflow: hidden;
-  font-family: var(--font-geist-mono), monospace;
+  font-family: var(--font-ibm-plex-mono), monospace;
   font-size: 0.78em;
   line-height: 1;
 }
