@@ -19,11 +19,13 @@ type PersistentTargetProps = {
   readonly className?: string
   readonly style?: CSSProperties
   readonly "data-scene-persistent"?: string
+  readonly "data-scene-persistent-layer-z-index"?: string
   readonly "data-scene-persistent-transition"?: string
 }
 
 type ScenePersistentElementProps = {
   readonly children: ReactElement<PersistentTargetProps>
+  readonly layerZIndex?: CSSProperties["zIndex"]
   readonly name: string
   readonly transition?: ScenePersistentTransition
 }
@@ -97,12 +99,15 @@ function ScenePersistentMorphingText({
  */
 export function ScenePersistentElement({
   children,
+  layerZIndex,
   name,
   transition
 }: ScenePersistentElementProps) {
   return cloneElement(children, {
     className: cn("invisible", children.props.className),
     "data-scene-persistent": name,
+    "data-scene-persistent-layer-z-index":
+      layerZIndex === undefined ? undefined : String(layerZIndex),
     "data-scene-persistent-transition": transition
       ? JSON.stringify(transition)
       : undefined
@@ -170,7 +175,8 @@ function captureTarget(
       transform: computedStyle.transform,
       transformOrigin: computedStyle.transformOrigin,
       whiteSpace: computedStyle.whiteSpace,
-      width: bounds.width
+      width: bounds.width,
+      zIndex: target.dataset.scenePersistentLayerZIndex
     },
     transition: parseTransition(target.dataset.scenePersistentTransition)
   }
