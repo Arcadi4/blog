@@ -5,14 +5,19 @@ import type { CSSProperties, ReactElement } from "react"
 import { MorphingText } from "@/components/ui/morphing-text"
 import { cn } from "@/lib/utils"
 
+type ScenePersistentTransitionEndpoint = CSSProperties & {
+  /** Duration in milliseconds. */
+  readonly duration?: number
+}
+
 export type ScenePersistentTransition = {
   readonly change?: {
     readonly effect?: "morph"
     readonly in?: CSSProperties
     readonly out?: CSSProperties
   }
-  readonly in?: CSSProperties
-  readonly out?: CSSProperties
+  readonly in?: ScenePersistentTransitionEndpoint
+  readonly out?: ScenePersistentTransitionEndpoint
 }
 
 type PersistentTargetProps = {
@@ -46,6 +51,7 @@ type PersistentContentPhase = "starting" | "transitioning"
 
 type PersistentElement = CapturedElement & {
   readonly contentPhase?: PersistentContentPhase
+  readonly durationMs: number
   readonly phase: PersistentElementPhase
   readonly previousContent?: string
   readonly previousTransition?: ScenePersistentTransition
@@ -58,6 +64,21 @@ type ScenePersistentLayerProps = {
 
 const PERSISTENT_TRANSITION_DURATION_MS = 900
 const PERSISTENT_MORPH_TIME_SECONDS = 0.45
+
+function resolveTransitionEndpoint(
+  endpoint: ScenePersistentTransitionEndpoint | undefined
+) {
+  const { duration = PERSISTENT_TRANSITION_DURATION_MS, ...style } =
+    endpoint ?? {}
+
+  if (!Number.isFinite(duration) || duration < 0) {
+    throw new Error(
+      "Scene persistent transition duration must be non-negative."
+    )
+  }
+
+  return { durationMs: duration, style }
+}
 
 type ScenePersistentMorphingTextProps = {
   readonly incomingContent: string
@@ -227,6 +248,7 @@ function reconcileElements(
       return {
         ...target,
         contentPhase: transitionsContent ? "starting" : current.contentPhase,
+        durationMs: PERSISTENT_TRANSITION_DURATION_MS,
         phase: "transitioning",
         previousContent: transitionsContent
           ? current.content
@@ -238,12 +260,15 @@ function reconcileElements(
       }
     }
 
+    const incoming = resolveTransitionEndpoint(target.transition?.in)
+
     return {
       ...target,
+      durationMs: incoming.durationMs,
       phase: target.transition?.in ? "entering" : "active",
       style: {
         ...target.targetStyle,
-        ...target.transition?.in
+        ...incoming.style
       }
     }
   })
@@ -253,12 +278,15 @@ function reconcileElements(
       return
     }
 
+    const outgoing = resolveTransitionEndpoint(element.transition.out)
+
     nextElements.push({
       ...element,
+      durationMs: outgoing.durationMs,
       phase: "exiting",
       style: {
         ...element.targetStyle,
-        ...element.transition.out
+        ...outgoing.style
       }
     })
   })
@@ -285,7 +313,9 @@ function refreshElements(
       phase: element.phase,
       style: {
         ...target.targetStyle,
-        ...(element.phase === "entering" ? target.transition?.in : undefined)
+        ...(element.phase === "entering"
+          ? resolveTransitionEndpoint(target.transition?.in).style
+          : undefined)
       }
     }
   })
@@ -295,7 +325,12 @@ export function ScenePersistentLayer({
   activeIndex
 }: ScenePersistentLayerProps) {
   const [elements, setElements] = useState<readonly PersistentElement[]>([])
+  const elementsRef = useRef(elements)
   const rootRef = useRef<HTMLDivElement>(null)
+
+  useLayoutEffect(() => {
+    elementsRef.current = elements
+  }, [elements])
 
   useLayoutEffect(() => {
     const deck = rootRef.current?.closest<HTMLElement>("main[data-home-deck]")
@@ -312,10 +347,21 @@ export function ScenePersistentLayer({
       slide.querySelectorAll<HTMLElement>("[data-scene-persistent]")
     )
 
-    setElements((currentElements) =>
-      reconcileElements(currentElements, captureTargets(slide, targets))
+    const nextElements = reconcileElements(
+      elementsRef.current,
+      captureTargets(slide, targets)
+    )
+    const cleanupDurationsMs = Array.from(
+      new Set(
+        nextElements.flatMap((element) =>
+          element.phase === "active" ? [] : [element.durationMs]
+        )
+      )
     )
 
+    setElements(nextElements)
+
+    let cleanupTimerIds: number[] = []
     let enterFrameId = window.requestAnimationFrame(() => {
       enterFrameId = window.requestAnimationFrame(() => {
         setElements((currentElements) =>
@@ -337,30 +383,38 @@ export function ScenePersistentLayer({
             }
           })
         )
+        cleanupTimerIds = cleanupDurationsMs.map((completedDurationMs) =>
+          window.setTimeout(() => {
+            setElements((currentElements) =>
+              currentElements
+                .filter(
+                  (element) =>
+                    element.phase !== "exiting" ||
+                    element.durationMs > completedDurationMs
+                )
+                .map((element) => {
+                  const settlesStyle =
+                    element.durationMs <= completedDurationMs &&
+                    (element.phase === "entering" ||
+                      element.phase === "transitioning")
+
+                  if (!settlesStyle) {
+                    return element
+                  }
+
+                  return {
+                    ...element,
+                    contentPhase: undefined,
+                    phase: "active",
+                    previousContent: undefined,
+                    previousTransition: undefined
+                  }
+                })
+            )
+          }, completedDurationMs)
+        )
       })
     })
-    const exitTimerId = window.setTimeout(() => {
-      setElements((currentElements) =>
-        currentElements
-          .filter((element) => element.phase !== "exiting")
-          .map((element) => {
-            const settlesStyle =
-              element.phase === "entering" || element.phase === "transitioning"
-
-            if (!settlesStyle && !element.contentPhase) {
-              return element
-            }
-
-            return {
-              ...element,
-              contentPhase: undefined,
-              phase: settlesStyle ? "active" : element.phase,
-              previousContent: undefined,
-              previousTransition: undefined
-            }
-          })
-      )
-    }, PERSISTENT_TRANSITION_DURATION_MS)
 
     function refresh() {
       setElements((currentElements) =>
@@ -375,7 +429,7 @@ export function ScenePersistentLayer({
 
     return () => {
       window.cancelAnimationFrame(enterFrameId)
-      window.clearTimeout(exitTimerId)
+      cleanupTimerIds.forEach((timerId) => window.clearTimeout(timerId))
       resizeObserver.disconnect()
       window.removeEventListener("resize", refresh)
     }
@@ -437,12 +491,18 @@ export function ScenePersistentLayer({
             className={cn(
               "pointer-events-none fixed z-1",
               element.phase !== "active" &&
-                "transition-all duration-900 ease-[cubic-bezier(.76,0,.24,1)] motion-reduce:transition-none"
+                "transition-all ease-[cubic-bezier(.76,0,.24,1)] motion-reduce:transition-none"
             )}
             data-scene-persistent-layer={element.name}
             data-scene-persistent-phase={element.phase}
             key={element.name}
-            style={element.style}
+            style={{
+              ...element.style,
+              transitionDuration:
+                element.phase === "active"
+                  ? undefined
+                  : `${element.durationMs}ms`
+            }}
             {...contentProps}
           />
         )
