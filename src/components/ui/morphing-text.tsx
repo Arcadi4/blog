@@ -20,11 +20,29 @@ function setTextState(element: HTMLSpanElement, fraction: number) {
   element.style.opacity = String(fraction ** 0.4)
 }
 
+function setTextContent(
+  element: HTMLSpanElement,
+  content: string,
+  html: boolean
+) {
+  if (html) {
+    if (element.innerHTML !== content) {
+      element.innerHTML = content
+    }
+    return
+  }
+
+  if (element.textContent !== content) {
+    element.textContent = content
+  }
+}
+
 const useMorphingText = (
   texts: string[],
   morphTime: number,
   cooldownTime: number,
-  loop: boolean
+  loop: boolean,
+  html: boolean
 ) => {
   const textIndexRef = useRef(0)
   const morphRef = useRef(0)
@@ -44,10 +62,14 @@ const useMorphingText = (
       const invertedFraction = 1 - fraction
       setTextState(current1, invertedFraction)
 
-      current1.textContent = texts[textIndexRef.current % texts.length]
-      current2.textContent = texts[(textIndexRef.current + 1) % texts.length]
+      setTextContent(current1, texts[textIndexRef.current % texts.length], html)
+      setTextContent(
+        current2,
+        texts[(textIndexRef.current + 1) % texts.length],
+        html
+      )
     },
-    [texts]
+    [html, texts]
   )
 
   const doMorph = useCallback(() => {
@@ -124,6 +146,8 @@ const useMorphingText = (
 export interface MorphingTextProps {
   className?: string
   cooldownTime?: number
+  /** Treat each text value as trusted HTML rendered by the application. */
+  html?: boolean
   loop?: boolean
   morphTime?: number
   textBox?: CSSProperties["textBox"]
@@ -134,10 +158,11 @@ export interface MorphingTextProps {
 type TextsProps = Required<
   Pick<MorphingTextProps, "cooldownTime" | "loop" | "morphTime">
 > &
-  Pick<MorphingTextProps, "textBox" | "texts">
+  Pick<MorphingTextProps, "html" | "textBox" | "texts">
 
 const Texts: React.FC<TextsProps> = ({
   cooldownTime,
+  html = false,
   loop,
   morphTime,
   textBox,
@@ -147,7 +172,8 @@ const Texts: React.FC<TextsProps> = ({
     texts,
     morphTime,
     cooldownTime,
-    loop
+    loop,
+    html
   )
   const textStyle: CSSProperties = {
     textBox,
@@ -199,6 +225,7 @@ const SvgFilters: React.FC<SvgFiltersProps> = ({ filterId }) => (
 export function MorphingText({
   className,
   cooldownTime = defaultCooldownTime,
+  html = false,
   loop = true,
   morphTime = defaultMorphTime,
   textBox,
@@ -218,6 +245,7 @@ export function MorphingText({
     >
       <Texts
         cooldownTime={cooldownTime}
+        html={html}
         loop={loop}
         morphTime={morphTime}
         textBox={textBox}

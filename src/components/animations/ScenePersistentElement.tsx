@@ -29,9 +29,9 @@ type ScenePersistentElementProps = {
 }
 
 type CapturedElement = {
+  readonly content: string
   readonly name: string
   readonly targetStyle: CSSProperties
-  readonly text: string
   readonly transition?: ScenePersistentTransition
 }
 
@@ -45,7 +45,7 @@ type PersistentContentPhase = "starting" | "transitioning"
 type PersistentElement = CapturedElement & {
   readonly contentPhase?: PersistentContentPhase
   readonly phase: PersistentElementPhase
-  readonly previousText?: string
+  readonly previousContent?: string
   readonly previousTransition?: ScenePersistentTransition
   readonly style: CSSProperties
 }
@@ -58,24 +58,25 @@ const PERSISTENT_TRANSITION_DURATION_MS = 900
 const PERSISTENT_MORPH_TIME_SECONDS = 0.45
 
 type ScenePersistentMorphingTextProps = {
-  readonly incomingText: string
-  readonly outgoingText: string
+  readonly incomingContent: string
+  readonly outgoingContent: string
   readonly textBox?: CSSProperties["textBox"]
 }
 
 function ScenePersistentMorphingText({
-  incomingText,
-  outgoingText,
+  incomingContent,
+  outgoingContent,
   textBox
 }: ScenePersistentMorphingTextProps) {
   const texts = useMemo(
-    () => [outgoingText, incomingText],
-    [incomingText, outgoingText]
+    () => [outgoingContent, incomingContent],
+    [incomingContent, outgoingContent]
   )
 
   return (
     <MorphingText
       className="absolute inset-0"
+      html
       loop={false}
       morphTime={PERSISTENT_MORPH_TIME_SECONDS}
       textBox={textBox}
@@ -126,6 +127,7 @@ function captureTarget(
   const computedStyle = getComputedStyle(target)
 
   return {
+    content: target.innerHTML,
     name: target.dataset.scenePersistent ?? "",
     targetStyle: {
       backdropFilter: computedStyle.backdropFilter,
@@ -170,7 +172,6 @@ function captureTarget(
       whiteSpace: computedStyle.whiteSpace,
       width: bounds.width
     },
-    text: target.textContent ?? "",
     transition: parseTransition(target.dataset.scenePersistentTransition)
   }
 }
@@ -208,8 +209,8 @@ function reconcileElements(
     const current = currentByName.get(target.name)
 
     if (current) {
-      const transitionsText =
-        current.text !== target.text &&
+      const transitionsContent =
+        current.content !== target.content &&
         Boolean(
           current.transition?.change?.effect ||
           current.transition?.change?.out ||
@@ -219,10 +220,12 @@ function reconcileElements(
 
       return {
         ...target,
-        contentPhase: transitionsText ? "starting" : current.contentPhase,
+        contentPhase: transitionsContent ? "starting" : current.contentPhase,
         phase: "transitioning",
-        previousText: transitionsText ? current.text : current.previousText,
-        previousTransition: transitionsText
+        previousContent: transitionsContent
+          ? current.content
+          : current.previousContent,
+        previousTransition: transitionsContent
           ? current.transition
           : current.previousTransition,
         style: target.targetStyle
@@ -346,7 +349,7 @@ export function ScenePersistentLayer({
               ...element,
               contentPhase: undefined,
               phase: settlesStyle ? "active" : element.phase,
-              previousText: undefined,
+              previousContent: undefined,
               previousTransition: undefined
             }
           })
@@ -375,13 +378,52 @@ export function ScenePersistentLayer({
   return (
     <div className="contents" data-scene-persistent-root ref={rootRef}>
       {elements.map((element) => {
-        const transitionsContent = element.previousText !== undefined
+        const transitionsContent = element.previousContent !== undefined
         const contentIsMoving = element.contentPhase === "transitioning"
         const contentEffect =
           element.transition?.change?.effect ??
           element.previousTransition?.change?.effect
         const contentClassName =
           "absolute inset-0 block transition-all duration-450 ease-[cubic-bezier(.76,0,.24,1)] motion-reduce:transition-none"
+        const contentProps = transitionsContent
+          ? {
+              children:
+                contentEffect === "morph" ? (
+                  <ScenePersistentMorphingText
+                    incomingContent={element.content}
+                    outgoingContent={element.previousContent}
+                    textBox={element.targetStyle.textBox}
+                  />
+                ) : (
+                  <>
+                    <span
+                      className={contentClassName}
+                      dangerouslySetInnerHTML={{
+                        __html: element.previousContent
+                      }}
+                      style={{
+                        ...(contentIsMoving
+                          ? element.previousTransition?.change?.out
+                          : undefined),
+                        textBox: element.targetStyle.textBox
+                      }}
+                    />
+                    <span
+                      className={contentClassName}
+                      dangerouslySetInnerHTML={{ __html: element.content }}
+                      style={{
+                        ...(contentIsMoving
+                          ? undefined
+                          : element.transition?.change?.in),
+                        textBox: element.targetStyle.textBox
+                      }}
+                    />
+                  </>
+                )
+            }
+          : {
+              dangerouslySetInnerHTML: { __html: element.content }
+            }
 
         return (
           <div
@@ -395,44 +437,8 @@ export function ScenePersistentLayer({
             data-scene-persistent-phase={element.phase}
             key={element.name}
             style={element.style}
-          >
-            {transitionsContent ? (
-              contentEffect === "morph" ? (
-                <ScenePersistentMorphingText
-                  incomingText={element.text}
-                  outgoingText={element.previousText}
-                  textBox={element.targetStyle.textBox}
-                />
-              ) : (
-                <>
-                  <span
-                    className={contentClassName}
-                    style={{
-                      ...(contentIsMoving
-                        ? element.previousTransition?.change?.out
-                        : undefined),
-                      textBox: element.targetStyle.textBox
-                    }}
-                  >
-                    {element.previousText}
-                  </span>
-                  <span
-                    className={contentClassName}
-                    style={{
-                      ...(contentIsMoving
-                        ? undefined
-                        : element.transition?.change?.in),
-                      textBox: element.targetStyle.textBox
-                    }}
-                  >
-                    {element.text}
-                  </span>
-                </>
-              )
-            ) : (
-              element.text
-            )}
-          </div>
+            {...contentProps}
+          />
         )
       })}
     </div>
