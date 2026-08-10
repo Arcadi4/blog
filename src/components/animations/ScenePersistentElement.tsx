@@ -35,7 +35,11 @@ type CapturedElement = {
   readonly transition?: ScenePersistentTransition
 }
 
-type PersistentElementPhase = "active" | "entering" | "exiting"
+type PersistentElementPhase =
+  | "active"
+  | "entering"
+  | "exiting"
+  | "transitioning"
 type PersistentContentPhase = "starting" | "transitioning"
 
 type PersistentElement = CapturedElement & {
@@ -216,7 +220,7 @@ function reconcileElements(
       return {
         ...target,
         contentPhase: transitionsText ? "starting" : current.contentPhase,
-        phase: "active",
+        phase: "transitioning",
         previousText: transitionsText ? current.text : current.previousText,
         previousTransition: transitionsText
           ? current.transition
@@ -319,7 +323,7 @@ export function ScenePersistentLayer({
               contentPhase: startsContentTransition
                 ? "transitioning"
                 : element.contentPhase,
-              phase: entersLayer ? "active" : element.phase,
+              phase: entersLayer ? "transitioning" : element.phase,
               style: entersLayer ? element.targetStyle : element.style
             }
           })
@@ -330,16 +334,22 @@ export function ScenePersistentLayer({
       setElements((currentElements) =>
         currentElements
           .filter((element) => element.phase !== "exiting")
-          .map((element) =>
-            element.contentPhase
-              ? {
-                  ...element,
-                  contentPhase: undefined,
-                  previousText: undefined,
-                  previousTransition: undefined
-                }
-              : element
-          )
+          .map((element) => {
+            const settlesStyle =
+              element.phase === "entering" || element.phase === "transitioning"
+
+            if (!settlesStyle && !element.contentPhase) {
+              return element
+            }
+
+            return {
+              ...element,
+              contentPhase: undefined,
+              phase: settlesStyle ? "active" : element.phase,
+              previousText: undefined,
+              previousTransition: undefined
+            }
+          })
       )
     }, PERSISTENT_TRANSITION_DURATION_MS)
 
@@ -376,7 +386,11 @@ export function ScenePersistentLayer({
         return (
           <div
             aria-hidden="true"
-            className="pointer-events-none fixed z-1 transition-all duration-900 ease-[cubic-bezier(.76,0,.24,1)] motion-reduce:transition-none"
+            className={cn(
+              "pointer-events-none fixed z-1",
+              element.phase !== "active" &&
+                "transition-all duration-900 ease-[cubic-bezier(.76,0,.24,1)] motion-reduce:transition-none"
+            )}
             data-scene-persistent-layer={element.name}
             data-scene-persistent-phase={element.phase}
             key={element.name}

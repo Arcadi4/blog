@@ -1,6 +1,6 @@
 import { useHomeSlideState } from "@/components/home/HomeSlideDeck"
 import { motion, useReducedMotion } from "motion/react"
-import { createElement } from "react"
+import { createElement, useState } from "react"
 import type { CSSProperties, ReactElement } from "react"
 
 type RevealDirection = "down" | "left" | "right" | "scale" | "up"
@@ -45,6 +45,7 @@ export function SceneReveal({
 }: SceneRevealProps) {
   const isActive = useHomeSlideState() === "active"
   const reduceMotion = useReducedMotion() ?? false
+  const [hasRevealed, setHasRevealed] = useState(false)
   const tagName = children.type
 
   if (typeof tagName !== "string" || !(tagName in motionElements)) {
@@ -54,6 +55,11 @@ export function SceneReveal({
   }
 
   const MotionElement = motionElements[tagName as MotionElementTag]
+
+  if (hasRevealed) {
+    return children
+  }
+
   const distanceValue = offsetDistance[distance]
   const hiddenState = {
     opacity: 0,
@@ -84,6 +90,11 @@ export function SceneReveal({
     ...children.props,
     initial: isActive ? false : hiddenState,
     animate: isActive ? visibleState : hiddenState,
+    onAnimationComplete: () => {
+      if (isActive) {
+        setHasRevealed(true)
+      }
+    },
     transition: {
       delay: isActive && !reduceMotion ? delayMs / 1000 : 0,
       duration: reduceMotion ? 0 : durationMs / 1000,
