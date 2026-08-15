@@ -6,6 +6,8 @@ import { MorphingText } from "@/components/ui/morphing-text"
 import { cn } from "@/lib/utils"
 
 type ScenePersistentTransitionEndpoint = CSSProperties & {
+  /** Delay in milliseconds. */
+  readonly delay?: number
   /** Duration in milliseconds. */
   readonly duration?: number
 }
@@ -51,6 +53,7 @@ type PersistentContentPhase = "starting" | "transitioning"
 
 type PersistentElement = CapturedElement & {
   readonly contentPhase?: PersistentContentPhase
+  readonly delayMs: number
   readonly durationMs: number
   readonly phase: PersistentElementPhase
   readonly previousContent?: string
@@ -68,8 +71,15 @@ const PERSISTENT_MORPH_TIME_SECONDS = 0.45
 function resolveTransitionEndpoint(
   endpoint: ScenePersistentTransitionEndpoint | undefined
 ) {
-  const { duration = PERSISTENT_TRANSITION_DURATION_MS, ...style } =
-    endpoint ?? {}
+  const {
+    delay = 0,
+    duration = PERSISTENT_TRANSITION_DURATION_MS,
+    ...style
+  } = endpoint ?? {}
+
+  if (!Number.isFinite(delay) || delay < 0) {
+    throw new Error("Scene persistent transition delay must be non-negative.")
+  }
 
   if (!Number.isFinite(duration) || duration < 0) {
     throw new Error(
@@ -77,7 +87,7 @@ function resolveTransitionEndpoint(
     )
   }
 
-  return { durationMs: duration, style }
+  return { delayMs: delay, durationMs: duration, style }
 }
 
 type ScenePersistentMorphingTextProps = {
@@ -248,6 +258,7 @@ function reconcileElements(
       return {
         ...target,
         contentPhase: transitionsContent ? "starting" : current.contentPhase,
+        delayMs: 0,
         durationMs: PERSISTENT_TRANSITION_DURATION_MS,
         phase: "transitioning",
         previousContent: transitionsContent
@@ -264,6 +275,7 @@ function reconcileElements(
 
     return {
       ...target,
+      delayMs: incoming.delayMs,
       durationMs: incoming.durationMs,
       phase: target.transition?.in ? "entering" : "active",
       style: {
@@ -282,6 +294,7 @@ function reconcileElements(
 
     nextElements.push({
       ...element,
+      delayMs: outgoing.delayMs,
       durationMs: outgoing.durationMs,
       phase: "exiting",
       style: {
@@ -351,10 +364,12 @@ export function ScenePersistentLayer({
       elementsRef.current,
       captureTargets(slide, targets)
     )
-    const cleanupDurationsMs = Array.from(
+    const cleanupTimesMs = Array.from(
       new Set(
         nextElements.flatMap((element) =>
-          element.phase === "active" ? [] : [element.durationMs]
+          element.phase === "active"
+            ? []
+            : [element.delayMs + element.durationMs]
         )
       )
     )
@@ -383,18 +398,18 @@ export function ScenePersistentLayer({
             }
           })
         )
-        cleanupTimerIds = cleanupDurationsMs.map((completedDurationMs) =>
+        cleanupTimerIds = cleanupTimesMs.map((completedTimeMs) =>
           window.setTimeout(() => {
             setElements((currentElements) =>
               currentElements
                 .filter(
                   (element) =>
                     element.phase !== "exiting" ||
-                    element.durationMs > completedDurationMs
+                    element.delayMs + element.durationMs > completedTimeMs
                 )
                 .map((element) => {
                   const settlesStyle =
-                    element.durationMs <= completedDurationMs &&
+                    element.delayMs + element.durationMs <= completedTimeMs &&
                     (element.phase === "entering" ||
                       element.phase === "transitioning")
 
@@ -411,7 +426,7 @@ export function ScenePersistentLayer({
                   }
                 })
             )
-          }, completedDurationMs)
+          }, completedTimeMs)
         )
       })
     })
@@ -498,6 +513,8 @@ export function ScenePersistentLayer({
             key={element.name}
             style={{
               ...element.style,
+              transitionDelay:
+                element.phase === "active" ? undefined : `${element.delayMs}ms`,
               transitionDuration:
                 element.phase === "active"
                   ? undefined
