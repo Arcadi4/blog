@@ -1,7 +1,7 @@
 import { useHomeSlideState } from "@/components/home/HomeSlideDeck"
 import { motion, useReducedMotion } from "motion/react"
 import { createElement, useState } from "react"
-import type { CSSProperties, ReactElement } from "react"
+import type { ComponentType, CSSProperties, ReactElement } from "react"
 
 type RevealDirection = "down" | "left" | "right" | "scale" | "up"
 type RevealDistance = "far" | "near"
@@ -27,6 +27,25 @@ const motionElements = {
 
 type MotionElementTag = keyof typeof motionElements
 
+/**
+ * motion.create() allocates a fresh component type per call, which would
+ * remount the child on every render. Cache one motion component per child
+ * type so component children (e.g. next/link) keep a stable identity. Link
+ * forwards props and ref to its `<a>`, so motion values reach the DOM node.
+ */
+const componentMotionCache = new Map<ReactElement["type"], ComponentType<any>>()
+
+function getMotionElement(type: ReactElement["type"]) {
+  let MotionElement = componentMotionCache.get(type)
+
+  if (!MotionElement) {
+    MotionElement = motion.create(type as never) as ComponentType<any>
+    componentMotionCache.set(type, MotionElement)
+  }
+
+  return MotionElement
+}
+
 const offsetDistance: Record<RevealDistance, string> = {
   far: "8rem",
   near: "2rem"
@@ -35,6 +54,11 @@ const offsetDistance: Record<RevealDistance, string> = {
 /**
  * Adds entrance choreography to one existing element when its nearest slide
  * becomes active. The slide deck owns state; this primitive only owns motion.
+ *
+ * The child may be any element or component: known native tags render through
+ * the map above, anything else (e.g. next/link) through a cached
+ * motion.create() component. Both paths run the same choreography and leave
+ * the child in place once revealed.
  */
 export function SceneReveal({
   children,
@@ -48,17 +72,14 @@ export function SceneReveal({
   const [hasRevealed, setHasRevealed] = useState(false)
   const tagName = children.type
 
-  if (typeof tagName !== "string" || !(tagName in motionElements)) {
-    throw new Error(
-      "SceneReveal requires a native element with Motion support as its child."
-    )
-  }
-
-  const MotionElement = motionElements[tagName as MotionElementTag]
-
   if (hasRevealed) {
     return children
   }
+
+  const MotionElement =
+    typeof tagName === "string" && tagName in motionElements
+      ? motionElements[tagName as MotionElementTag]
+      : getMotionElement(tagName)
 
   const distanceValue = offsetDistance[distance]
   const hiddenState = {
