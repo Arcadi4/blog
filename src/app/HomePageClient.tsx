@@ -1,5 +1,4 @@
 "use client"
-
 import { menuItems, socialMediaItems } from "@/app/posts/menuItems"
 import { ScenePersistentElement } from "@/components/animations/ScenePersistentElement"
 import { SceneReveal } from "@/components/animations/SceneReveal"
@@ -7,9 +6,10 @@ import { HomeSlideDeck } from "@/components/home/HomeSlideDeck"
 import { SceneGrid } from "@/components/home/SceneGrid"
 import { Barcode } from "@/components/signal/Barcode"
 import type { ContentArticle } from "@/lib/content-index"
-import { cn } from "@/lib/utils"
-import NextLink from "next/link"
+import Link from "next/link"
 import ProximityLink from "@/components/proximity/ProximityLink"
+import Image from "next/image"
+import { formatDate } from "@/lib/utils"
 
 type HomePageClientProps = {
   readonly articles: readonly ContentArticle[]
@@ -162,39 +162,39 @@ export function HomePageClient({ articles }: HomePageClientProps) {
       </SceneGrid>
 
       {latestArticles.map((article, index) => (
-        <SceneGrid as="article" key={article.id} rows={8}>
+        <SceneGrid as="article" rows={8} gridLines="none">
           <ScenePersistentElement name="primary-panel">
             <div
               aria-hidden="true"
-              className={cn(
-                "pointer-events-none absolute inset-y-0 w-[16.03dvw] left-[66.11dvw]",
-                index === 0
-                  ? "bg-magenta"
-                  : index === 1
-                    ? "bg-acid"
-                    : "bg-klein"
-              )}
+              className="col-span-5 col-start-7 row-span-2 row-start-1 bg-black"
             />
           </ScenePersistentElement>
 
           <ScenePersistentElement
-            name="total-articles"
+            layerZIndex={10}
+            name="article-page-header"
             transition={{
               in: {
                 opacity: 0,
-                transform: "translateX(35%)"
+                transform: "scale(0,1)",
+                transformOrigin: "right",
+                delay: 400
               },
               out: {
                 opacity: 0,
-                transform: "translateX(-35%)"
+                transform: "scale(0,1)",
+                transformOrigin: "right",
+                duration: 400
               }
             }}
           >
             <div
               aria-hidden="true"
-              className="col-start-3 row-start-2 font-funnel-display text-[5.9cqw] text-trim-cap leading-none tracking-tighter text-gray-500"
+              className="pointer-events-none relative col-span-9 col-start-3 row-span-1 row-start-3 -mt-4 origin-right bg-magenta"
             >
-              /03
+              <h2 className="absolute right-0 bottom-0 font-funnel-display text-9xl text-trim-cap leading-none tracking-tighter">
+                Latest Articles
+              </h2>
             </div>
           </ScenePersistentElement>
 
@@ -216,21 +216,66 @@ export function HomePageClient({ articles }: HomePageClientProps) {
           >
             <div
               aria-hidden="true"
-              className="col-span-3 col-start-1 row-start-2 -ml-2 font-funnel-display text-[16cqw] text-trim-cap leading-none tracking-tighter"
-              data-article-index={index}
+              className="col-end-12 row-start-1 justify-self-end font-funnel-display text-9xl text-trim-cap leading-none tracking-tighter text-white"
             >
-              {String(index + 1).padStart(2, "0")}
+              {`{${String(index + 1).padStart(2, "0")}}`}
             </div>
           </ScenePersistentElement>
 
+          <div className="separator absolute inset-0 row-span-1 row-start-6 -my-4 border-y" />
+          <div className="separator absolute inset-0 row-span-1 row-start-7 border-b" />
+
           <SceneReveal delayMs={180} distance="far">
-            <div className="col-span-5 col-start-3 row-start-4">
-              <h2 className="text-justify font-funnel-display text-7xl text-trim-cap leading-none font-medium">
-                {article.title}
-              </h2>
-              <p className="mt-8 text-xl">{article.excerpt}</p>
+            <Link
+              aria-label={article.title}
+              href={`/posts/${article.slug}`}
+              key={article.id}
+              className="group relative col-span-full row-start-6 grid grid-cols-subgrid"
+            >
+              <div className="absolute inset-0 -z-10 col-span-8 col-start-2 -my-4 origin-left bg-acid transition-all duration-500 ease-[cubic-bezier(.76,0,.24,1)] group-hover:scale-x-[1.05] group-hover:bg-klein group-focus-visible:scale-x-[1.05] motion-reduce:transition-none" />
+              <div className="col-span-4 col-start-2">
+                <h2 className="text-justify font-funnel-display text-4xl font-medium">
+                  {article.title}
+                </h2>
+              </div>
+              <div className="col-span-3 col-start-7">
+                <p>{article.excerpt}</p>
+                <p className="mt-2 -translate-x-2 font-mono text-xs leading-none text-white uppercase opacity-0 transition duration-300 group-hover:translate-x-0 group-hover:opacity-100 motion-reduce:transition-none">
+                  Read article →
+                </p>
+              </div>
+            </Link>
+          </SceneReveal>
+
+          <SceneReveal delayMs={360} distance="far">
+            <div className="relative col-span-full row-start-7 grid grid-cols-subgrid">
+              <p className="absolute bottom-0 col-start-2 leading-none">
+                Published
+                <br />
+                {formatDate(article.publishDate)}
+              </p>
+              <p className="absolute bottom-0 col-start-4 leading-none">
+                Edited
+                <br />
+                {formatDate(article.lastEditedTime)}
+              </p>
             </div>
           </SceneReveal>
+
+          {article.banner && (
+            <SceneReveal delayMs={320} distance="near">
+              <div className="relative col-span-7 col-start-2 row-span-4 row-start-2 overflow-hidden">
+                <Link href={`/posts/${article.slug}`} className="group">
+                  <Image
+                    src={article.banner}
+                    alt={article.title}
+                    fill
+                    className="object-cover transition-transform duration-700 ease-[cubic-bezier(.76,0,.24,1)] group-hover:scale-[1.05] group-focus-visible:scale-[1.05] motion-reduce:transition-none"
+                  />
+                </Link>
+              </div>
+            </SceneReveal>
+          )}
         </SceneGrid>
       ))}
 
@@ -254,13 +299,13 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             <h2 className="font-funnel-display text-9xl leading-none font-medium text-acid">
               Looking for more?
             </h2>
-            <NextLink
+            <Link
               className="mt-[clamp(1.5rem,4vh,3rem)] flex w-[min(100%,38rem)] items-center justify-between bg-acid p-4 font-mono text-[.78rem] leading-none text-foreground uppercase hover:bg-magenta hover:text-background"
               href="/all"
             >
               <span>All articles</span>
               <span aria-hidden="true">→</span>
-            </NextLink>
+            </Link>
           </div>
         </SceneReveal>
 
