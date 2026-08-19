@@ -162,8 +162,20 @@ export function HomePageClient({ articles }: HomePageClientProps) {
       </SceneGrid>
 
       {latestArticles.map((article, index) => (
-        <SceneGrid as="article" rows={8} gridLines="none">
-          <ScenePersistentElement name="primary-panel">
+        <SceneGrid as="article" rows={8} gridLines="none" key={article.id}>
+          <ScenePersistentElement
+            name="primary-panel"
+            transition={{
+              in: {
+                duration: 400,
+                opacity: 0
+              },
+              out: {
+                duration: 400,
+                opacity: 0
+              }
+            }}
+          >
             <div
               aria-hidden="true"
               className="col-span-5 col-start-7 row-span-2 row-start-1 bg-black"
@@ -182,8 +194,6 @@ export function HomePageClient({ articles }: HomePageClientProps) {
               },
               out: {
                 opacity: 0,
-                transform: "scale(0,1)",
-                transformOrigin: "right",
                 duration: 400
               }
             }}
@@ -279,40 +289,38 @@ export function HomePageClient({ articles }: HomePageClientProps) {
         </SceneGrid>
       ))}
 
-      <SceneGrid className="text-background" gridLines="none" rows={8}>
-        <ScenePersistentElement name="primary-panel">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-2 bg-foreground"
-          />
-        </ScenePersistentElement>
-
-        <div
-          aria-hidden="true"
-          className="absolute top-0 left-[7vw] font-serif text-[70rem] leading-none text-magenta"
-        >
-          *
-        </div>
-
-        <SceneReveal delayMs={140} distance="far">
-          <div className="z-1 col-span-7 col-start-3 row-span-5 row-start-2 flex flex-col justify-center">
-            <h2 className="font-funnel-display text-9xl leading-none font-medium text-acid">
-              Looking for more?
-            </h2>
-            <Link
-              className="mt-[clamp(1.5rem,4vh,3rem)] flex w-[min(100%,38rem)] items-center justify-between bg-acid p-4 font-mono text-[.78rem] leading-none text-foreground uppercase hover:bg-magenta hover:text-background"
-              href="/all"
-            >
-              <span>All articles</span>
-              <span aria-hidden="true">→</span>
-            </Link>
-          </div>
+      <SceneGrid className="text-background" gridLines="background" rows={8}>
+        <SceneReveal direction="up" delayMs={240}>
+          <div className="col-span-7 col-start-1 row-span-full row-start-2 -mx-8 bg-acid" />
+        </SceneReveal>
+        <SceneReveal direction="up" delayMs={480}>
+          <div className="col-span-9 col-start-1 row-span-full row-start-3 -mx-8 bg-magenta" />
+        </SceneReveal>
+        <SceneReveal direction="up" delayMs={720}>
+          <div className="col-span-11 col-start-1 row-span-full row-start-4 -mx-8 bg-klein" />
         </SceneReveal>
 
-        <SceneReveal delayMs={300}>
-          <div className="z-1 col-span-11 row-start-8 flex items-end justify-between border-t border-background/30 pt-[.7rem] font-mono text-[.66rem] uppercase">
-            <Barcode className="text-background" code="End-of-File" />
-          </div>
+        <div className="absolute inset-0 top-1/2 bg-gray-900" />
+
+        <SceneReveal direction="up" delayMs={520} distance="near">
+          <Link
+            href="/all"
+            className="group relative col-span-10 col-start-2 row-span-2 row-start-6 grid grid-cols-subgrid items-center overflow-hidden border-y border-background focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-acid"
+          >
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 origin-left scale-x-0 bg-acid transition-transform duration-600 ease-[cubic-bezier(.76,0,.24,1)] group-hover:scale-x-100 motion-reduce:transition-none"
+            />
+            <span className="z-1 col-span-7 flex gap-2 align-top font-funnel-display transition-colors duration-300 group-hover:text-foreground group-focus-visible:text-foreground motion-reduce:transition-none">
+              <span className="text-9xl text-trim-cap leading-none font-medium tracking-tighter">
+                All posts
+              </span>
+              <span className="text-base">({articles.length})</span>
+            </span>
+            <span className="z-1 col-start-10 justify-self-end font-funnel-display text-7xl transition-colors duration-300 group-hover:text-foreground group-focus-visible:text-foreground motion-reduce:transition-none">
+              →
+            </span>
+          </Link>
         </SceneReveal>
       </SceneGrid>
     </HomeSlideDeck>
