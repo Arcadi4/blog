@@ -88,7 +88,7 @@ function ArchiveArticle({
       ) : null}
 
       {article.tags.length > 0 ? (
-        <div className="col-span-2 col-start-11 mt-8 self-end text-[clamp(1.25rem,1.8cqi,2rem)] leading-none max-md:col-span-3 max-md:col-start-10 max-md:row-start-5">
+        <div className="col-span-2 col-start-11 mt-8 self-end text-4xl leading-none max-md:col-span-3 max-md:col-start-10 max-md:row-start-5">
           {article.tags.map((tag) => (
             <p
               className={selectedTags.has(tag) ? "text-klein" : undefined}
@@ -235,7 +235,7 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
           durationMs={500}
         >
           <Link
-            className="font-funnel-display text-5xl leading-none transition-colors hover:text-klein focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-klein"
+            className="font-funnel-display text-6xl leading-none transition-colors hover:text-klein focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-klein"
             href="/"
           >
             @4rcadia
@@ -257,7 +257,7 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
         <Entrance
           animationClassName="fade-in slide-in-from-left-8"
           as="h1"
-          className="z-20 col-span-6 col-start-1 row-span-1 row-start-5 flex items-start self-start font-funnel-display text-[clamp(4.5rem,9.3cqi,10rem)] leading-none whitespace-nowrap"
+          className="z-20 col-span-6 col-start-1 row-span-1 row-start-5 flex items-start self-start font-funnel-display text-9xl leading-none whitespace-nowrap"
           delayMs={240}
           durationMs={700}
         >
