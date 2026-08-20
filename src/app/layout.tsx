@@ -13,7 +13,8 @@ import {
   ibmPlexMono,
   ibmPlexSans,
   libreBarcode,
-  playfairDisplay
+  playfairDisplay,
+  wdxlLubrifontJpN
 } from "@/app/fonts"
 import { cn } from "@/lib/utils"
 import React from "react"
@@ -36,6 +37,7 @@ export default function RootLayout({
         ibmPlexSans.variable,
         playfairDisplay.variable,
         funnelDisplay.variable,
+        wdxlLubrifontJpN.variable,
         geist.variable,
         libreBarcode.variable,
         "overflow-x-clip antialiased",

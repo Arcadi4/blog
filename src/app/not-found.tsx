@@ -1,5 +1,11 @@
-import ErrorPage from "@/components/ErrorPage"
+import { ErrorPageClient } from "./ErrorPageClient"
 
 export default function NotFound() {
-  return <ErrorPage code={404} title="Not Found" />
+  return (
+    <ErrorPageClient
+      code="404"
+      description={["You are trying", "to visit"]}
+      title={["This page", "does not exist."]}
+    />
+  )
 }

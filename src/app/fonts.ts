@@ -4,7 +4,8 @@ import {
   IBM_Plex_Mono,
   IBM_Plex_Sans,
   Libre_Barcode_128,
-  Playfair_Display
+  Playfair_Display,
+  WDXL_Lubrifont_JP_N
 } from "next/font/google"
 
 export const geist = Geist({
@@ -53,4 +54,11 @@ export const funnelDisplay = Funnel_Display({
   subsets: ["latin"],
   variable: "--font-funnel",
   weight: "variable"
+})
+
+export const wdxlLubrifontJpN = WDXL_Lubrifont_JP_N({
+  display: "swap",
+  preload: false,
+  variable: "--font-wdxl-lubrifont-jp-n",
+  weight: "400"
 })

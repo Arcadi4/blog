@@ -1,5 +1,11 @@
-import ErrorPage from "@/components/ErrorPage"
+import { ErrorPageClient } from "./ErrorPageClient"
 
 export default function Forbidden() {
-  return <ErrorPage code={403} title="Forbidden" heroSymbol="!" marker="!!!" />
+  return (
+    <ErrorPageClient
+      code="403"
+      description={["You do not have", "access to"]}
+      title={["Access", "forbidden."]}
+    />
+  )
 }
