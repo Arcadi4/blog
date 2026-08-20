@@ -56,7 +56,7 @@ export function Menu({
               shadowColor={shadowColor}
               className={linkClassName}
             >
-              {prefix + item.name}
+              {prefix + item.name + (suffix ?? "")}
             </ProximityLink>
           )}
         </EaseIn>
