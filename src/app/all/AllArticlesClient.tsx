@@ -47,57 +47,82 @@ function ArchiveArticle({
       id={`article-${article.slug}`}
       animationClassName="fade-in slide-in-from-bottom-8"
       as="article"
-      className={hidden ? "hidden" : "grid grid-cols-12 gap-4 px-8"}
+      className={
+        hidden ? "hidden" : "grid min-h-0 min-w-0 grid-cols-12 gap-4 px-8"
+      }
       delayMs={Math.min(index, 3) * 90}
       durationMs={650}
     >
-      <div className="col-span-5 col-start-1 flex flex-col gap-4 border-t pt-4">
-        <div className="col-span-full flex h-auto justify-between leading-none">
-          <p>({index + 1})</p>
-          <p>Published {formatDate(article.publishDate)}</p>
-          <p>Edited {formatDate(article.lastEditedTime)}</p>
-        </div>
+      <div className="col-span-5 col-start-1 grid min-h-0 min-w-0 auto-rows-auto grid-cols-subgrid gap-0">
         <Link
           aria-label={`Read ${article.title}`}
           href={`/posts/${article.slug}`}
+          className="col-span-4 min-h-0 min-w-0 self-start"
         >
-          <h2 className="text-justify font-funnel-display text-6xl leading-none text-pretty transition-colors duration-300 hover:text-klein focus-visible:text-klein">
+          <h2 className="font-funnel-display text-4xl leading-none text-pretty transition-colors duration-300 hover:text-klein focus-visible:text-klein">
             {article.title}
           </h2>
         </Link>
 
-        <p className="text-base leading-tight">{article.excerpt}</p>
+        <div className="col-span-full my-4 border-t" />
+
+        <div className="col-span-full grid min-h-0 min-w-0 grid-cols-subgrid gap-8">
+          <div className="col-span-4 flex justify-between leading-tight">
+            <p>(Publish) {formatDate(article.publishDate)}</p>
+            <p>(Edit) {formatDate(article.lastEditedTime)}</p>
+          </div>
+
+          <Link
+            aria-label={`Read ${article.title}`}
+            href={`/posts/${article.slug}`}
+            className="col-span-4"
+          >
+            <p className="text-justify leading-tight text-pretty transition-colors duration-300 hover:text-klein focus-visible:text-klein">
+              {article.excerpt}
+            </p>
+          </Link>
+
+          <p className="col-start-5 leading-tight">(Abstract)</p>
+
+          {article.tags.length > 0 ? (
+            <>
+              <p className="col-span-4 col-start-1 justify-self-end leading-tight">
+                (Tags)
+              </p>
+              <div className="col-start-5 flex flex-col leading-tight whitespace-nowrap">
+                {article.tags.map((tag) => (
+                  <p
+                    className={selectedTags.has(tag) ? "text-klein" : undefined}
+                    key={tag}
+                  >
+                    + {tag}
+                  </p>
+                ))}
+              </div>
+            </>
+          ) : null}
+        </div>
       </div>
 
       {article.banner ? (
         <Link
           aria-label={`Read ${article.title}`}
-          className="group relative col-span-3 col-start-8 h-full overflow-hidden focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-klein max-md:col-span-9 max-md:col-start-1 max-md:row-start-5"
+          className="relative col-span-5 col-start-6 min-h-0 min-w-0 self-stretch overflow-hidden"
           href={`/posts/${article.slug}`}
         >
           <HalftoneReveal
-            dotDensity={90}
-            dotSize={0.6}
-            paperColor={colorKlein}
-            inkColor={colorAcid}
-            src={article.banner}
             borderRadius="0px"
+            className="absolute inset-0 h-full min-h-0 w-full min-w-0"
+            dotDensity={90}
+            dotSize={0.9}
             idleReveal={0.25}
+            inkColor={colorAcid}
+            paperColor={colorKlein}
+            revealRadius={0.7}
+            src={article.banner}
+            style={{ position: "absolute", inset: "0" }}
           />
         </Link>
-      ) : null}
-
-      {article.tags.length > 0 ? (
-        <div className="col-span-2 col-start-11 mt-8 self-end text-4xl leading-none max-md:col-span-3 max-md:col-start-10 max-md:row-start-5">
-          {article.tags.map((tag) => (
-            <p
-              className={selectedTags.has(tag) ? "text-klein" : undefined}
-              key={tag}
-            >
-              + {tag}
-            </p>
-          ))}
-        </div>
       ) : null}
     </Entrance>
   )
@@ -235,7 +260,7 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
           durationMs={500}
         >
           <Link
-            className="font-funnel-display text-6xl leading-none transition-colors hover:text-klein focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-klein"
+            className="font-funnel-display text-4xl leading-none transition-colors hover:text-klein focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-klein"
             href="/"
           >
             @4rcadia
@@ -270,7 +295,7 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
         <Entrance
           animationClassName="fade-in slide-in-from-right-6"
           as="div"
-          className="z-30 col-span-4 col-start-8 row-span-2 row-start-5 self-start"
+          className="z-30 col-span-2 col-start-8 row-span-3 row-start-5 self-start"
           delayMs={440}
           durationMs={600}
         >
@@ -334,7 +359,7 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
             transform: wheelEntering ? "scale(1)" : "scale(0.95)"
           }}
         >
-          <div className="pointer-events-auto col-span-2 col-start-6 h-[33svh] self-center">
+          <div className="pointer-events-auto col-span-2 col-start-11 h-[33svh] self-center">
             <OptionWheel
               tilt={0}
               xPadding={4}
@@ -342,7 +367,6 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
               blur={0.25}
               items={slugs}
               selectedIndex={selectedWheelIndex}
-              textColor={colorKlein}
               activeColor={colorMagenta}
               onItemClick={(_, item) => {
                 const article = visibleArticles.find(

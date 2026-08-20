@@ -430,7 +430,7 @@ const HalftoneReveal = ({
   return (
     <div
       ref={containerRef}
-      className={`relative h-full w-full cursor-crosshair touch-none overflow-hidden ${className}`.trim()}
+      className={`relative min-h-0 w-full min-w-0 cursor-crosshair touch-none overflow-hidden ${className}`.trim()}
       style={{ borderRadius, ...style }}
     />
   )
