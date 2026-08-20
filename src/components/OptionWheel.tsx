@@ -1,13 +1,14 @@
 "use client"
 
 import {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
   type CSSProperties,
   type KeyboardEvent,
   type PointerEvent,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
   type WheelEvent
 } from "react"
 
@@ -34,17 +35,21 @@ type DragState = {
 }
 
 type WheelState = {
-  readonly count: number
-  readonly rowHeight: number
-  readonly smoothing: number
-  readonly tilt: number
-  readonly fade: number
-  readonly blur: number
+  count: number
+  rowHeight: number
+  smoothing: number
+  tilt: number
+  fade: number
+  blur: number
 }
 
 const MIN_OPACITY = 0.08
 const MAX_TILT_ANGLE = Math.PI / 2
-const AUTO_FONT_FILL_RATIO = 0.98
+// Bold base: font = usable / (len * 0.54) * 0.96
+const BOLD_AVG = 0.54
+const SHRINK = 0.96
+const MIN_PX = 8
+const MAX_PX = 32
 
 function clamp(value: number, count: number) {
   return Math.min(Math.max(value, 0), Math.max(count - 1, 0))
@@ -66,7 +71,7 @@ export default function OptionWheel({
   className = ""
 }: OptionWheelProps) {
   const rootRef = useRef<HTMLDivElement>(null)
-  const measureRef = useRef<HTMLDivElement>(null)
+  const innerRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef<(HTMLDivElement | null)[]>([])
   const positionRef = useRef(clamp(selectedIndex, items.length))
   const targetRef = useRef(clamp(selectedIndex, items.length))
@@ -76,57 +81,69 @@ export default function OptionWheel({
   const dragRef = useRef<DragState | undefined>(undefined)
   const suppressClickRef = useRef(false)
   const onItemClickRef = useRef(onItemClick)
+  const longest = useMemo(() => {
+    let max = 0
+    for (const item of items) max = Math.max(max, item.length)
+    return Math.max(max, 1)
+  }, [items])
+  const hasAuto = fontSize === undefined
+  const autoFontSizeValue = `clamp(${MIN_PX}px, calc((100cqi - 2 * var(--ow-x-padding)) / var(--ow-longest) / ${BOLD_AVG} * ${SHRINK}), ${MAX_PX}px)`
+
+  const [dragging, setDragging] = useState(false)
+
+  onItemClickRef.current = onItemClick
+  const initialRowHeight = hasAuto
+    ? Math.max(16 * spacing, 1)
+    : Math.max((fontSize as number) * 16 * spacing, 1)
   const stateRef = useRef<WheelState>({
     count: items.length,
-    rowHeight: 16,
+    rowHeight: initialRowHeight,
     smoothing,
     tilt,
     fade,
     blur
   })
-  const [dragging, setDragging] = useState(false)
-  const [autoFontSize, setAutoFontSize] = useState(16)
-  const fontSizeInPixels = fontSize === undefined ? autoFontSize : fontSize * 16
-  const resolvedFontSize = fontSize ?? autoFontSize / 16
-
-  onItemClickRef.current = onItemClick
-  stateRef.current = {
-    count: items.length,
-    rowHeight: Math.max(fontSizeInPixels * spacing, 1),
-    smoothing,
-    tilt,
-    fade,
-    blur
+  stateRef.current.count = items.length
+  stateRef.current.smoothing = smoothing
+  stateRef.current.tilt = tilt
+  stateRef.current.fade = fade
+  stateRef.current.blur = blur
+  if (!hasAuto) {
+    stateRef.current.rowHeight = Math.max(
+      (fontSize as number) * 16 * spacing,
+      1
+    )
   }
+
   useLayoutEffect(() => {
     targetRef.current = clamp(selectedIndex, items.length)
   }, [items.length, selectedIndex])
 
   useLayoutEffect(() => {
-    if (fontSize !== undefined) return
-
-    const root = rootRef.current
-    const measure = measureRef.current
-    if (!root || !measure) return
-
-    const updateFontSize = () => {
-      const textWidth = measure.getBoundingClientRect().width
-      const availableWidth = Math.max(root.clientWidth - xPadding * 2, 0)
-      if (!textWidth || !availableWidth) return
-
-      const nextFontSize = (availableWidth / textWidth) * AUTO_FONT_FILL_RATIO
-      setAutoFontSize((current) =>
-        Math.abs(current - nextFontSize) > 0.01 ? nextFontSize : current
-      )
+    if (!hasAuto) return
+    const inner = innerRef.current
+    if (!inner) return
+    const updateRowHeight = () => {
+      const px = Number.parseFloat(getComputedStyle(inner).fontSize)
+      if (Number.isFinite(px) && px > 0) {
+        const next = Math.max(px * spacing, 1)
+        if (Math.abs(stateRef.current.rowHeight - next) > 0.05) {
+          stateRef.current.rowHeight = next
+        }
+      }
     }
-
-    const observer = new ResizeObserver(updateFontSize)
-    observer.observe(root)
-    updateFontSize()
-    void document.fonts.ready.then(updateFontSize)
-
-    return () => observer.disconnect()
-  }, [fontSize, items, xPadding])
+    updateRowHeight()
+    const observer = new ResizeObserver(updateRowHeight)
+    observer.observe(inner)
+    const root = rootRef.current
+    if (root) observer.observe(root)
+    window.addEventListener("resize", updateRowHeight)
+    void document.fonts.ready.then(updateRowHeight)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener("resize", updateRowHeight)
+    }
+  }, [hasAuto, spacing, longest])
 
   useEffect(() => {
     const render = (now: number) => {
@@ -256,21 +273,22 @@ export default function OptionWheel({
     onItemClickRef.current?.(index, items[index])
   }
 
+  const rootStyle = {
+    "--ow-text-color": textColor,
+    "--ow-active-color": activeColor,
+    "--ow-x-padding": `${xPadding}px`,
+    "--ow-longest": String(longest),
+    ...(hasAuto ? { containerType: "inline-size" as const } : {})
+  } as unknown as CSSProperties
+
   return (
     <div
       ref={rootRef}
       role="listbox"
       tabIndex={0}
       aria-label="Article navigation"
-      className={`relative h-full w-full [touch-action:none] overflow-hidden outline-none select-none ${dragging ? "cursor-grabbing" : "cursor-grab"}${className ? ` ${className}` : ""}`}
-      style={
-        {
-          "--ow-text-color": textColor,
-          "--ow-active-color": activeColor,
-          "--ow-font-size": `${resolvedFontSize}rem`,
-          "--ow-x-padding": `${xPadding}px`
-        } as CSSProperties
-      }
+      className={`relative h-full w-full touch-none overflow-hidden outline-none select-none ${dragging ? "cursor-grabbing" : "cursor-grab"}${className ? ` ${className}` : ""}`}
+      style={rootStyle}
       onKeyDown={handleKeyDown}
       onPointerCancel={handlePointerEnd}
       onPointerDown={handlePointerDown}
@@ -278,32 +296,31 @@ export default function OptionWheel({
       onPointerUp={handlePointerEnd}
       onWheel={handleWheel}
     >
-      {fontSize === undefined ? (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none invisible absolute w-max font-[inherit] text-[1px] leading-none"
-          ref={measureRef}
-        >
-          {items.map((item, index) => (
-            <div key={`${item}-${index}`}>{item}</div>
-          ))}
-        </div>
-      ) : null}
-      {items.map((item, index) => (
-        <div
-          className="absolute top-1/2 left-[var(--ow-x-padding)] origin-left cursor-pointer [font-size:var(--ow-font-size)] leading-none whitespace-nowrap [color:color-mix(in_srgb,var(--ow-active-color)_calc(var(--ow-position,0)*100%),var(--ow-text-color))] will-change-[filter,opacity,transform]"
-          data-cursor="interactive"
-          key={`${item}-${index}`}
-          ref={(element) => {
-            itemRefs.current[index] = element
-          }}
-          aria-selected={selectedIndex === index}
-          style={{ fontWeight: selectedIndex === index ? 500 : 200 }}
-          onClick={() => handleItemClick(index)}
-        >
-          {item}
-        </div>
-      ))}
+      <div
+        ref={innerRef}
+        className="relative h-full w-full"
+        style={{ fontSize: hasAuto ? autoFontSizeValue : `${fontSize}rem` }}
+      >
+        {items.map((item, index) => (
+          <div
+            className="absolute top-1/2 left-[var(--ow-x-padding)] origin-left cursor-pointer leading-none whitespace-nowrap will-change-[filter,opacity,transform]"
+            data-cursor="interactive"
+            key={`${item}-${index}`}
+            ref={(element) => {
+              itemRefs.current[index] = element
+            }}
+            aria-selected={selectedIndex === index}
+            style={{
+              fontWeight: selectedIndex === index ? 600 : 400,
+              color:
+                "color-mix(in srgb, var(--ow-active-color) calc(var(--ow-position, 0) * 100%), var(--ow-text-color))"
+            }}
+            onClick={() => handleItemClick(index)}
+          >
+            {item}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
