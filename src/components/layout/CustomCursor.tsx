@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 
 const SIZE = 64
 const OFFSET = SIZE / 2
+const INTERACTIVE_EXIT_DELAY_MS = 100
 const INTERACTIVE_SELECTOR = [
   "[data-cursor='interactive']",
   "a",
@@ -41,8 +42,9 @@ export default function CustomCursor() {
     if (!supportsCustomCursor()) return
 
     let position: { x: number; y: number } | null = null
-    let holdTimer: ReturnType<typeof setTimeout> | null = null
-
+    let holdTimer: number | undefined
+    let interactiveTimer: number | undefined
+    let prevInteractive = false
     const moveTo = (x: number, y: number) => {
       position = { x, y }
       const transform = `translate3d(${x - OFFSET}px, ${y - OFFSET}px, 0)`
@@ -52,28 +54,46 @@ export default function CustomCursor() {
 
     const updateInteractiveTarget = () => {
       if (position) {
-        setInteractive(
+        setInteractiveTarget(
           isInteractive(document.elementFromPoint(position.x, position.y))
         )
       }
     }
 
+    const setInteractiveTarget = (nextInteractive: boolean) => {
+      if (nextInteractive === prevInteractive) return
+
+      prevInteractive = nextInteractive
+      clearTimeout(interactiveTimer)
+      interactiveTimer = undefined
+
+      if (nextInteractive) {
+        setInteractive(true)
+        return
+      }
+
+      interactiveTimer = window.setTimeout(() => {
+        interactiveTimer = undefined
+        setInteractive(false)
+      }, INTERACTIVE_EXIT_DELAY_MS)
+    }
+
     const clearPress = () => {
-      if (holdTimer) clearTimeout(holdTimer)
-      holdTimer = null
+      clearTimeout(holdTimer)
+      holdTimer = undefined
       setPressed(false)
     }
 
     const handlePointerMove = (event: PointerEvent) => {
       moveTo(event.clientX, event.clientY)
       document.body.classList.add("custom-cursor-enabled")
-      setInteractive(isInteractive(event.target))
+      setInteractiveTarget(isInteractive(event.target))
     }
 
     const handlePointerDown = (event: PointerEvent) => {
       if (event.button !== 0) return
-      holdTimer = setTimeout(() => {
-        holdTimer = null
+      holdTimer = window.setTimeout(() => {
+        holdTimer = undefined
         setPressed(true)
       }, 150)
     }
@@ -102,7 +122,8 @@ export default function CustomCursor() {
       window.removeEventListener("blur", clearPress)
       document.removeEventListener("mouseleave", clearPress)
       window.removeEventListener("contextmenu", clearPress)
-      if (holdTimer) clearTimeout(holdTimer)
+      clearTimeout(holdTimer)
+      clearTimeout(interactiveTimer)
       document.body.classList.remove("custom-cursor-enabled")
     }
   }, [])
