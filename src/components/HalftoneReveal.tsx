@@ -1,6 +1,7 @@
 import { useRef, useEffect, CSSProperties } from "react"
 import { Renderer, Program, Triangle, Mesh, Texture } from "ogl"
-
+import { getImageProps } from "next/image"
+import type { StaticImageData } from "next/image"
 const DEFAULT_SRC = "https://picsum.photos/seed/halftone-reveal/1200/800"
 
 const hexToRgb = (hex: string): [number, number, number] => {
@@ -28,7 +29,7 @@ const SHAPES: Record<Shape, number> = {
 const TRIGGERS: Record<Trigger, number> = { off: 0, hover: 1, always: 2 }
 
 export interface HalftoneRevealProps {
-  src?: string
+  src?: string | StaticImageData
   inkColor?: string
   paperColor?: string
   mode?: Mode
@@ -290,13 +291,50 @@ const HalftoneReveal = ({
     const program = new Program(gl, { vertex, fragment, uniforms })
     const mesh = new Mesh(gl, { geometry: new Triangle(gl), program })
 
+    const rawSrc = typeof src === "string" ? src : (src as StaticImageData).src
+    const isStaticImport = typeof src !== "string"
+    let textureSrc = rawSrc
+
+    // Local public assets (/banners/xxx) go through Next's image optimizer
+    // via `/_next/image?url=&w=&q=` to serve a DPR-aware, format-negotiated
+    // variant (see public/banners: 2–3.5 MB originals -> ~30–80 KB at 640w).
+    // Remote URLs are fetched directly to avoid 400s when remotePatterns
+    // isn't configured (Notion S3 hosts vary; DEFAULT_SRC is external).
+    if (!isStaticImport && rawSrc.startsWith("/") && !rawSrc.startsWith("//")) {
+      try {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2)
+        const cssW = container.clientWidth || 640
+        const cssH = container.clientHeight || Math.round(cssW * 0.66)
+        const physicalW = Math.min(Math.round(cssW * dpr), 3840)
+        const physicalH = Math.min(Math.round(cssH * dpr), 3840)
+        const { props } = getImageProps({
+          alt: "",
+          width: physicalW,
+          height: physicalH,
+          src: rawSrc,
+          quality: 75
+        })
+        if (props.src) textureSrc = props.src
+      } catch {
+        textureSrc = rawSrc
+      }
+    }
+
     const img = new Image()
     img.crossOrigin = "anonymous"
-    img.src = src
+    img.decoding = "async"
+    let didFallback = false
     img.onload = () => {
       texture.image = img
       uniforms.uImageSize.value = [img.naturalWidth, img.naturalHeight]
     }
+    img.onerror = () => {
+      if (!didFallback && textureSrc !== rawSrc) {
+        didFallback = true
+        img.src = rawSrc
+      }
+    }
+    img.src = textureSrc
 
     const resize = () => {
       const w = container.clientWidth || 1
@@ -355,7 +393,7 @@ const HalftoneReveal = ({
       uniformsRef.current = null
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [src])
+  }, [typeof src === "string" ? src : (src as StaticImageData).src])
 
   useEffect(() => {
     const u = uniformsRef.current
