@@ -15,7 +15,7 @@ type ErrorPageClientProps = {
 }
 
 const errorGridClassName =
-  "@container relative isolate grid grid-cols-12 grid-rows-8 gap-4 overflow-visible [--column-track:calc((100cqi-11rem)/12)] [--type-step:calc(var(--column-track)/2)]"
+  "@container relative isolate grid p-8 grid-cols-12 grid-rows-8 gap-4 overflow-visible [--column-track:calc((100cqi-11rem)/12)] [--type-step:calc(var(--column-track)/2)]"
 
 export function ErrorPageClient({
   code,
@@ -29,8 +29,23 @@ export function ErrorPageClient({
   return (
     <main className="relative min-h-dvh w-full overflow-visible bg-klein text-background">
       <div className={`${errorGridClassName} h-dvh w-full p-8`}>
+        <Entrance
+          animationClassName="fade-in slide-in-from-left-4"
+          as="header"
+          className="z-20 col-span-2 col-start-1 row-start-1 self-start"
+          delayMs={300}
+          durationMs={500}
+        >
+          <Link
+            className="font-funnel-display text-5xl leading-none font-normal transition-colors hover:text-acid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-acid"
+            href="/"
+          >
+            @4rcadia
+          </Link>
+        </Entrance>
+
         <Displacement
-          className="inset-0 z-0 p-8"
+          className="inset-0 z-0"
           contentClassName={`${errorGridClassName} h-full w-full`}
           contentStyle={{ overflow: "visible" }}
           style={{ position: "absolute" }}
@@ -42,7 +57,7 @@ export function ErrorPageClient({
             className="pointer-events-none z-0 col-span-9 col-start-4 row-span-full row-start-1 self-start font-japanese-display text-[50cqh] text-trim-cap leading-none whitespace-pre text-magenta select-none supports-[font-size:round(nearest,1px,1px)]:text-[round(nearest,50cqh,var(--type-step))]"
             durationMs={700}
           >
-            {"エラー\n発生"}
+            {"エラー\n発生。"}
           </Entrance>
 
           <Entrance
@@ -76,21 +91,6 @@ export function ErrorPageClient({
             durationMs={700}
           >
             {digits[2]}
-          </Entrance>
-
-          <Entrance
-            animationClassName="fade-in slide-in-from-left-4"
-            as="header"
-            className="z-20 col-span-2 col-start-1 row-start-1 self-start"
-            delayMs={300}
-            durationMs={500}
-          >
-            <Link
-              className="font-funnel-display text-5xl leading-none font-normal transition-colors hover:text-acid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-acid"
-              href="/"
-            >
-              @4rcadia
-            </Link>
           </Entrance>
 
           <Entrance
@@ -154,7 +154,7 @@ export function ErrorPageClient({
             delayStepMs={70}
             prefix=""
             suffix=" ←"
-            linkClassName="w-fit font-funnel-display text-3xl transition-colors hover:text-acid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-acid xl:text-5xl"
+            linkClassName="w-fit font-funnel-display text-3xl transition-all hover:text-acid focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-acid xl:text-5xl"
           />
         </nav>
       </div>
