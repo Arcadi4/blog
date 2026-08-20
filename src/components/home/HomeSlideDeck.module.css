@@ -8,18 +8,9 @@
 }
 
 .deck {
-  scrollbar-color: currentColor transparent;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
 .deck::-webkit-scrollbar {
-  width: 0.25rem;
-}
-
-.deck::-webkit-scrollbar-thumb {
-  background: currentColor;
-}
-
-.deck::-webkit-scrollbar-track {
-  background: transparent;
+  display: none;
 }

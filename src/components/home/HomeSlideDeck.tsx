@@ -1,6 +1,7 @@
 "use client"
 
 import { ScenePersistentLayer } from "@/components/animations/ScenePersistentElement"
+import { LineSidebar } from "@/components/ui/line-sidebar"
 import { cn } from "@/lib/utils"
 import type { ReactNode } from "react"
 import {
@@ -54,13 +55,6 @@ export function HomeSlideDeck({ children, labels }: HomeSlideDeckProps) {
     [lastIndex]
   )
 
-  const moveBy = useCallback(
-    (distance: number) => {
-      selectSlide(activeIndex + distance)
-    },
-    [activeIndex, selectSlide]
-  )
-
   useEffect(() => {
     const deck = deckRef.current
 
@@ -81,14 +75,13 @@ export function HomeSlideDeck({ children, labels }: HomeSlideDeckProps) {
         return
       }
 
-      event.preventDefault()
-      moveBy(Math.sign(event.deltaY))
+      selectSlide(activeIndex + Math.sign(event.deltaY))
     }
 
     deck.addEventListener("wheel", handleWheel, { passive: false })
 
     return () => deck.removeEventListener("wheel", handleWheel)
-  }, [moveBy])
+  }, [activeIndex, selectSlide])
 
   useEffect(() => {
     const deck = deckRef.current
@@ -173,79 +166,22 @@ export function HomeSlideDeck({ children, labels }: HomeSlideDeckProps) {
 
       <ScenePersistentLayer activeIndex={activeIndex} />
 
-      <nav
-        aria-label="Choose a homepage scene"
-        className="fixed top-1/2 left-[92%] z-20 grid -translate-y-1/2 grid-cols-[1px_auto] items-stretch gap-3"
-      >
-        <span
-          aria-hidden="true"
-          className="relative block h-full w-px overflow-hidden bg-current/20"
-        >
-          <span
-            className="absolute inset-0 origin-top bg-current transition-transform duration-700 ease-[cubic-bezier(.76,0,.24,1)] motion-reduce:transition-none"
-            style={{
-              transform: `scaleY(${(activeIndex + 1) / slides.length})`
-            }}
-          />
-        </span>
-        <ol className="m-0 flex list-none flex-col gap-[.45rem] p-0">
-          {labels.map((label, index) => (
-            <li key={`${index}-${label}`}>
-              <button
-                aria-current={index === activeIndex ? "step" : undefined}
-                aria-label={`Go to scene ${index + 1}: ${label}`}
-                className={cn(
-                  "group/scene-button flex min-w-[2.1rem] items-baseline gap-3 bg-transparent py-[.15rem] text-left font-mono text-[.7rem] leading-none text-inherit uppercase opacity-[.38] transition duration-180 hover:-translate-x-1 hover:opacity-100 focus-visible:-translate-x-1 focus-visible:opacity-100  motion-reduce:transition-none",
-                  index === activeIndex && "-translate-x-1 opacity-100"
-                )}
-                onClick={() => selectSlide(index)}
-                type="button"
-              >
-                <span aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span
-                  className={cn(
-                    "hidden max-w-28 xl:group-hover/scene-button:inline xl:group-focus-visible/scene-button:inline",
-                    index === activeIndex && "inline"
-                  )}
-                >
-                  {label}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ol>
-      </nav>
-
-      <div
-        aria-hidden="true"
-        className="fixed top-7 right-8 z-20 flex items-center gap-[.6rem] font-mono text-[.72rem] leading-none"
-      >
-        <span>{String(activeIndex + 1).padStart(2, "0")}</span>
-        <span className="h-px w-8 bg-current opacity-45" />
-        <span>{String(slides.length).padStart(2, "0")}</span>
-      </div>
-
-      <div className="fixed right-8 bottom-7 z-20 flex overflow-hidden border">
-        <button
-          aria-label="Previous scene"
-          className="grid size-[2.7rem] place-items-center border-0 font-mono text-base text-inherit hover:not-disabled:bg-foreground hover:not-disabled:text-background disabled:opacity-25"
-          disabled={activeIndex === 0}
-          onClick={() => moveBy(-1)}
-          type="button"
-        >
-          ↑
-        </button>
-        <button
-          aria-label="Next scene"
-          className="grid size-[2.7rem] place-items-center border-0 border-l border-black font-mono text-base text-inherit hover:not-disabled:bg-foreground hover:not-disabled:text-background disabled:opacity-25"
-          disabled={activeIndex === lastIndex}
-          onClick={() => moveBy(1)}
-          type="button"
-        >
-          ↓
-        </button>
+      <div className="fixed top-1/2 right-8 z-50 -translate-y-1/2 mix-blend-difference">
+        <LineSidebar
+          activeIndex={activeIndex}
+          aria-label="Choose a homepage scene"
+          items={labels}
+          onItemClick={selectSlide}
+          className="font-mono text-[.7rem] uppercase"
+          accentColor="var(--color-magenta)"
+          markerColor="rgba(255, 255, 255, 0.2)"
+          textColor="#fff"
+          itemGap={10}
+          fontSize={0.7}
+          maxShift={8}
+          markerLength={18}
+          proximityRadius={90}
+        />
       </div>
     </main>
   )

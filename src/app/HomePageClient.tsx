@@ -22,7 +22,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
   const labels = [
     "Home",
     "Nav",
-    ...latestArticles.map((article) => article.title),
+    ...latestArticles.map((_, index) => `最新文章[${index + 1}]`),
     "Footer"
   ]
 
