@@ -1,7 +1,7 @@
 "use client"
 
 import clsx from "clsx"
-import { createElement, useEffect, useState } from "react"
+import { createElement, useRef, useState } from "react"
 import type {
   AnimationEvent,
   AnimationEventHandler,
@@ -9,14 +9,17 @@ import type {
   ElementType,
   JSX
 } from "react"
+import type { EntranceSeenOptions } from "./useEntranceAnimation"
+import { useEntranceAnimation } from "./useEntranceAnimation"
 
 type EntranceElement = keyof HTMLElementTagNameMap & keyof JSX.IntrinsicElements
 
-type EntranceOwnProps<T extends EntranceElement> = {
+type EntranceOwnProps<T extends EntranceElement> = EntranceSeenOptions & {
   animationClassName: string
   as?: T
   delayMs?: number
   durationMs: number
+  disabled?: boolean
 }
 
 export type EntranceProps<T extends EntranceElement = "div"> =
@@ -26,6 +29,10 @@ export type EntranceProps<T extends EntranceElement = "div"> =
 /**
  * Renders one semantic element with temporary entrance styles. The animation
  * state is retired after completion, so later layout changes stay immediate.
+ *
+ * @property onSeen - Waits until the element reaches minPosition before the animation delay starts
+ * @property minPosition - Trigger line percentage measured up from the viewport bottom (0 = entering screen, 50 = middle, negative = before entering)
+ * @property disabled - When true, bypasses the scroll trigger and starts the entrance immediately
  */
 export function Entrance<T extends EntranceElement = "div">({
   animationClassName,
@@ -35,16 +42,22 @@ export function Entrance<T extends EntranceElement = "div">({
   durationMs,
   onAnimationEnd,
   style,
+  disabled = false,
+  minPosition = 30,
+  onSeen = false,
   ...props
 }: EntranceProps<T>) {
-  const [hasEntered, setHasEntered] = useState(false)
+  const [hasFinished, setHasFinished] = useState(false)
   const Component: ElementType = as ?? "div"
+  const targetRef = useRef<HTMLElement | null>(null)
 
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setHasEntered(true)
-    }
-  }, [])
+  const { entered, reduceMotion } = useEntranceAnimation({
+    delayMs: onSeen ? delayMs : 0,
+    disabled,
+    minPosition,
+    onSeen,
+    targetRef
+  })
 
   const forwardedAnimationEnd = onAnimationEnd as
     | AnimationEventHandler<HTMLElement>
@@ -52,26 +65,32 @@ export function Entrance<T extends EntranceElement = "div">({
   const handleAnimationEnd = (event: AnimationEvent<HTMLElement>) => {
     forwardedAnimationEnd?.(event)
     if (event.target === event.currentTarget) {
-      setHasEntered(true)
+      setHasFinished(true)
     }
   }
 
+  const shouldAnimate =
+    !hasFinished && !reduceMotion && (onSeen ? entered : true)
+  const isHidden = onSeen && !entered && !hasFinished && !reduceMotion
+
   return createElement(Component, {
     ...props,
+    ...(onSeen ? { ref: targetRef } : {}),
     className: clsx(
       className,
-      !hasEntered && "animate-in motion-reduce:animate-none",
-      !hasEntered && animationClassName
+      isHidden && "opacity-0",
+      shouldAnimate && "animate-in motion-reduce:animate-none",
+      shouldAnimate && animationClassName
     ),
-    onAnimationEnd: hasEntered ? forwardedAnimationEnd : handleAnimationEnd,
-    style: hasEntered
-      ? style
-      : {
+    onAnimationEnd: shouldAnimate ? handleAnimationEnd : forwardedAnimationEnd,
+    style: shouldAnimate
+      ? {
           ...style,
-          animationDelay: `${delayMs}ms`,
+          animationDelay: `${onSeen ? 0 : delayMs}ms`,
           animationDuration: `${durationMs}ms`,
           animationFillMode: "backwards",
           animationTimingFunction: "ease-out"
         }
+      : style
   })
 }
