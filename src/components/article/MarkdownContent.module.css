@@ -1,8 +1,11 @@
 .content {
-  color: color-mix(in srgb, var(--color-foreground) 80%, transparent);
-  font-size: 1.125rem;
-  line-height: 1.75;
+  color: color-mix(in srgb, var(--color-foreground) 82%, transparent);
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  letter-spacing: -0.012em;
   min-width: 0;
+  font-variant-ligatures: common-ligatures;
+  hanging-punctuation: first allow-end;
 }
 
 .content > :first-child {
@@ -13,63 +16,123 @@
   margin-bottom: 0;
 }
 
-/* Headings */
+/* Headings — Swiss display construction: tight leading, negative tracking, rule-above */
 .content :is(h1, h2, h3, h4, h5, h6) {
   color: var(--color-foreground);
-  font-family: var(--font-title), serif;
+  font-family: var(--font-funnel), Helvetica, sans-serif;
   font-weight: 600;
-  line-height: 1.1;
-  margin-block: 1.75em 0.75em;
+  line-height: 0.98;
   text-wrap: pretty;
+  letter-spacing: -0.04em;
+  scroll-margin-top: 7rem;
 }
 
 .content h1 {
-  font-size: 3rem;
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.055em;
+  margin-block: 3.25em 0.85em;
+  line-height: 0.9;
 }
 
 .content h2 {
-  font-size: 2.25rem;
+  font-size: clamp(1.75rem, 3.2vw, 2.35rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 0.95;
+  margin-block: 3em 0.95em;
+  border-top: 1px solid
+    color-mix(in srgb, var(--color-foreground) 18%, transparent);
+  padding-top: 0.85em;
 }
 
 .content h3 {
-  font-size: 1.875rem;
+  font-size: clamp(1.35rem, 2.4vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  margin-block: 2.5em 0.75em;
 }
 
 .content h4 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-block: 2em 0.65em;
 }
 
 .content h5 {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  margin-block: 2em 0.6em;
 }
 
 .content h6 {
-  font-size: 1.125rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
+  margin-block: 1.75em 0.5em;
 }
 
 /* Body copy */
 .content p {
-  margin-block: 1.25em;
+  margin-block: 1.15em;
+  hyphens: auto;
+  hanging-punctuation: first;
+}
+
+.content p + p {
+  margin-block-start: 1.15em;
 }
 
 .content strong {
   color: var(--color-foreground);
-  font-weight: 600;
+  font-weight: 650;
+}
+
+.content em {
+  font-style: italic;
 }
 
 .content a {
   color: var(--color-klein);
   text-decoration-line: underline;
-  text-decoration-color: var(--color-klein);
-  text-underline-offset: 0.15em;
+  text-decoration-color: color-mix(
+    in srgb,
+    var(--color-klein) 55%,
+    transparent
+  );
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+  transition:
+    text-decoration-color 180ms ease,
+    color 180ms ease;
+}
+
+.content a:hover {
+  color: var(--color-foreground);
+  text-decoration-color: var(--color-foreground);
+}
+
+.content a:focus-visible {
+  outline: 2px solid var(--color-klein);
+  outline-offset: 2px;
+  text-decoration: none;
 }
 
 .content blockquote {
-  border-left: 0.25rem solid var(--color-magenta);
-  color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+  border-left: 2px solid var(--color-magenta);
+  color: color-mix(in srgb, var(--color-foreground) 68%, transparent);
   font-style: italic;
-  margin-block: 1.75em;
-  padding-left: 1em;
+  margin-block: 2em;
+  padding: 0.2em 0 0.2em 1.15em;
+  font-size: 1.02em;
+  line-height: 1.7;
 }
 
 .content blockquote > :first-child {
@@ -80,10 +143,10 @@
   margin-bottom: 0;
 }
 
-/* Lists */
+/* Lists — precise hanging markers, technical rhythm */
 .content :is(ul, ol) {
   margin-block: 1.25em;
-  padding-left: 1.625em;
+  padding-left: 1.45em;
 }
 
 .content ul {
@@ -99,12 +162,14 @@
 }
 
 .content li {
-  margin-block: 0.4em;
-  padding-left: 0.375em;
+  margin-block: 0.38em;
+  padding-left: 0.32em;
 }
 
 .content li::marker {
-  color: color-mix(in srgb, var(--color-foreground) 55%, transparent);
+  color: var(--color-klein);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.9em;
 }
 
 .content [class~="contains-task-list"],
@@ -116,27 +181,41 @@
   padding-left: 0;
 }
 
-.content [class~="task-list-item"] input[type="checkbox"] {
-  accent-color: var(--color-klein);
-  margin-right: 0.5em;
+.content [class~="task-list-item"] {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6em;
 }
 
-/* Code */
+.content [class~="task-list-item"] input[type="checkbox"] {
+  accent-color: var(--color-klein);
+  margin-top: 0.45em;
+  flex-shrink: 0;
+}
+
+/* Code — diegetic, high-contrast like Endfield diagnostic pane */
 .content :not(pre) > code {
   background: var(--color-foreground);
   color: var(--color-acid);
-  font-size: 0.875em;
-  padding: 0.125em 0.25em;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.82em;
+  letter-spacing: -0.01em;
+  padding: 0.14em 0.32em;
+  border-radius: 0;
+  font-weight: 500;
+  word-break: break-word;
 }
 
 .content pre {
   border-radius: 0;
-  font-size: 0.875rem;
+  font-size: 0.84rem;
   line-height: 1.7;
-  margin-block: 2em;
+  margin-block: 2.2em;
   overflow-x: auto;
-  padding: 1.25rem 1.5rem;
+  padding: 1.35rem 1.5rem;
   tab-size: 2;
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 12%, transparent);
+  /* shiki theme overrides bg, keep border as frame */
 }
 
 .content pre code {
@@ -145,48 +224,125 @@
   color: inherit;
   font-size: inherit;
   padding: 0;
+  font-family: var(--font-mono), monospace;
 }
 
-/* Media and separators */
+/* Media and separators — objective photography, hairline rules */
 .content img {
   display: block;
   height: auto;
-  margin-block: 2em;
+  margin-block: 2.2em;
   width: 100%;
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 10%, transparent);
 }
 
 .content hr {
   border: 0;
-  border-top: 1px solid #9ca3af;
-  margin-block: 3em;
+  border-top: 1px solid
+    color-mix(in srgb, var(--color-foreground) 14%, transparent);
+  margin-block: 3.25em;
+  position: relative;
 }
 
-/* Tables */
+.content hr::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 3.5rem;
+  height: 1px;
+  background: var(--color-klein);
+}
+
+/* Tables — HUD ledger, technical */
 .content table {
   border-collapse: collapse;
   display: block;
-  font-size: 0.95em;
-  margin-block: 2em;
+  font-size: 0.92em;
+  margin-block: 2.2em;
   overflow-x: auto;
   text-align: left;
   width: 100%;
+  border-top: 1px solid var(--color-foreground);
 }
 
 .content thead {
   border-bottom: 1px solid var(--color-foreground);
   color: var(--color-foreground);
+  background: color-mix(in srgb, var(--color-foreground) 4%, transparent);
+}
+
+.content thead th {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.82em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .content tr {
   border-bottom: 1px solid
-    color-mix(in srgb, var(--color-foreground) 25%, transparent);
+    color-mix(in srgb, var(--color-foreground) 14%, transparent);
+}
+
+.content tr:last-child {
+  border-bottom: 1px solid var(--color-foreground);
 }
 
 .content :is(th, td) {
-  padding: 0.6em 0.8em;
+  padding: 0.65em 0.85em;
   vertical-align: top;
 }
 
 .content th {
   font-weight: 600;
+}
+
+.content td {
+  color: color-mix(in srgb, var(--color-foreground) 80%, transparent);
+}
+
+/* Details/Summary —折迭 like technical drawer */
+.content details {
+  margin-block: 1.75em;
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 14%, transparent);
+  padding: 0.85em 1em;
+  background: color-mix(in srgb, var(--color-foreground) 2.5%, transparent);
+}
+
+.content summary {
+  cursor: pointer;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.9em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-klein);
+  list-style: none;
+}
+
+.content summary::-webkit-details-marker {
+  display: none;
+}
+
+.content summary::before {
+  content: "→ ";
+  display: inline-block;
+  transition: transform 160ms ease;
+}
+
+.content details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+/* Footnotes / small */
+.content small {
+  font-size: 0.88em;
+  line-height: 1.6;
+  color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
+}
+
+/* Selection inside prose */
+.content ::selection {
+  background: var(--color-magenta);
+  color: white;
 }

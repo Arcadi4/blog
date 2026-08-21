@@ -2,14 +2,13 @@ import { notFound } from "next/navigation"
 import { getAllPostSlugs, getPostData } from "@/lib/posts"
 import { formatDate } from "@/lib/utils"
 import { menuItems } from "@/app/posts/menuItems"
-import { EaseIn } from "@/components/animations/EaseIn"
-import { ScaleIn } from "@/components/animations/ScaleIn"
+import { Entrance } from "@/components/animations/Entrance"
 import { MarkdownContent } from "@/components/article/MarkdownContent"
+import { ArticleWheelNav, ReadingProgress, type TocItem } from "./PostClient"
 import { Menu } from "@/components/layout/Menu"
-import MarqueeCard from "@/components/MarqueeCard"
-import VerticalGrid from "@/components/VerticalGrid"
 import { Metadata } from "next"
-import { colorKlein } from "@/lib/colors"
+import Image from "next/image"
+import Link from "next/link"
 
 export const dynamicParams = false
 
@@ -44,14 +43,20 @@ export async function generateMetadata({
   }
 }
 
-const yearRampRows = [
-  { row: "row-start-1", weight: "font-light" },
-  { row: "row-start-2", weight: "font-normal" },
-  { row: "row-start-3", weight: "font-medium" }
-]
+const gridClassName = "grid grid-cols-12 gap-4 p-8"
 
-const titleType =
-  "font-title text-[clamp(3rem,8vw,9.5rem)] leading-[0.85] font-light tracking-[-0.06em] text-pretty"
+function slugifyHeading(input: string): string {
+  const stripped = input
+    .replace(/<[^>]+>/g, "")
+    .trim()
+    .toLowerCase()
+  return stripped
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\u4e00-\u9fff-]+/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 48)
+}
 
 export default async function Post({
   params
@@ -66,164 +71,258 @@ export default async function Post({
   }
 
   const edited = post.publishedAt.getTime() !== post.lastModifiedAt.getTime()
-  const year = String(post.publishedAt.getFullYear())
+
+  let toc: TocItem[] = []
+  let finalHtml = post.content
+  let headingCursor = 0
+
+  const withH2H3 = post.content.replace(
+    /<h([2-3])([^>]*)>([\s\S]*?)<\/h\1>/gi,
+    (full: string, levelStr: string, attrs: string, inner: string) => {
+      const label = inner
+        .replace(/<[^>]+>/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+      if (!label) return full
+      const base = slugifyHeading(label) || "section"
+      const id = `${base}-${headingCursor}`
+      toc.push({ id, label, level: Number(levelStr) })
+      headingCursor += 1
+      if (/id\s*=/.test(attrs)) return full
+      return `<h${levelStr}${attrs} id="${id}">${inner}</h${levelStr}>`
+    }
+  )
+
+  if (toc.length > 0) {
+    finalHtml = withH2H3
+  } else {
+    let h1Cursor = 0
+    const h1Toc: TocItem[] = []
+    const withH1 = post.content.replace(
+      /<h1([^>]*)>([\s\S]*?)<\/h1>/gi,
+      (full: string, attrs: string, inner: string) => {
+        const label = inner
+          .replace(/<[^>]+>/g, "")
+          .replace(/\s+/g, " ")
+          .trim()
+        if (!label) return full
+        const base = slugifyHeading(label) || "section"
+        const id = `${base}-${h1Cursor}`
+        h1Toc.push({ id, label, level: 1 })
+        h1Cursor += 1
+        if (/id\s*=/.test(attrs)) return full
+        return `<h1${attrs} id="${id}">${inner}</h1>`
+      }
+    )
+    if (h1Toc.length > 0) {
+      toc = h1Toc
+      finalHtml = withH1
+    }
+  }
 
   return (
-    <main id="top" className="relative overflow-x-clip">
-      {/* Hero */}
-      <section className="relative grid h-[60dvh] w-dvw grid-cols-12 grid-rows-3 gap-x-4 gap-y-4 px-8 pt-8">
-        {/* Color Block */}
-        <ScaleIn
-          from="top"
-          className="-z-10 col-span-6 col-start-1 row-span-4 row-start-1 -mt-8 -ml-8 bg-klein"
-        />
+    <main
+      id="top"
+      className="relative isolate min-h-dvh overflow-x-clip bg-background text-foreground"
+    >
+      <ReadingProgress />
+      <ArticleWheelNav items={toc} />
 
-        {/* Guidelines */}
-        <ScaleIn
-          from="top"
-          delayMs={100}
-          className="separator absolute inset-0 -z-10 col-span-1 col-start-7 border-r"
-        />
-
-        {/* Corner text */}
-        <p className="col-start-1 row-start-1 leading-none whitespace-pre-line text-background">
-          {"https://\nblog.\narcadia\n.moe"}
-        </p>
-
-        {/* Menu */}
-        <aside className="z-50 col-span-full col-start-10 row-start-1">
-          <Menu
-            items={menuItems}
-            linkClassName="font-title text-4xl leading-none"
-            delayMs={100}
-            delayStepMs={100}
-          />
-        </aside>
-
-        {/* Year weight ramp */}
-        {yearRampRows.map((item, index) => (
-          <EaseIn
-            key={item.row}
-            from="up"
-            delayMs={100 * index}
-            className={`col-start-8 ${item.row} ${item.weight} self-start text-2xl text-trim-cap leading-none tracking-[-0.06em] select-none`}
-          >
-            <span>{year}</span>
-          </EaseIn>
-        ))}
-
-        {/* Title: solid over magenta-stroke echo */}
-        <EaseIn
-          from="up"
-          distance="lg"
-          delayMs={200}
-          className="col-span-5 col-start-2 row-span-3 row-start-1 self-end"
+      {/* Hero — short Swiss, banner as main visual below */}
+      <section
+        aria-labelledby="post-title"
+        className={`${gridClassName} relative`}
+      >
+        <Entrance
+          animationClassName="fade-in slide-in-from-left-4"
+          as="header"
+          className="col-span-4 col-start-1 row-start-1 self-start"
+          durationMs={500}
         >
-          <h1 className={`${titleType} relative font-bold text-background`}>
+          <Link
+            className="font-funnel-display text-4xl leading-none tracking-[-0.04em] transition-colors hover:text-klein focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-klein"
+            href="/"
+          >
+            @4rcadia
+          </Link>
+        </Entrance>
+
+        <nav
+          aria-label="Primary"
+          className="col-span-3 col-start-9 row-span-1 row-start-1 self-start justify-self-end max-md:col-span-5 max-md:col-start-8"
+        >
+          <Menu
+            items={menuItems.filter((item) => item.href !== "/all")}
+            className="flex flex-col items-end font-funnel-display text-4xl leading-none max-md:text-3xl"
+            delayMs={240}
+            delayStepMs={55}
+          />
+        </nav>
+
+        <Entrance
+          animationClassName="fade-in slide-in-from-bottom-4"
+          as="div"
+          className="col-span-7 col-start-2 row-start-2 mt-8 self-end max-md:col-span-full max-md:col-start-1 max-md:mt-8"
+          delayMs={160}
+          durationMs={700}
+        >
+          <h1
+            id="post-title"
+            className="font-funnel-display text-[clamp(2.8rem,6vw,5.2rem)] leading-[0.88] font-medium tracking-[-0.06em] text-pretty"
+          >
             {post.title}
           </h1>
-        </EaseIn>
+        </Entrance>
 
-        {/* Rotated slug */}
-        <p className="col-start-12 row-span-2 row-start-2 self-center justify-self-end font-mono text-xs leading-none text-klein select-none [writing-mode:vertical-rl]">
-          /posts/{post.id}
-        </p>
-
-        {/* Metadata */}
-        <div className="col-span-3 col-start-9 row-span-2 row-start-3 self-end text-lg leading-tight">
-          <EaseIn from="left" delayMs={300}>
-            <p>
-              <span className="text-klein">{"{published}"}</span>
-              <br />
-              {formatDate(post.publishedAt)}
-            </p>
-          </EaseIn>
+        <div className="col-span-6 col-start-2 row-start-3 mt-3 flex flex-wrap gap-x-6 gap-y-2 self-start text-sm leading-tight max-md:col-span-full max-md:col-start-1">
+          <span>
+            <span className="text-foreground/45">Published</span>{" "}
+            {formatDate(post.publishedAt)}
+          </span>
           {edited && (
-            <EaseIn from="left" delayMs={400}>
-              <p className="mt-4">
-                <span className="text-klein">{"{last revision}"}</span>
-                <br />
-                {formatDate(post.lastModifiedAt)}
-              </p>
-            </EaseIn>
+            <span>
+              <span className="text-foreground/45">Revised</span>{" "}
+              {formatDate(post.lastModifiedAt)}
+            </span>
           )}
           {post.tags.length > 0 && (
-            <EaseIn from="left" delayMs={500}>
-              <p className="mt-4">
-                <span className="text-klein">{"{tags}"}</span>
-                <br />
-                {post.tags.map((tag) => `#${tag}`).join(" ")}
-              </p>
-            </EaseIn>
-          )}
-          {post.excerpt && (
-            <EaseIn from="left" delayMs={600}>
-              <p className="mt-4">
-                <span className="text-klein">{"{abstract}"}</span>
-                <br />
-                {post.excerpt}
-              </p>
-            </EaseIn>
+            <span>
+              {post.tags.map((tag) => (
+                <span key={tag} className="mr-2 last:mr-0">
+                  + {tag}
+                </span>
+              ))}
+            </span>
           )}
         </div>
-
-        {/* Scroll hint */}
-        <span className="col-start-12 row-start-3 self-end justify-self-end font-funnel-display text-5xl leading-none text-klein">
-          ↓↓
-        </span>
       </section>
 
-      {/* Body */}
-      <section className="relative grid w-dvw grid-cols-12 gap-x-4 px-8">
-        <div className="absolute inset-0 -z-10">
-          <VerticalGrid className="h-full" />
+      {post.banner ? (
+        <section className={`${gridClassName} pt-0`}>
+          <Entrance
+            animationClassName="fade-in slide-in-from-bottom-4"
+            as="div"
+            className="col-span-10 col-start-2 overflow-hidden border border-foreground/10 max-md:col-span-full max-md:col-start-1"
+            delayMs={220}
+            durationMs={700}
+            onSeen
+          >
+            <div className="relative aspect-[21/9] max-h-[28vh] w-full overflow-hidden bg-[#ececec]">
+              <Image
+                src={post.banner}
+                alt={post.title}
+                fill
+                className="object-cover"
+                sizes="(min-width: 1024px) 80vw, 100vw"
+                priority={false}
+              />
+            </div>
+          </Entrance>
+        </section>
+      ) : null}
+
+      {/* Body — 12-col reading grid, generous whitespace */}
+      <section className="grid grid-cols-12 gap-4 px-8 py-12 max-md:px-6 max-md:py-10">
+        {/* Mobile TOC */}
+        <details className="group col-span-full lg:hidden">
+          <summary className="flex cursor-pointer list-none items-center justify-between border-y border-foreground py-3">
+            <span className="text-sm tracking-[-0.02em]">
+              Contents — {toc.length}
+            </span>
+            <span className="text-lg leading-none transition-transform group-open:rotate-45">
+              +
+            </span>
+          </summary>
+          <ol className="mt-4 grid gap-2">
+            {toc.length === 0 ? (
+              <li className="text-sm text-foreground/40">
+                No sections — linear reading.
+              </li>
+            ) : (
+              toc.map((item, i) => (
+                <li
+                  key={item.id}
+                  className="flex gap-3 border-b border-foreground/10 py-2 last:border-0"
+                >
+                  <span className="text-sm text-foreground/30">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <a
+                    href={`#${item.id}`}
+                    className="font-funnel-display text-sm leading-tight tracking-[-0.01em] hover:text-klein"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            )}
+          </ol>
+        </details>
+
+        {/* Center prose */}
+        <div className="col-span-12 lg:col-span-6 lg:col-start-4">
+          {post.excerpt && (
+            <Entrance
+              animationClassName="fade-in slide-in-from-bottom-4"
+              as="div"
+              className="mb-10 border-y border-foreground py-6"
+              delayMs={120}
+              durationMs={600}
+              onSeen
+            >
+              <p className="font-funnel-display text-[clamp(1.25rem,2.2vw,1.75rem)] leading-[1.15] tracking-[-0.02em] text-pretty">
+                {post.excerpt}
+              </p>
+            </Entrance>
+          )}
+
+          <Entrance
+            animationClassName="fade-in slide-in-from-bottom-2"
+            as="div"
+            className="min-w-0"
+            delayMs={80}
+            durationMs={650}
+            onSeen
+          >
+            <MarkdownContent className="min-w-0" html={finalHtml} />
+          </Entrance>
         </div>
-
-        <ScaleIn
-          from="right"
-          className="separator col-span-full row-start-1 -mx-8 border-t"
-        />
-
-        <aside className="z-20 col-span-2 col-start-1 row-start-2 pt-16">
-          <div className="sticky top-8 font-mono text-sm leading-tight">
-            <p className="text-klein">{"{path}"}</p>
-            <p className="break-all">/posts/{post.id}</p>
-          </div>
-        </aside>
-
-        <MarkdownContent
-          className="col-span-8 col-start-3 row-start-2 py-16"
-          html={post.content}
-        />
       </section>
 
       {/* End */}
-      <section className="relative grid w-dvw grid-cols-12 grid-rows-1 gap-x-4 px-8">
-        <div className="separator absolute top-0 z-10 w-dvw border-t" />
+      <section className="grid grid-cols-12 gap-4 border-t border-foreground/15 p-8">
+        <div className="col-span-7 col-start-1 flex items-center gap-3 self-center max-md:col-span-full">
+          <span
+            className="hidden h-px flex-1 bg-foreground/10 md:block"
+            aria-hidden
+          />
+          <p className="text-xs tracking-[-0.01em] text-foreground/30">
+            end of transmission
+          </p>
+        </div>
 
-        <ScaleIn durationMs={1000} from="left" onSeen minPosition={5}>
-          <MarqueeCard className="col-span-7 col-start-1 row-start-1 -ml-8 h-32 bg-acid">
-            end of transmission end of transmission end of transmission
-          </MarqueeCard>
-        </ScaleIn>
-
-        <nav className="z-50 col-span-full col-start-8 row-start-1 self-center">
+        <nav
+          aria-label="Post navigation"
+          className="col-span-5 col-start-8 flex flex-col items-end gap-1 self-center max-md:col-span-full max-md:items-start"
+        >
           <Menu
             items={[
               { name: "Back to home", href: "/" },
               { name: "All posts", href: "/all" }
             ]}
-            itemClassName="font-funnel-display text-6xl leading-none"
+            className="flex flex-col items-end max-md:items-start"
+            linkClassName="font-funnel-display text-4xl leading-none tracking-[-0.03em] hover:text-klein max-md:text-3xl"
             prefix="← "
-            shadowColor={colorKlein}
+            delayMs={120}
+            delayStepMs={80}
           />
+          <Link
+            href="#top"
+            className="mt-2 text-xs tracking-[-0.01em] text-foreground/40 underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-klein"
+          >
+            ↑ back to top
+          </Link>
         </nav>
-
-        <ScaleIn
-          from="right"
-          onSeen
-          className="separator col-span-full row-start-2 -mx-8 border-t"
-        />
       </section>
     </main>
   )
