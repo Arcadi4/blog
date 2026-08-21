@@ -1,3 +1,5 @@
+"use client"
+
 import { useHomeSlideState } from "@/components/home/HomeSlideDeck"
 import { motion, useReducedMotion } from "motion/react"
 import { createElement, useState } from "react"
