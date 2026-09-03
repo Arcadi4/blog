@@ -1,6 +1,4 @@
 "use client"
-
-import clsx from "clsx"
 import { createElement, useRef, useState } from "react"
 import type {
   AnimationEvent,
@@ -11,6 +9,7 @@ import type {
 } from "react"
 import type { EntranceSeenOptions } from "./useEntranceAnimation"
 import { useEntranceAnimation } from "./useEntranceAnimation"
+import { clsx } from "cn"
 
 type EntranceElement = keyof HTMLElementTagNameMap & keyof JSX.IntrinsicElements
 
