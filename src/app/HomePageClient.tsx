@@ -49,10 +49,11 @@ export function HomePageClient({ articles }: HomePageClientProps) {
         </SceneReveal>
 
         <SceneReveal direction="left" distance="far" durationMs={980}>
-          <p className="col-span-7 col-start-4 row-span-3 row-start-3 self-center font-funnel-display text-5xl text-trim-cap leading-none text-klein">
-            studying <span className="text-black">applied mathematics</span>;
+          <p className="col-span-7 col-start-4 row-span-3 row-start-3 self-center font-funnel-display text-4xl text-trim-cap leading-none text-klein">
+            studying <span className="text-black">mathematics</span>;
             <br />
-            i am a <span className="text-black">full stack dev</span>;
+            i am (becoming) a <span className="text-black">full stack dev</span>
+            ;
             <br />
             hobbyist <span className="text-black">graphical designer</span>;
             <br />
@@ -62,7 +63,17 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             </span>
             , and more;
             <br />
-            fan of <span className="text-black">j-pop band ZUTOMAYO</span>;
+            fan of{" "}
+            <span className="text-black">
+              j-pop band{" "}
+              <Link
+                className="underline"
+                href="https://open.spotify.com/artist/38WbKH6oKAZskBhqDFA8Uj"
+              >
+                ZUTOMAYO
+              </Link>
+            </span>
+            ;
           </p>
         </SceneReveal>
 
