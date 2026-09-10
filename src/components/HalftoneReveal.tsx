@@ -301,7 +301,7 @@ const HalftoneReveal = ({
     // via `/_next/image?url=&w=&q=` to serve a DPR-aware, format-negotiated
     // variant (see public/banners: 2–3.5 MB originals -> ~30–80 KB at 640w).
     // Remote URLs are fetched directly to avoid 400s when remotePatterns
-    // isn't configured (Notion S3 hosts vary; DEFAULT_SRC is external).
+    // isn't configured (article images live on arbitrary hosts).
     if (!isStaticImport && rawSrc.startsWith("/") && !rawSrc.startsWith("//")) {
       try {
         const dpr = Math.min(window.devicePixelRatio || 1, 2)

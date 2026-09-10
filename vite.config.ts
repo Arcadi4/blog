@@ -23,6 +23,7 @@ export default defineConfig({
       "next-env.d.ts",
       "src/generated/**",
       "public/banners/**",
+      "content/**",
       "AGENTS.md"
     ]
   },

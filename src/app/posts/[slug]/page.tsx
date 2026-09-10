@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation"
-import { getAllPostSlugs, getPostData } from "@/lib/posts"
+import { getArticle, getArticles } from "@/lib/content"
 import { formatDate } from "@/lib/utils"
 import { menuItems } from "@/app/posts/menuItems"
 import { Entrance } from "@/components/animations/Entrance"
 import { MarkdownContent } from "@/components/article/MarkdownContent"
-import { ArticleWheelNav, ReadingProgress, type TocItem } from "./PostClient"
+import { ArticleWheelNav, ReadingProgress } from "./PostClient"
 import { Menu } from "@/components/layout/Menu"
 import { Metadata } from "next"
 import Image from "next/image"
@@ -13,9 +13,8 @@ import Link from "next/link"
 export const dynamicParams = false
 
 export async function generateStaticParams() {
-  const posts = await getAllPostSlugs()
-  return posts.map((post) => ({
-    slug: post.slug
+  return getArticles().map((article) => ({
+    slug: article.slug
   }))
 }
 
@@ -25,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const post = await getPostData(slug)
+  const post = getArticle(slug)
 
   if (!post) {
     return {
@@ -45,80 +44,20 @@ export async function generateMetadata({
 
 const gridClassName = "grid grid-cols-12 gap-4 p-8"
 
-function slugifyHeading(input: string): string {
-  const stripped = input
-    .replace(/<[^>]+>/g, "")
-    .trim()
-    .toLowerCase()
-  return stripped
-    .replace(/\s+/g, "-")
-    .replace(/[^\w\u4e00-\u9fff-]+/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 48)
-}
-
 export default async function Post({
   params
 }: {
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const post = await getPostData(slug)
+  const post = getArticle(slug)
 
   if (!post) {
     notFound()
   }
 
-  const edited = post.publishedAt.getTime() !== post.lastModifiedAt.getTime()
-
-  let toc: TocItem[] = []
-  let finalHtml = post.content
-  let headingCursor = 0
-
-  const withH2H3 = post.content.replace(
-    /<h([2-3])([^>]*)>([\s\S]*?)<\/h\1>/gi,
-    (full: string, levelStr: string, attrs: string, inner: string) => {
-      const label = inner
-        .replace(/<[^>]+>/g, "")
-        .replace(/\s+/g, " ")
-        .trim()
-      if (!label) return full
-      const base = slugifyHeading(label) || "section"
-      const id = `${base}-${headingCursor}`
-      toc.push({ id, label, level: Number(levelStr) })
-      headingCursor += 1
-      if (/id\s*=/.test(attrs)) return full
-      return `<h${levelStr}${attrs} id="${id}">${inner}</h${levelStr}>`
-    }
-  )
-
-  if (toc.length > 0) {
-    finalHtml = withH2H3
-  } else {
-    let h1Cursor = 0
-    const h1Toc: TocItem[] = []
-    const withH1 = post.content.replace(
-      /<h1([^>]*)>([\s\S]*?)<\/h1>/gi,
-      (full: string, attrs: string, inner: string) => {
-        const label = inner
-          .replace(/<[^>]+>/g, "")
-          .replace(/\s+/g, " ")
-          .trim()
-        if (!label) return full
-        const base = slugifyHeading(label) || "section"
-        const id = `${base}-${h1Cursor}`
-        h1Toc.push({ id, label, level: 1 })
-        h1Cursor += 1
-        if (/id\s*=/.test(attrs)) return full
-        return `<h1${attrs} id="${id}">${inner}</h1>`
-      }
-    )
-    if (h1Toc.length > 0) {
-      toc = h1Toc
-      finalHtml = withH1
-    }
-  }
+  const edited = post.publishDate.getTime() !== post.lastEditedTime.getTime()
+  const toc = post.toc
 
   return (
     <main
@@ -177,12 +116,12 @@ export default async function Post({
         <div className="col-span-6 col-start-2 row-start-3 mt-3 flex flex-wrap gap-x-6 gap-y-2 self-start text-sm leading-tight max-md:col-span-full max-md:col-start-1">
           <span>
             <span className="text-foreground/45">Published</span>{" "}
-            {formatDate(post.publishedAt)}
+            {formatDate(post.publishDate)}
           </span>
           {edited && (
             <span>
               <span className="text-foreground/45">Revised</span>{" "}
-              {formatDate(post.lastModifiedAt)}
+              {formatDate(post.lastEditedTime)}
             </span>
           )}
           {post.tags.length > 0 && (
@@ -284,7 +223,7 @@ export default async function Post({
             durationMs={650}
             onSeen
           >
-            <MarkdownContent className="min-w-0" html={finalHtml} />
+            <MarkdownContent className="min-w-0" code={post.content} />
           </Entrance>
         </div>
       </section>

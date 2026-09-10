@@ -1,0 +1,49 @@
+---
+title: "基于tmux socket的协作Minecraft服务器管理"
+slug: "minecraft-server-management"
+excerpt: "通过tmux套接字共享terminal来和多个不同用户协作管理服务器，并且安全地管理权限。"
+publishDate: "2026-05-01T00:00:00.000Z"
+lastEditedTime: "2026-08-20T07:06:00.000Z"
+locale: "zh-CN"
+tags:
+  - "Minecraft"
+  - "Linux"
+banner: "/banners/minecraft-server-management.jpg"
+---
+
+可能听起来是一个小众的需求，但这个方案很可能会对你的服务器管理或者是搭建任何其他Linux工作流有所启发。
+# 目标
+这个方案旨在：
+- 多人协作管理服务器，并确保权限安全
+- 尽可能长时间的无人值守运行
+- 不使用图形界面（远程桌面）来确保在最差的网络环境下的可访问性
+- 使协作者的操作尽可能方便并且不要求过多技术背景，将多数维护压力转嫁到你身上
+# 工具列表
+环境和工具：
+- Linux平台
+	- 用Windows也可以。但是可能会在部分工具的兼容性和权限管理方面遇到一些问题。而且Windows命令行体验和生态总体来说不如Linux。
+	- [使用哪个linux发行版](https://www.bilibili.com/video/BV1bi29BnEX9/)？这可能取决于你的自我意识、原生家庭、智力水平、精神卫生情况、亚文化圈子、音乐品味、MBTI甚至性取向。对于一个较为正常的人我可能会推荐Ubuntu、Rocky Linux或者Linux Mint。
+- [`tmux`](https://www.ruanyifeng.com/blog/2019/10/tmux.html)
+	-
+	- tmux在这里起到的功能很多，将在下文中详细解释
+- [`frp`](https://github.com/fatedier/frp?tab=readme-ov-file) \~ 公网访问
+	- 最理想的情况当然是你自己有一个独立公网IP。
+	- IPv6也是一个可选项。但是目前中国大陆大部分家庭宽带的IPv6需要手动配置，公共场合的共享Wi-Fi则多数不支持IPv6。不过配置IPv6仍然是一个不错的选项，在环境支持时使用IPv6直接访问可以避免消耗你的frp服务商流量，而且可能速度更快。
+- `ssh` \~ 远程访问
+- `systemd` \~ 系统服务管理
+一些推荐的工具，可选：
+- 一个域名
+- 系统级备份工具
+	- 重要性不言而喻
+	- 大部分发行版都会自带
+- `fzf` \~ 命令行搜索
+- `yazi` \~ 命令行文件管理
+- `netdata` \~ 性能监测
+- 远程桌面工具
+	- 通常不使用，可以作为frp失效时的备份访问手段，避免完全失联。
+	- （本文暂时未收到任何赞助费）ToDesk、TeamViewer、向日葵、etc.
+- `git`
+	- 备份、同步、和记录服务器的配置文件更改
+	- 给Minecraft服务器写 `.gitignore` 会很麻烦
+	- 别把存档、服务端、模组/插件或者其他任何二进制文件传上去！！！
+# 结构

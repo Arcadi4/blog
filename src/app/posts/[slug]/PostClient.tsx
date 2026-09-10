@@ -3,12 +3,7 @@
 import { useEffect, useState } from "react"
 import OptionWheel from "@/components/OptionWheel"
 import { colorMagenta } from "@/lib/colors"
-
-export type TocItem = {
-  readonly id: string
-  readonly label: string
-  readonly level: number
-}
+import type { TocItem } from "@/lib/toc"
 
 export function ReadingProgress() {
   const [progress, setProgress] = useState(0)

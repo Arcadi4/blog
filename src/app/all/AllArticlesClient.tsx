@@ -13,7 +13,7 @@ import {
   InputGroupText
 } from "@/components/ui/input-group"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import type { ContentArticle } from "@/lib/content-index"
+import type { ArticleMeta } from "@/lib/content"
 import { formatDate } from "@/lib/utils"
 import { Toggle } from "@/components/ui/toggle"
 import HalftoneReveal from "@/components/HalftoneReveal"
@@ -21,11 +21,11 @@ import { colorAcid, colorKlein, colorMagenta } from "@/lib/colors"
 import OptionWheel from "@/components/OptionWheel"
 
 type AllArticlesClientProps = {
-  readonly articles: readonly ContentArticle[]
+  readonly articles: readonly ArticleMeta[]
 }
 
 type ArchiveArticleProps = {
-  readonly article: ContentArticle
+  readonly article: ArticleMeta
   readonly hidden: boolean
   readonly index: number
   readonly selectedTags: ReadonlySet<string>
@@ -136,13 +136,6 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
   const [wheelEntering, setWheelEntering] = useState(false)
   const [selectedWheelIndex, setSelectedWheelIndex] = useState(0)
 
-  const orderedArticles = useMemo(
-    () =>
-      articles.toSorted(
-        (a, b) => b.publishDate.valueOf() - a.publishDate.valueOf()
-      ),
-    [articles]
-  )
   const tags = useMemo(
     () =>
       Array.from(new Set(articles.flatMap((article) => article.tags))).sort(),
@@ -150,7 +143,7 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
   )
   const search = useMemo(
     () =>
-      new Fuse(orderedArticles, {
+      new Fuse(articles, {
         ignoreLocation: true,
         keys: [
           { name: "title", weight: 0.5 },
@@ -160,22 +153,22 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
         ],
         threshold: 0.35
       }),
-    [orderedArticles]
+    [articles]
   )
 
   const visibleArticles = useMemo(() => {
     const normalizedQuery = query.trim()
     const candidates = normalizedQuery
       ? search.search(normalizedQuery).map(({ item }) => item)
-      : orderedArticles
+      : articles
 
     return candidates.filter((article) =>
       selectedTags.every((tag) => article.tags.includes(tag))
     )
-  }, [orderedArticles, query, search, selectedTags])
+  }, [articles, query, search, selectedTags])
   const selectedTagSet = useMemo(() => new Set(selectedTags), [selectedTags])
-  const visibleArticleIds = useMemo(
-    () => new Set(visibleArticles.map((article) => article.id)),
+  const visibleArticleSlugs = useMemo(
+    () => new Set(visibleArticles.map((article) => article.slug)),
     [visibleArticles]
   )
   const slugs = useMemo(
@@ -385,12 +378,12 @@ export function AllArticlesClient({ articles }: AllArticlesClientProps) {
         </div>
 
         <div className="flex flex-col gap-16">
-          {orderedArticles.map((article, index) => (
+          {articles.map((article, index) => (
             <ArchiveArticle
               article={article}
-              hidden={!visibleArticleIds.has(article.id)}
+              hidden={!visibleArticleSlugs.has(article.slug)}
               index={index}
-              key={article.id}
+              key={article.slug}
               selectedTags={selectedTagSet}
             />
           ))}

@@ -1,8 +1,6 @@
-import { getPublicArticles } from "@/lib/content-index"
+import { getArticles } from "@/lib/content"
 import { HomePageClient } from "./HomePageClient"
 
-export default async function Home() {
-  const articles = await getPublicArticles()
-
-  return <HomePageClient articles={articles} />
+export default function Home() {
+  return <HomePageClient articles={getArticles()} />
 }

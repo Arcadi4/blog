@@ -5,20 +5,18 @@ import { SceneReveal } from "@/components/animations/SceneReveal"
 import { HomeSlideDeck } from "@/components/home/HomeSlideDeck"
 import { SceneGrid } from "@/components/home/SceneGrid"
 import { Barcode } from "@/components/signal/Barcode"
-import type { ContentArticle } from "@/lib/content-index"
+import type { ArticleMeta } from "@/lib/content"
 import Link from "next/link"
 import ProximityLink from "@/components/proximity/ProximityLink"
 import Image from "next/image"
 import { formatDate } from "@/lib/utils"
 
 type HomePageClientProps = {
-  readonly articles: readonly ContentArticle[]
+  readonly articles: readonly ArticleMeta[]
 }
 
 export function HomePageClient({ articles }: HomePageClientProps) {
-  const latestArticles = articles
-    .toSorted((a, b) => b.publishDate.valueOf() - a.publishDate.valueOf())
-    .slice(0, 3)
+  const latestArticles = articles.slice(0, 3)
   const labels = [
     "Home",
     "Nav",
@@ -173,7 +171,7 @@ export function HomePageClient({ articles }: HomePageClientProps) {
       </SceneGrid>
 
       {latestArticles.map((article, index) => (
-        <SceneGrid as="article" rows={8} gridLines="none" key={article.id}>
+        <SceneGrid as="article" rows={8} gridLines="none" key={article.slug}>
           <ScenePersistentElement
             name="primary-panel"
             transition={{
@@ -250,7 +248,6 @@ export function HomePageClient({ articles }: HomePageClientProps) {
             <Link
               aria-label={article.title}
               href={`/posts/${article.slug}`}
-              key={article.id}
               className="group relative col-span-full row-start-6 grid grid-cols-subgrid"
             >
               <div className="absolute inset-0 -z-10 col-span-8 col-start-2 -my-4 origin-left bg-acid transition-all duration-500 ease-[cubic-bezier(.76,0,.24,1)] group-hover:scale-x-[1.05] group-hover:bg-klein group-focus-visible:scale-x-[1.05] motion-reduce:transition-none" />
