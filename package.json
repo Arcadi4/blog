@@ -25,10 +25,10 @@
     "fuse.js": "^7.5.0",
     "geist": "^1.7.2",
     "katex": "^0.18.7",
-    "lucide-react": "^1.45.0",
+    "lucide-react": "^1.47.0",
     "mdast-util-gfm-footnote": "^2.1.0",
     "micromark-extension-gfm-footnote": "^2.1.0",
-    "motion": "^13.2.0",
+    "motion": "^13.4.0",
     "next": "16.3.5",
     "ogl": "^1.0.11",
     "react": "19.3.0",
@@ -44,14 +44,14 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
     "@types/mdast": "^4.0.4",
-    "@types/node": "^26.5.1",
+    "@types/node": "^26.6.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "shadcn": "^4.21.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "velite": "^0.4.0",
-    "vite-plus": "^0.3.1"
+    "vite-plus": "^0.3.2"
   },
   "packageManager": "pnpm@12.3.4"
 }
