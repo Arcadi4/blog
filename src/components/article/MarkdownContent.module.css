@@ -343,6 +343,21 @@
   color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
 }
 
+.content [data-footnotes] {
+  margin-block: 2.2em;
+  font-size: 0.88em;
+}
+
+/* The generated endnote label is meant for assistive tech only */
+.content [data-footnotes] h2 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* Selection inside prose */
 .content ::selection {
   background: var(--color-magenta);

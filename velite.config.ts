@@ -1,7 +1,23 @@
 import rehypeShikiFromHighlighter from "@shikijs/rehype/core"
 import { createHighlighter } from "shiki"
 import { defineConfig, s } from "velite"
+import { gfmFootnote } from "micromark-extension-gfm-footnote"
+import { gfmFootnoteFromMarkdown } from "mdast-util-gfm-footnote"
+import type { Plugin } from "unified"
 import { parseToc, remarkHeadingAnchors, type TocItem } from "./src/lib/toc"
+
+/**
+ * remark-gfm omits footnotes, so the official GFM footnote extensions are
+ * wired in directly; MDX's mdast-util-to-hast pass renders the endnote
+ * section and the reference/backref links from the resulting nodes.
+ */
+const remarkFootnotes: Plugin = function () {
+  const data = this.data()
+  data.micromarkExtensions ??= []
+  data.micromarkExtensions.push(gfmFootnote())
+  data.fromMarkdownExtensions ??= []
+  data.fromMarkdownExtensions.push(gfmFootnoteFromMarkdown())
+}
 
 const highlighter = await createHighlighter({
   themes: ["one-dark-pro"],
@@ -37,7 +53,7 @@ export default defineConfig({
         banner: s.string().optional(),
         toc,
         content: s.mdx({
-          remarkPlugins: [remarkHeadingAnchors],
+          remarkPlugins: [remarkHeadingAnchors, remarkFootnotes],
           rehypePlugins: [
             [
               rehypeShikiFromHighlighter,
