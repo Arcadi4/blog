@@ -1,4 +1,6 @@
 import rehypeShikiFromHighlighter from "@shikijs/rehype/core"
+import rehypeKatex from "rehype-katex"
+import remarkMath from "remark-math"
 import { createHighlighter } from "shiki"
 import { defineConfig, s } from "velite"
 import { gfmFootnote } from "micromark-extension-gfm-footnote"
@@ -53,8 +55,12 @@ export default defineConfig({
         banner: s.string().optional(),
         toc,
         content: s.mdx({
-          remarkPlugins: [remarkHeadingAnchors, remarkFootnotes],
+          remarkPlugins: [remarkHeadingAnchors, remarkFootnotes, remarkMath],
           rehypePlugins: [
+            // KaTeX must run before Shiki: block math reaches rehype as
+            // pre > code.language-math, which Shiki would otherwise highlight
+            // as plaintext before rehypeKatex can claim it.
+            [rehypeKatex, { output: "htmlAndMathml" }],
             [
               rehypeShikiFromHighlighter,
               highlighter,

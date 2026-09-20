@@ -9,6 +9,7 @@ import { Menu } from "@/components/layout/Menu"
 import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
+import "katex/dist/katex.min.css"
 
 export const dynamicParams = false
 
