@@ -307,12 +307,12 @@
 /* Details/Summary —折迭 like technical drawer */
 .content details {
   margin-block: 1.75em;
-  border: 1px solid color-mix(in srgb, var(--color-foreground) 14%, transparent);
-  padding: 0.85em 1em;
-  background: color-mix(in srgb, var(--color-foreground) 2.5%, transparent);
 }
 
 .content summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
   cursor: pointer;
   font-family: var(--font-mono), monospace;
   font-size: 0.9em;
@@ -326,14 +326,37 @@
   display: none;
 }
 
+/* Chip-mounted plus collapses to minus when open — reads as a control,
+   never as a stray glyph */
 .content summary::before {
-  content: "→ ";
-  display: inline-block;
-  transition: transform 160ms ease;
+  content: "";
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background-color: color-mix(in srgb, currentColor 8%, transparent);
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size:
+    12px 1.5px,
+    1.5px 12px;
+  transition:
+    background-size 160ms ease,
+    background-color 160ms ease;
+}
+
+.content summary:hover::before {
+  background-color: color-mix(in srgb, currentColor 14%, transparent);
 }
 
 .content details[open] summary::before {
-  transform: rotate(90deg);
+  background-size:
+    12px 1.5px,
+    1.5px 0;
+  background-color: color-mix(in srgb, currentColor 12%, transparent);
 }
 
 /* Footnotes / small */
