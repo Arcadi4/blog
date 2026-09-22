@@ -38,7 +38,7 @@ export interface DisplacementOptions {
 }
 
 export interface DisplacementElements {
-  /** Canvas with layoutsubtree that hosts the HTML content. */
+  /** Canvas with content="drawable" (or layoutsubtree) that hosts the HTML content. */
   source: HTMLCanvasElement
   /** The element inside the source canvas that gets captured. */
   content: HTMLElement
@@ -650,7 +650,8 @@ export function Displacement({
     <div className={className} style={{ position: "relative", ...style }}>
       <canvas
         ref={sourceRef}
-        // @ts-expect-error experimental html-in-canvas attribute
+        content="drawable"
+        // @ts-expect-error backwards compatibility with earlier origin trial builds
         layoutsubtree="true"
         suppressHydrationWarning
         style={
@@ -662,6 +663,8 @@ export function Displacement({
         {native ? (
           <div
             ref={contentRef}
+            // @ts-expect-error experimental html-in-canvas attribute
+            drawable=""
             className={contentClassName}
             style={{
               position: "relative",
