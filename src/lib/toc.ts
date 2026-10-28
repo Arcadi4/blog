@@ -14,16 +14,10 @@ type HeadingData = {
 }
 
 function textOf(node: RootContent): string {
+  if (node.type === "html") return ""
   if ("value" in node && typeof node.value === "string") return node.value
   if ("children" in node) return node.children.map(textOf).join("")
   return ""
-}
-
-function labelOf(node: Heading): string {
-  return textOf(node)
-    .replace(/<[^>]+>/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
 }
 
 function headingSlug(label: string): string {
@@ -56,7 +50,7 @@ function collectHeadings(root: Root): Heading[] {
  */
 export function assignHeadingAnchors(root: Root): TocItem[] {
   const candidates = collectHeadings(root).flatMap((node) => {
-    const label = labelOf(node)
+    const label = textOf(node).replace(/\s+/g, " ").trim()
     return label ? [{ node, label }] : []
   })
   const deep = candidates.filter(
